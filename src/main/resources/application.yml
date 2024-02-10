@@ -1,7 +1,10 @@
 spring:
-  profiles:
-    include:
-    - db
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${{ secrets.DB_URL }}
+    username: ${{ secrets.DB_USERNAME }}
+    password: ${{ secrets.DB_PASSWORD }}
+
   jpa:
     hibernate:
       ddl-auto: none
