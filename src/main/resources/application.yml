@@ -2,8 +2,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: url
-    username: name
-    password: pw
+    username: username
+    password: password
   jpa:
     hibernate:
       ddl-auto: none
@@ -13,3 +13,15 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
+  cloud:
+    aws:
+      s3:
+        bucket: bucket-name
+      credentials:
+        access-key: access-key
+        secret-key: secret-key
+      region:
+        static: region
+        auto: false
+      stack:
+        auto: false
