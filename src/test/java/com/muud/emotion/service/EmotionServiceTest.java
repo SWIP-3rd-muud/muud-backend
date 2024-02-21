@@ -14,15 +14,15 @@ class EmotionServiceTest {
     @Test
     void getEmotion() {
         // Given
-        String emotionEnum = "EMOTION1";
+        String emotionEnum = "EMOTION4";
 
         // When
         EmotionResponse emotionResponse = emotionService.getEmotionResponse(emotionEnum);
 
         // Then
         assertNotNull(emotionResponse);
-        assertEquals("호우주의보", emotionResponse.combinedName());
-        assertEquals("조용하고 잔잔한 봄날의 그늘", emotionResponse.description());
+        assertEquals("안개주의보", emotionResponse.combinedName());
+        assertEquals("온통 회색빛인 마음에 안개가 뒤덮였어요", emotionResponse.description());
     }
 
     @Test
@@ -44,7 +44,7 @@ class EmotionServiceTest {
 
         // Then
         assertNotNull(emotionResponseList);
-        assertEquals("덤덤하네", emotionResponseList.get(1).combinedName());
-        assertEquals(2, emotionResponseList.size());
+        assertEquals("우르르 쾅쾅", emotionResponseList.get(1).combinedName());
+        assertEquals(6, emotionResponseList.size());
     }
 }
