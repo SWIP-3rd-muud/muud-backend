@@ -3,6 +3,8 @@ package com.muud.emotion.service;
 import com.muud.emotion.dto.EmotionResponse;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class EmotionServiceTest {
@@ -33,5 +35,16 @@ class EmotionServiceTest {
             // When
             emotionService.getEmotionResponse(emotionEnum);
         });
+    }
+
+    @Test
+    void getEmotionList() {
+        // When
+        List<EmotionResponse> emotionResponseList = emotionService.getEmotionResponseList();
+
+        // Then
+        assertNotNull(emotionResponseList);
+        assertEquals("덤덤하네", emotionResponseList.get(1).combinedName());
+        assertEquals(2, emotionResponseList.size());
     }
 }

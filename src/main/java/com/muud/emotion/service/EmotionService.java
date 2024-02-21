@@ -5,6 +5,8 @@ import com.muud.emotion.dto.EmotionResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EmotionService {
@@ -14,5 +16,11 @@ public class EmotionService {
                 .findFirst()
                 .map(EmotionResponse::from)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid type: " + emotionEnum));
+    }
+
+    public List<EmotionResponse> getEmotionResponseList() {
+        return Arrays.stream(Emotion.values())
+                .map(EmotionResponse::from)
+                .collect(Collectors.toList());
     }
 }
