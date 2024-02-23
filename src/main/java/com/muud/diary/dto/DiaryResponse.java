@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 public record DiaryResponse(Long diaryId,
                             String content,
                             Emotion emotion,
-                            LocalDateTime createdAt,
-                            LocalDateTime modifiedAt) {
+                            LocalDateTime createdDate,
+                            LocalDateTime updatedDate) {
     public static DiaryResponse from(Diary diary) {
         return new DiaryResponse(
                 diary.getDiaryId(),
