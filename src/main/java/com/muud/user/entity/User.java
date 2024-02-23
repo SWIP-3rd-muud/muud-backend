@@ -3,8 +3,9 @@ import com.muud.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-
+@Getter
 @Entity @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity{
     @Id @Column(name = "user_id")
@@ -20,6 +21,7 @@ public class User extends BaseEntity{
     private LoginType loginType;
     private String socialId; //카카오 로그인시, 이메일 로그인 유저는 null
 
+    private String refreshToken;
     @Builder
     public User(String email, String password, String nickname, LoginType loginType, String socialId) {
         this.email = email;
@@ -27,5 +29,11 @@ public class User extends BaseEntity{
         this.nickname = nickname;
         this.loginType = loginType;
         this.socialId = socialId;
+    }
+    public void updateRefreshToken(String refreshToken){
+        this.refreshToken = refreshToken;
+    }
+    public boolean checkPassword(String password){
+        return this.password.equals(password);
     }
 }
