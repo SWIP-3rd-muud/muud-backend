@@ -15,7 +15,7 @@ public record DiaryResponse(Long diaryId,
                 diary.getDiaryId(),
                 diary.getContent(),
                 diary.getEmotion(),
-                diary.getCreatedAt(),
-                diary.getModifiedAt());
+                diary.getCreatedDate(),
+                diary.getUpdatedDate());
     }
 }
