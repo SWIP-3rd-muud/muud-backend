@@ -1,7 +1,9 @@
 package com.muud.emotion.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @Getter
 public enum Emotion {
     EMOTION1(new String[]{"기쁨", "설렘"}, "쨍쨍한 햇빛", "날씨 좋은 날,  푸른 하늘에 보이는 쨍쨍한 햇빛 같아요", "\\uD83D\\uDE00", new String[]{"기쁨", "설렘", "행복"}),

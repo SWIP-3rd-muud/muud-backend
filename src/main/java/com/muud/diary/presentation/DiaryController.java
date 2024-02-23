@@ -3,17 +3,12 @@ package com.muud.diary.presentation;
 import com.muud.diary.application.DiaryService;
 import com.muud.diary.domain.Diary;
 import com.muud.diary.dto.DiaryRequest;
-import com.muud.global.error.ExceptionType;
+import com.muud.diary.dto.DiaryResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.lang.annotation.ElementType;
 import java.net.URI;
 
 @RestController
@@ -26,5 +21,10 @@ public class DiaryController {
 
         Diary diary = diaryService.writeDiary(diaryRequest);
         return ResponseEntity.created(URI.create("/diaries/"+diary.getDiaryId())).build();
+    }
+
+    @GetMapping("/diaries/{diaryId}")
+    public ResponseEntity<DiaryResponse> getDiaryResponse(@PathVariable("diaryId") Long diaryId) {
+        return ResponseEntity.ok(diaryService.getDiaryResponse(diaryId));
     }
 }
