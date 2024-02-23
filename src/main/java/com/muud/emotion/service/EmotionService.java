@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 @Service
 public class EmotionService {
 
-    public EmotionResponse getEmotionResponse(String emotionEnum) {
-        return Arrays.stream(Emotion.values()).filter(emotion -> emotion.name().equalsIgnoreCase(emotionEnum))
+    public EmotionResponse getEmotionResponse(String emotionName) {
+        return Arrays.stream(Emotion.values()).filter(emotion -> emotion.name().equalsIgnoreCase(emotionName))
                 .findFirst()
                 .map(EmotionResponse::from)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid type: " + emotionEnum));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid type: " + emotionName));
     }
 
     public List<EmotionResponse> getEmotionResponseList() {

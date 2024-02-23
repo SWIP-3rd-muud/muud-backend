@@ -23,10 +23,10 @@ public class EmotionController {
         return ResponseEntity.ok(emotionResponseList);
     }
 
-    @GetMapping("/emotions/{emotion}")
-    public ResponseEntity<EmotionResponse> getEmotionResponse(@PathVariable("emotion") String emotion) {
+    @GetMapping("/emotions/{emotionName}")
+    public ResponseEntity<EmotionResponse> getEmotionResponse(@PathVariable("emotionName") String emotionName) {
 
-        EmotionResponse emotionResponse = emotionService.getEmotionResponse(emotion);
+        EmotionResponse emotionResponse = emotionService.getEmotionResponse(emotionName);
         return ResponseEntity.ok(emotionResponse);
     }
 }
