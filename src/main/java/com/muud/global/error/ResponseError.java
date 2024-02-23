@@ -1,5 +1,8 @@
 package com.muud.global.error;
 
+import lombok.Getter;
+
+@Getter
 public class ResponseError {
     private String message;
 
