@@ -1,5 +1,8 @@
 package com.muud.user.entity;
+import com.muud.auth.dto.KakaoInfoResponse;
+import com.muud.auth.dto.SignupRequest;
 import com.muud.global.common.BaseEntity;
+import com.muud.user.dto.UserInfo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,7 +16,7 @@ public class User extends BaseEntity{
     private Long id;
     @Column(nullable = false, unique = true)
     private String email;
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String password;
     @Column(nullable = false, length = 10)
     private String nickname;
@@ -35,5 +38,12 @@ public class User extends BaseEntity{
     }
     public boolean checkPassword(String password){
         return this.password.equals(password);
+    }
+
+    public UserInfo toDto(){
+        return UserInfo.builder()
+                .id(id)
+                .nickname(nickname)
+                .build();
     }
 }

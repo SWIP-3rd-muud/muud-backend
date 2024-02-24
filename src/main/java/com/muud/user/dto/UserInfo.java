@@ -2,7 +2,10 @@ package com.muud.user.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-@Getter @Builder
+import lombok.Setter;
+
+@Getter @Setter
+@Builder
 public class UserInfo {
     private Long id;
     private String nickname;
