@@ -1,9 +1,0 @@
-#인증&인가 설정 파일
-jwt:
-  secretKey: ${JWT_KEY}
-kakao:
-  auth:
-    api-key: ${KAKAO_API_KEY}
-    client-secret: ${KAKAO_CLIENT_SECRET}
-    redirect-url-dev: http://127.0.0.1:8080/oauth2/callback/kakao #dev 환경용
-    redirect-url: ${KAKAO_REDIRECT_URL}

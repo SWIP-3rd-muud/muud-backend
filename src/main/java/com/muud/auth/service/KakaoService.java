@@ -25,7 +25,7 @@ public class KakaoService {
     @Value("${kakao.auth.client-secret}")
     private String KAKAO_CLIENT_SECRET;
 
-    @Value("${kakao.auth.redirect-url-dev}")
+    @Value("${kakao.auth.redirect-url}")
     private String KAKAO_REDIRECT_URL;
 
     private final static String KAKAO_AUTH_URI = "https://kauth.kakao.com";
