@@ -1,8 +1,10 @@
 package com.muud.auth.service;
 
+import com.muud.auth.dto.KakaoInfoResponse;
 import com.muud.auth.dto.SigninRequest;
 import com.muud.auth.dto.SigninResponse;
 import com.muud.auth.dto.SignupRequest;
+import com.muud.auth.error.UserNotFoundException;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
 import com.muud.user.dto.UserInfo;
@@ -16,6 +18,7 @@ import com.muud.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Transactional(readOnly = true)
@@ -41,25 +44,35 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    public SigninResponse signinWithEmail(SigninRequest signinRequest) throws Exception {
+    public SigninResponse signinWithEmail(SigninRequest signinRequest){
         //확인 후 토큰 발급
-        Optional<User> findUser = userRepository.findByEmail(signinRequest.getEmail());
-        if(findUser.isEmpty()){
-            throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
+        User user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow(() -> new ApiException(ExceptionType.INVALID_AUTHENTICATE));
+
+        if(user.checkPassword(passwordEncoder.encrypt(signinRequest.getEmail(), signinRequest.getPassword()))){
+            JwtToken token = jwtTokenUtils.createToken(user.getEmail(), user.getNickname()); //로그인시 토큰 발급
+            return SigninResponse.builder()
+                    .accessToken(token.getAccessToken())
+                    .refreshToken(token.getRefreshToken())
+                    .userInfo(UserInfo.builder().id(user.getId()).nickname(user.getNickname()).build()) //**추후 수정 필요
+                    .build();
         }else{
-            User user = findUser.get();
-            System.out.println(user.getNickname());
-            if(user.checkPassword(passwordEncoder.encrypt(signinRequest.getEmail(), signinRequest.getPassword()))){
-                JwtToken token = jwtTokenUtils.createToken(user.getEmail(), user.getNickname()); //로그인시 토큰 발급
-                return SigninResponse.builder()
-                        .accessToken(token.getAccessToken())
-                        .refreshToken(token.getRefreshToken())
-                        .userInfo(UserInfo.builder().id(user.getId()).nickname(user.getNickname()).build()) //**추후 수정 필요
-                        .build();
-            }else{
-                throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
-            }
+            throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
         }
     }
+
+    public SigninResponse signinWithKakao(KakaoInfoResponse kakaoInfoResponse) throws UserNotFoundException {
+        Optional<User> findUser = userRepository.findByEmailAndSocialId(kakaoInfoResponse.getEmail(), kakaoInfoResponse.getSocialId());
+        if(findUser.isEmpty()){
+            throw new UserNotFoundException("회원가입이 필요합니다", kakaoInfoResponse.getSocialId());
+        }
+        User user = findUser.get();
+        JwtToken token = jwtTokenUtils.createToken(user.getEmail(), user.getNickname());
+        return SigninResponse.builder()
+                .accessToken(token.getAccessToken())
+                .refreshToken(token.getRefreshToken())
+                .userInfo(UserInfo.builder().id(user.getId()).nickname(user.getNickname()).build()) //**추후 수정 필요
+                .build();
+    }
+
 
 }

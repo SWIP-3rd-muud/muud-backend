@@ -27,6 +27,10 @@ jobs:
         spring.cloud.aws.credentials.access-key: ${{ secrets.S3_ACCESS_KEY }}
         spring.cloud.aws.credentials.secret-key: ${{ secrets.S3_SECRET_KEY }}
         spring.cloud.aws.region.static: ${{ secrets.S3_REGION }}
+        jwt.secretKey: ${{ secrets.JWT_KEY }}
+        kakao.auth.api-key: ${{ secrets.KAKAO_API_KEY }}
+        kakao.auth.client-secret: ${{ secrets.KAKAO_CLIENT_SECRET }}
+        kakao.auth.redirect-url: ${{ secrets.KAKAO_REDIRECT_URL }}
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:
