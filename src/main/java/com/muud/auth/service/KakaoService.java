@@ -6,10 +6,7 @@ import com.muud.global.error.ExceptionType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -28,16 +25,8 @@ public class KakaoService {
     @Value("${kakao.auth.redirect-url}")
     private String KAKAO_REDIRECT_URL;
 
-    private final static String KAKAO_AUTH_URI = "https://kauth.kakao.com";
+    private final static String KAKAO_AUTH_URI = "https://kauth.kakao.com/oauth/token";
     private final static String KAKAO_API_URI = "https://kapi.kakao.com";
-
-    //카카오 인증 페이지 요청 URI
-    public String getKakaoAuth() {
-        return KAKAO_AUTH_URI + "/oauth/authorize"
-                + "?client_id=" + KAKAO_CLIENT_ID
-                + "&redirect_uri=" + KAKAO_REDIRECT_URL
-                + "&response_type=code";
-    }
 
     //코드 -> 토큰 -> 카카오 사용자 정보
     public KakaoInfoResponse getKakaoInfo(String code) {
@@ -45,41 +34,40 @@ public class KakaoService {
             Map<String, String> tokenResponse = getKakaoToken(code);
             return getUserInfoWithToken(tokenResponse.get("accessToken"));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ApiException(ExceptionType.BAD_REQUEST); //code 오류 등
         }
     }
 
     //코드 -> 인증 토큰
-    public Map<String, String> getKakaoToken(String code) throws Exception {
-        if (code == null) throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
-
+    public Map<String, String> getKakaoToken(String code){
+        if (code == null) throw new ApiException(ExceptionType.BAD_REQUEST);
         String accessToken = "";
         String refreshToken = "";
 
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-type", "application/x-www-form-urlencoded");
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            headers.add("Accept", "application/json");
 
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("grant_type"   , "authorization_code");
+            params.add("grant_type", "authorization_code");
             params.add("client_id"    , KAKAO_CLIENT_ID);
             params.add("client_secret", KAKAO_CLIENT_SECRET);
-            params.add("code"         , code);
+            params.add("code", code);
             params.add("redirect_uri" , KAKAO_REDIRECT_URL);
 
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
-
             ResponseEntity<Map> response = restTemplate.exchange(
-                    KAKAO_AUTH_URI + "/oauth/token",
+                    KAKAO_AUTH_URI,
                     HttpMethod.POST,
                     httpEntity,
                     Map.class
             );
+
             Map<String, String> result = response.getBody();
-            System.out.println(result);
-            accessToken  = (String) result.get("access_token");
-            refreshToken = (String) result.get("refresh_token");
+            accessToken  = result.get("access_token");
+            refreshToken = result.get("refresh_token");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -104,13 +92,14 @@ public class KakaoService {
         );
 
         //Response 데이터 파싱
+        //**추후 협의 후 필요한 정보 추가
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObj    = (JSONObject) jsonParser.parse(response.getBody());
         JSONObject account = (JSONObject) jsonObj.get("kakao_account");
         JSONObject profile = (JSONObject) account.get("profile");
         String id = String.valueOf(jsonObj.get("id"));
         String nickname = (String) profile.get("nickname");
-        String email = (String) profile.get("email");
+        String email = (String) account.get("email");
 
         return KakaoInfoResponse.builder()
                 .socialId(id)

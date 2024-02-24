@@ -1,5 +1,7 @@
 package com.muud.auth.dto;
 
+import com.muud.user.entity.LoginType;
+import com.muud.user.entity.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +18,14 @@ public class KakaoInfoResponse {
         this.socialId = socialId;
         this.email = email;
         this.nickname = nickname;
+    }
+
+    public User toEntity(){
+        return User.builder()
+                .email(email)
+                .nickname(nickname)
+                .socialId(socialId)
+                .loginType(LoginType.KAKAO)
+                .build();
     }
 }
