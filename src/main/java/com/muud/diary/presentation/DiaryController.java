@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,5 +27,10 @@ public class DiaryController {
     @GetMapping("/diaries/{diaryId}")
     public ResponseEntity<DiaryResponse> getDiaryResponse(@PathVariable("diaryId") Long diaryId) {
         return ResponseEntity.ok(diaryService.getDiaryResponse(diaryId));
+    }
+
+    @GetMapping("/diaries")
+    public ResponseEntity<List<DiaryResponse>> getDiaryResponseListByMonth(@RequestParam(name = "month", required = true) int month) {
+        return ResponseEntity.ok(diaryService.getDiaryResponseListByMonth(month));
     }
 }

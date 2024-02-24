@@ -9,6 +9,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class DiaryService {
@@ -24,5 +27,12 @@ public class DiaryService {
     public DiaryResponse getDiaryResponse(Long diaryId) {
         return DiaryResponse.from(diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new));
+    }
+
+    public List<DiaryResponse> getDiaryResponseListByMonth(int month) {
+        List<Diary> diaryList = diaryRepository.findByMonth(month);
+        return diaryList.stream()
+                .map(DiaryResponse::from)
+                .collect(Collectors.toList());
     }
 }
