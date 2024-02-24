@@ -1,12 +1,12 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/muud_dev
-    username: root
-    password: Wannabe1231!!
+    url: url
+    username: username
+    password: password
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
@@ -28,10 +28,9 @@ spring:
 
 #인증&인가 설정 파일
 jwt:
-  secretKey: jwt_key
+  secretKey: ${JWT_KEY}
 kakao:
   auth:
-    api-key: kakao_api_key
-    client-secret: kakao_client_secret
-    redirect-url-dev: http://127.0.0.1:8080/oauth2/callback/kakao #dev 환경용
-    redirect-url: kakao_redirect
+    api-key: ${KAKAO_API_KEY}
+    client-secret: ${KAKAO_CLIENT_SECRET}
+    redirect-url: ${KAKAO_REDIRECT_URL}
