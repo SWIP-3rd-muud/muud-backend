@@ -27,6 +27,11 @@ jobs:
         spring.cloud.aws.credentials.access-key: ${{ secrets.S3_ACCESS_KEY }}
         spring.cloud.aws.credentials.secret-key: ${{ secrets.S3_SECRET_KEY }}
         spring.cloud.aws.region.static: ${{ secrets.S3_REGION }}
+    - name: Set Secret
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: ./src/main/resources/authprops.yml
+      env:
         jwt.secretKey: ${{ secrets.JWT_KEY }}
         kakao.auth.api-key: ${{ secrets.KAKAO_API_KEY }}
         kakao.auth.client-secret: ${{ secrets.KAKAO_CLIENT_SECRET }}
