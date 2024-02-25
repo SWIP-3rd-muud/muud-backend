@@ -46,4 +46,8 @@ public class Diary extends BaseEntity {
         this.content = content;
         this.emotion = emotion;
     }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }
