@@ -35,4 +35,13 @@ public class DiaryService {
                 .map(DiaryResponse::from)
                 .collect(Collectors.toList());
     }
+
+    public DiaryResponse updateContent(Long diaryId, DiaryRequest diaryRequest) {
+        Diary diary = diaryRepository.findById(diaryId)
+                .orElseThrow(IllegalArgumentException::new);
+        diary.updateContent(diaryRequest.content());
+        
+        Diary updatedDiary = diaryRepository.save(diary);
+        return DiaryResponse.from(updatedDiary);
+    }
 }

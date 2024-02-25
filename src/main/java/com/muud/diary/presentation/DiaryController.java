@@ -33,4 +33,10 @@ public class DiaryController {
     public ResponseEntity<List<DiaryResponse>> getDiaryResponseListByMonth(@RequestParam(name = "month", required = true) int month) {
         return ResponseEntity.ok(diaryService.getDiaryResponseListByMonth(month));
     }
+
+    @PutMapping("/diaries/{diaryId}")
+    public ResponseEntity<DiaryResponse> updatePost(@PathVariable("diaryId") Long diaryId,
+                                                    @Valid @RequestBody DiaryRequest diaryRequest) {
+        return ResponseEntity.ok(diaryService.updateContent(diaryId, diaryRequest));
+    }
 }
