@@ -6,8 +6,8 @@ import com.muud.auth.dto.SigninResponse;
 import com.muud.auth.dto.SignupRequest;
 import com.muud.auth.service.AuthService;
 import com.muud.auth.service.KakaoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.json.simple.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +20,14 @@ public class AuthController {
     private final AuthService authService;
     private final KakaoService kakaoService;
     @PostMapping("auth/signup")
-    public ResponseEntity<Map<String, String>> signupWithEmail(@RequestBody SignupRequest request){
+    public ResponseEntity signupWithEmail(@Valid @RequestBody SignupRequest request){
         authService.signupWithEmail(request);
-        return ResponseEntity.ok(Map.of("message", "회원가입이 완료되었습니다"));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "회원가입이 완료되었습니다."));
     }
 
     @PostMapping("/auth/signin")
-    public ResponseEntity<SigninResponse> signinWithEmail(@RequestBody SigninRequest signinRequest) {
+    public ResponseEntity<SigninResponse> signinWithEmail(@Valid @RequestBody SigninRequest signinRequest) {
         SigninResponse signinResponse = authService.signinWithEmail(signinRequest);
         return ResponseEntity.ok().body(signinResponse);
     }
