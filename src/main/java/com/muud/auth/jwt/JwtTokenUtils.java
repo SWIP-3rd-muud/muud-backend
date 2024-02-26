@@ -1,15 +1,14 @@
 package com.muud.auth.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.muud.global.error.ApiException;
+import com.muud.global.error.ExceptionType;
+import com.muud.user.entity.User;
+import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.util.Base64;
 import java.util.Date;
 
@@ -20,17 +19,17 @@ public class JwtTokenUtils {
     private String secretKey;
     private static final String BEARER_TYPE = "bearer";
     // 토큰 유효시간 30분
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30; //access 30분
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7; //refresh 7일
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public JwtToken createToken(String email, String nickname) {
-        Claims claims = Jwts.claims().setSubject(email); // JWT payload 에 저장되는 정보단위
-        claims.put("email", email);
-        claims.put("nickname", nickname);
+    public JwtToken createToken(User user) {
+        Claims claims = Jwts.claims().setSubject(String.valueOf(user.getId()));
+        claims.put("email", user.getEmail());
+        claims.put("nickname", user.getNickname());
 
         Date now = new Date();
         Date accessTokenExpiresIn = new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME);
@@ -57,24 +56,43 @@ public class JwtTokenUtils {
                 .build();
     }
 
-    public boolean validateToken(String jwtToken) {
+    public boolean validToken(String token){
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
-            return !claims.getBody().getExpiration().before(new Date());
-        } catch (Exception e) {
-            return false;
+            Claims claims = Jwts.parser()
+                    .setSigningKey(secretKey.getBytes())
+                    .parseClaimsJws(token) //토큰 파싱
+                    .getBody();
+            return true;  //유효하다면 true 반환
+        } catch (MalformedJwtException | UnsupportedJwtException | SignatureException e) {
+            throw new ApiException(ExceptionType.INVALID_TOKEN);
+        } catch (ExpiredJwtException e) {
+            throw new ApiException(ExceptionType.TOKEN_EXPIRED);
         }
     }
-
-    // 토큰에서 회원 정보 추출
-    public String getUserEmail(String token) {
-        return Jwts.parser().setSigningKey(secretKey)
-                .parseClaimsJws(token).getBody().getSubject();
+    public Claims parseJwtToken(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (JwtException e) {
+            throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
+        }
+    }
+    // 토큰에서 회원 Id 정보 추출
+    public String getUserIdFromToken(String token) {
+        try {
+            return Jwts.parser().setSigningKey(secretKey)
+                    .parseClaimsJws(token).getBody().getSubject();
+        }catch (MalformedJwtException | UnsupportedJwtException | SignatureException e) {
+            throw new ApiException(ExceptionType.INVALID_TOKEN);
+        } catch (ExpiredJwtException e) {
+            throw new ApiException(ExceptionType.TOKEN_EXPIRED);
+        }
     }
 
     // Request의 Header에서 token 값을 가져옴
     public String resolveToken(HttpServletRequest request) {
         return request.getHeader("X-AUTH-TOKEN");
     }
-
 }

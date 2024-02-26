@@ -67,6 +67,7 @@ public class KakaoService {
 
             Map<String, String> result = response.getBody();
             accessToken  = result.get("access_token");
+            System.out.println(accessToken);
             refreshToken = result.get("refresh_token");
         } catch (Exception e) {
             e.printStackTrace();

@@ -6,6 +6,7 @@ import com.muud.auth.dto.SigninResponse;
 import com.muud.auth.dto.SignupRequest;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
+import com.muud.user.dto.UserInfo;
 import org.springframework.stereotype.Service;
 
 import com.muud.auth.jwt.JwtToken;
@@ -28,10 +29,15 @@ public class AuthService {
         return userRepository.findByEmail(email);
     }
 
+    public UserInfo getUserInfoFromToken(Long id, String email){
+        return userRepository.findByIdAndEmail(id, email)
+                .map((User::toDto))
+                .orElseThrow(()->new ApiException(ExceptionType.INVALID_TOKEN));
+    }
     @Transactional
     public User signupWithEmail(SignupRequest request) {
         if(getUserByEmail(request.getEmail()).isPresent()) //이메일 중복 체크
-            throw new ApiException(ExceptionType.INVALID_INPUT_VALUE);
+            throw new ApiException(ExceptionType.ALREADY_EXIST_EMAIL);
         User user = User.builder()
                 .email(request.getEmail())
                 .nickname(request.getNickname())
@@ -47,7 +53,8 @@ public class AuthService {
         User user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow(() -> new ApiException(ExceptionType.INVALID_AUTHENTICATE));
 
         if(user.checkPassword(passwordEncoder.encrypt(signinRequest.getEmail(), signinRequest.getPassword()))){
-            JwtToken token = jwtTokenUtils.createToken(user.getEmail(), user.getNickname()); //로그인시 토큰 발급
+            JwtToken token = jwtTokenUtils.createToken(user); //로그인시 토큰 발급
+            user.updateRefreshToken(token.getRefreshToken());
             return SigninResponse.builder()
                     .accessToken(token.getAccessToken())
                     .refreshToken(token.getRefreshToken())
@@ -67,7 +74,7 @@ public class AuthService {
             user = userRepository.save(user);
             isNew = true;
         }
-        JwtToken token = jwtTokenUtils.createToken(user.getEmail(), user.getNickname());
+        JwtToken token = jwtTokenUtils.createToken(user);
         user.updateRefreshToken(token.getRefreshToken());
         return SigninResponse.builder()
                 .accessToken(token.getAccessToken())
@@ -86,7 +93,7 @@ public class AuthService {
                 .loginType(LoginType.KAKAO)
                 .build();
         userRepository.save(user);
-        JwtToken token = jwtTokenUtils.createToken(user.getEmail(), user.getNickname());
+        JwtToken token = jwtTokenUtils.createToken(user);
         user.updateRefreshToken(token.getRefreshToken());
         return SigninResponse.builder()
                 .accessToken(token.getAccessToken())
