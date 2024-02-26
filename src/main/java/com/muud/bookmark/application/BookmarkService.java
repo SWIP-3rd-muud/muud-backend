@@ -38,9 +38,9 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void removeBookmark(Long bookmarkId) {
-        Bookmark bookmark = bookmarkRepository.findById(bookmarkId)
-                .orElseThrow(()->new ApiException(ExceptionType.NOT_FOUND));
+    public void removeBookmark(Long userId, Long diaryId) {
+        Bookmark bookmark = bookmarkRepository.findByUserIdAndDiaryId(userId, diaryId)
+                .orElseThrow(() -> new ApiException(ExceptionType.NOT_FOUND));
         bookmarkRepository.delete(bookmark);
     }
 
