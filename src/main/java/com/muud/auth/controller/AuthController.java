@@ -19,7 +19,7 @@ import java.util.Map;
 public class AuthController {
     private final AuthService authService;
     private final KakaoService kakaoService;
-    @PostMapping("auth/signup")
+    @PostMapping("/auth/signup")
     public ResponseEntity signupWithEmail(@Valid @RequestBody SignupRequest request){
         authService.signupWithEmail(request);
         return ResponseEntity.status(HttpStatus.CREATED)
