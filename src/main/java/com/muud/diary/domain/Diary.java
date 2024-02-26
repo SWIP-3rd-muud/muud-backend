@@ -15,8 +15,9 @@ public class Diary extends BaseEntity {
 //    private static final int MAX_CONTENT_LENGTH = 200;
 
     @Id
+    @Column(name = "diary_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long diaryId;
+    private Long id;
 
 //    @NotNull
 //    @Size(max = MAX_CONTENT_LENGTH)
@@ -42,7 +43,7 @@ public class Diary extends BaseEntity {
 //    private Bookmark bookmark;
 
     public Diary(String content, Emotion emotion) {
-        this.diaryId = null;
+        this.id = null;
         this.content = content;
         this.emotion = emotion;
     }
