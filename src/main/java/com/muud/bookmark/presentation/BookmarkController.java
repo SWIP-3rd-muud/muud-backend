@@ -16,26 +16,29 @@ import java.util.List;
 public class BookmarkController {
     private final BookmarkService bookmarkService;
 
-    @GetMapping("/bookmarks")
+    @GetMapping("/diaries/bookmarks")
     public ResponseEntity<List<BookmarkResponse>> getBookmarkResponseList(@RequestBody BookmarkRequest bookmarkRequest) {
         return ResponseEntity.ok(bookmarkService.getBookmarkResponseListByUser(bookmarkRequest.userId()));
     }
 
-    @PostMapping("/bookmarks")
-    public ResponseEntity<Object> addBookmark(@RequestBody BookmarkRequest bookmarkRequest) {
-        Bookmark bookmark = bookmarkService.addBookmark(bookmarkRequest.userId(), bookmarkRequest.diaryId());
-        return ResponseEntity.created(URI.create("/bookmarks/"+bookmark.getId())).build();
-    }
-
-    @GetMapping("/bookmarks/{bookmarkId}")
-    public ResponseEntity<Boolean> checkBookmark(@RequestBody BookmarkRequest bookmarkRequest) {
-        boolean isBookmarked = bookmarkService.isBookmarkedByUser(bookmarkRequest.userId(), bookmarkRequest.diaryId());
+    @GetMapping("/diaries/{diaryId}/bookmarks")
+    public ResponseEntity<Boolean> checkBookmark(@PathVariable("diaryId") Long diaryId,
+                                                 @RequestBody BookmarkRequest bookmarkRequest) {
+        boolean isBookmarked = bookmarkService.isBookmarkedByUser(bookmarkRequest.userId(), diaryId);
         return ResponseEntity.ok(isBookmarked);
     }
 
-    @DeleteMapping("/bookmarks/{bookmarkId}")
-    public ResponseEntity<Object> removeBookmark(@PathVariable("bookmarkId") Long bookmarkId) {
-        bookmarkService.removeBookmark(bookmarkId);
+    @PostMapping("/diaries/{diaryId}/bookmarks")
+    public ResponseEntity<Object> addBookmark(@PathVariable("diaryId") Long diaryId,
+                                              @RequestBody BookmarkRequest bookmarkRequest) {
+        Bookmark bookmark = bookmarkService.addBookmark(bookmarkRequest.userId(), diaryId);
+        return ResponseEntity.created(URI.create("/bookmarks/"+bookmark.getId())).build();
+    }
+
+    @DeleteMapping("/diaries/{diaryId}/bookmarks")
+    public ResponseEntity<Object> removeBookmark(@PathVariable("diaryId") Long diaryId,
+                                                 @RequestBody BookmarkRequest bookmarkRequest) {
+        bookmarkService.removeBookmark(bookmarkRequest.userId(), diaryId);
         return ResponseEntity.noContent().build();
     }
 }
