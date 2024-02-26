@@ -21,7 +21,7 @@ public class DiaryController {
     public ResponseEntity<Object> writeDiary(@Valid @RequestBody DiaryRequest diaryRequest) {
 
         Diary diary = diaryService.writeDiary(diaryRequest);
-        return ResponseEntity.created(URI.create("/diaries/"+diary.getDiaryId())).build();
+        return ResponseEntity.created(URI.create("/diaries/"+diary.getId())).build();
     }
 
     @GetMapping("/diaries/{diaryId}")

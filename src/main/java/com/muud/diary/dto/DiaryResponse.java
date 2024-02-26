@@ -5,14 +5,14 @@ import com.muud.emotion.entity.Emotion;
 
 import java.time.LocalDateTime;
 
-public record DiaryResponse(Long diaryId,
+public record DiaryResponse(Long id,
                             String content,
                             Emotion emotion,
                             LocalDateTime createdDate,
                             LocalDateTime updatedDate) {
     public static DiaryResponse from(Diary diary) {
         return new DiaryResponse(
-                diary.getDiaryId(),
+                diary.getId(),
                 diary.getContent(),
                 diary.getEmotion(),
                 diary.getCreatedDate(),
