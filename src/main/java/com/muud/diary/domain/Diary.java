@@ -1,11 +1,14 @@
 package com.muud.diary.domain;
 
+import com.muud.bookmark.domain.Bookmark;
 import com.muud.emotion.entity.Emotion;
 import com.muud.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,8 +42,8 @@ public class Diary extends BaseEntity {
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    private PlaylistId playlistId;
 
-//    @OneToMany(mappedBy = "diary", fetch = FetchType.LAZY)
-//    private Bookmark bookmark;
+    @OneToMany(mappedBy = "diary")
+    private List<Bookmark> bookmarkList;
 
     public Diary(String content, Emotion emotion) {
         this.id = null;
