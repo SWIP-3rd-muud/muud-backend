@@ -1,14 +1,15 @@
 package com.muud.playlist.entity;
 
-import com.google.api.services.youtube.model.SearchResult;
 import com.muud.emotion.entity.Emotion;
 import com.muud.global.common.BaseEntity;
 import com.muud.playlist.dto.VideoDto;
-import com.muud.playlist.repository.PlayListRepository;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+
+import java.util.*;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PlayList extends BaseEntity {
@@ -20,13 +21,14 @@ public class PlayList extends BaseEntity {
     private String channelName;
     @Enumerated(value = EnumType.STRING)
     private Emotion emotion;
-
+    private String tags;
     @Builder
-    public PlayList(String title, String videoId, String channelName, Emotion emotion) {
+    public PlayList(String title, String videoId, String channelName, Emotion emotion, List<String> tags) {
         this.title = title;
         this.videoId = videoId;
         this.channelName = channelName;
         this.emotion = emotion;
+        this.tags = convertTagsToString(tags);
     }
 
     public VideoDto toDto(){
@@ -34,14 +36,18 @@ public class PlayList extends BaseEntity {
                 .id(id)
                 .videoId(videoId)
                 .title(title)
+                .tags(convertTagsToList(tags))
+                .channelName(channelName)
                 .build();
     }
-    public static PlayList from(SearchResult searchResult, Emotion emotion){
-        return PlayList.builder()
-                .title(searchResult.getSnippet().getTitle())
-                .videoId(searchResult.getId().getVideoId())
-                .channelName(searchResult.getSnippet().getChannelTitle())
-                .emotion(emotion)
-                .build();
+    public String convertTagsToString(List<String> tagList){
+        StringBuilder sb = new StringBuilder();
+        tagList.forEach(t -> sb.append(t+";"));
+        return sb.toString();
+    }
+    public List<String> convertTagsToList(String tags){
+        if(tags!=null)
+            return Arrays.stream(tags.split(";")).toList();
+        return Collections.EMPTY_LIST;
     }
 }

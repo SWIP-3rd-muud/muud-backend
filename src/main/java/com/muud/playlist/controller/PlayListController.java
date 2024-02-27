@@ -32,16 +32,11 @@ public class PlayListController {
     private final YoutubeDataService youtubeDataService;
     @GetMapping("/playlists")
     public ResponseEntity<PlayListResponse> getPlayLists(@RequestParam(name = "emotion", required = true) Emotion emotion, @PageableDefault(size = 4) Pageable pageable){
-
-        try {
-            Page<VideoDto> videoDtoList = playListService.getPlayLists(emotion, pageable);
-            List<String> ids = videoDtoList.map(videoDto -> videoDto.getVideoId())
-                    .stream().collect(Collectors.toList());
-            youtubeDataService.getVideoDetails(ids);
-            return ResponseEntity.ok(PlayListResponse.from(videoDtoList));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Page<VideoDto> videoDtoList = playListService.getPlayLists(emotion, pageable);
+        List<String> ids = videoDtoList
+                .map(videoDto -> videoDto.getVideoId())
+                .stream().collect(Collectors.toList());
+        return ResponseEntity.ok(PlayListResponse.from(videoDtoList));
 
     }
 
