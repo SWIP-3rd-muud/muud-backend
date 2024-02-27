@@ -28,7 +28,7 @@ public class YoutubeDataService {
     private final PlayListRepository playListRepository;
 
     @Transactional
-    @Scheduled(cron = "0 0 16 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 30 16 * * ?", zone = "Asia/Seoul")
     public void updateVideoList() throws IOException {
         log.info("playlist data refresh schedule start");
         JsonFactory jsonFactory = new JacksonFactory();
