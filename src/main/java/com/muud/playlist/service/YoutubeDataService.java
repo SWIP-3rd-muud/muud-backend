@@ -5,6 +5,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.Video;
+import com.google.api.services.youtube.model.VideoSnippet;
 import com.muud.emotion.entity.Emotion;
 import com.muud.playlist.entity.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.*;
@@ -25,10 +27,10 @@ public class YoutubeDataService {
     private String apiKey;
     private final PlayListRepository playListRepository;
 
-    @Scheduled(cron = "0 10 0 * * ?", zone = "Asia/Seoul")
+    @Transactional
+    @Scheduled(cron = "0 0 16 * * ?", zone = "Asia/Seoul")
     public void updateVideoList() throws IOException {
         log.info("playlist data refresh schedule start");
-        // JSON 데이터를 처리하기 위한 JsonFactory 객체 생성
         JsonFactory jsonFactory = new JacksonFactory();
         playListRepository.deleteAll();
 
@@ -38,9 +40,7 @@ public class YoutubeDataService {
                 jsonFactory,
                 request -> {})
                 .build();
-
-        // YouTube Search API를 사용하여 동영상 검색을 위한 요청 객체 생성
-        YouTube.Search.List search = youtube.search().list(Collections.singletonList("snippet"));
+        YouTube.Search.List search = youtube.search().list(Collections.singletonList("id"));
 
         // API 설정
         search.setKey(apiKey);
@@ -55,18 +55,20 @@ public class YoutubeDataService {
             search.setQ(emotion.getTitleEmotion()+" PlayList");
             SearchListResponse searchResponse = search.execute();
 
-            // 검색 결과에서 동영상 목록 가져오기
-            playLists.addAll(searchResponse.getItems().stream()
-                    .map(r -> PlayList.from(r, emotion))
-                    .collect(Collectors.toList()));
+            List<String> ids= searchResponse.getItems().stream()
+                    .map(p -> p.getId().getVideoId())
+                    .collect(Collectors.toList());
+            List<PlayList> playListList = getVideoDetails(emotion, ids);
+            savePlayList(playListList);
         }
-        savePlayList(playLists);
+
     }
     public void savePlayList(List<PlayList> playListList){
         playListRepository.saveAll(playListList);
     }
 
-    public Map<String, List<String>> getVideoDetails(List<String> videoIds) throws IOException {
+    public List<PlayList> getVideoDetails(Emotion emotion, List<String> videoIds) throws IOException {
+        if(videoIds.isEmpty()) return null;
         JsonFactory jsonFactory = new JacksonFactory();
         YouTube youtube = new YouTube.Builder(
                 new com.google.api.client.http.javanet.NetHttpTransport(),
@@ -78,10 +80,15 @@ public class YoutubeDataService {
         request.setKey(apiKey)
                 .setId(videoIds);
         List<Video> videoList = request.execute().getItems();
-        Map<String, List<String>> tagsMap = new HashMap<>();
-        videoList.forEach(video -> {
-            tagsMap.put(video.getId(), video.getSnippet().getTags());
-        });
-        return tagsMap;
+        return videoList.stream().map(video -> {
+            VideoSnippet snippet = video.getSnippet();
+            return PlayList.builder()
+                    .videoId(video.getId())
+                    .title(snippet.getTitle())
+                    .channelName(snippet.getChannelTitle())
+                    .tags(snippet.getTags())
+                    .emotion(emotion)
+                    .build();
+        }).collect(Collectors.toList());
     }
 }
