@@ -41,6 +41,10 @@ public class PlayList extends BaseEntity {
                 .build();
     }
     public String convertTagsToString(List<String> tagList){
+        if(tagList==null) return null;
+        if(tagList.size()>3){
+            tagList = tagList.subList(0, 3);
+        }
         StringBuilder sb = new StringBuilder();
         tagList.forEach(t -> sb.append(t+";"));
         return sb.toString();

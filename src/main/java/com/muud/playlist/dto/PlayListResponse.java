@@ -19,7 +19,7 @@ public class PlayListResponse {
     }
     public static PlayListResponse from(Page<VideoDto> videoDtoPage){
         return PlayListResponse.builder()
-                .totalCount(videoDtoPage.getSize())
+                .totalCount(videoDtoPage.getNumberOfElements())
                 .playlists(videoDtoPage.stream().toList())
                 .build();
     }
