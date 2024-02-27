@@ -44,4 +44,8 @@ public class DiaryService {
         Diary updatedDiary = diaryRepository.save(diary);
         return DiaryResponse.from(updatedDiary);
     }
+
+    public List<Diary> getDiaryList() {
+        return diaryRepository.findAll();
+    }
 }
