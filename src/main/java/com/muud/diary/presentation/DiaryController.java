@@ -29,7 +29,7 @@ public class DiaryController {
         return ResponseEntity.ok(diaryService.getDiaryResponse(diaryId));
     }
 
-    @GetMapping("/diaries")
+    @GetMapping("/diaries/month")
     public ResponseEntity<List<DiaryResponse>> getDiaryResponseListByMonth(@RequestParam(name = "month", required = true) int month) {
         return ResponseEntity.ok(diaryService.getDiaryResponseListByMonth(month));
     }
