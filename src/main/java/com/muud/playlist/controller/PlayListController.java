@@ -33,11 +33,7 @@ public class PlayListController {
     @GetMapping("/playlists")
     public ResponseEntity<PlayListResponse> getPlayLists(@RequestParam(name = "emotion", required = true) Emotion emotion, @PageableDefault(size = 4) Pageable pageable){
         Page<VideoDto> videoDtoList = playListService.getPlayLists(emotion, pageable);
-        List<String> ids = videoDtoList
-                .map(videoDto -> videoDto.getVideoId())
-                .stream().collect(Collectors.toList());
         return ResponseEntity.ok(PlayListResponse.from(videoDtoList));
-
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
