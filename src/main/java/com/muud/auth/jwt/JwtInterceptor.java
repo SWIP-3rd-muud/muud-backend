@@ -21,10 +21,9 @@ public class JwtInterceptor implements HandlerInterceptor {
     private final AuthService authService;
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if(HttpMethod.OPTIONS.matches(request.getMethod())) { //cors
+        if(request.getMethod().equals("OPTIONS")) {
             return true;
         }
-
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
         // 토큰이 없으면 요청 거부
         if (token == null || !token.startsWith("Bearer ")) {
