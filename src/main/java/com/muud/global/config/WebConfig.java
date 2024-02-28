@@ -27,9 +27,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(jwtInterceptor)
-//                .addPathPatterns("/**")
-//                .excludePathPatterns(excludePathPatterns);
-        //개발환경을 위해 잠시 꺼둠
+        registry.addInterceptor(jwtInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns(excludePathPatterns);
     }
 }

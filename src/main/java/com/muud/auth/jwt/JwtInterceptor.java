@@ -4,6 +4,7 @@ import com.muud.auth.service.AuthService;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
 import com.muud.user.dto.UserInfo;
+import com.muud.user.entity.User;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,7 +32,9 @@ public class JwtInterceptor implements HandlerInterceptor {
         }else{
             token = token.substring(7, token.length());
         }
-        request.setAttribute("userId", jwtTokenUtils.getUserIdFromToken(token));
+        User user = authService.getUserById(Long.valueOf(jwtTokenUtils.getUserIdFromToken(token)))
+                .orElseThrow(() -> new ApiException(ExceptionType.INVALID_TOKEN));
+        request.setAttribute("user", user);
         return true;
     }
 }
