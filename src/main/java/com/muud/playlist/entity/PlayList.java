@@ -6,11 +6,12 @@ import com.muud.playlist.dto.VideoDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.*;
 
-@Entity
+@Entity @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PlayList extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

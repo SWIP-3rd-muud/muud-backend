@@ -15,4 +15,8 @@ public class PageResponse<T>{
         this.totalCount = totalCount;
     }
 
+    public PageResponse(Page<T> page){
+        this.content = page.getContent();
+        this.totalCount = page.getNumberOfElements();
+    }
 }
