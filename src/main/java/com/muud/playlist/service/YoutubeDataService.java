@@ -9,6 +9,7 @@ import com.google.api.services.youtube.model.VideoSnippet;
 import com.muud.emotion.entity.Emotion;
 import com.muud.playlist.entity.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,8 @@ public class YoutubeDataService {
     private final PlayListRepository playListRepository;
 
     @Transactional
-    @Scheduled(cron = "0 10 14 * * ?", zone = "Asia/Seoul")
+    @PostConstruct
+    //@Scheduled(cron = "0 10 14 * * ?", zone = "Asia/Seoul")
     public void updateVideoList() throws IOException {
         log.info("playlist data refresh schedule start");
         JsonFactory jsonFactory = new JacksonFactory();
