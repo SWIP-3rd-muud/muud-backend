@@ -34,6 +34,9 @@ public class AuthService {
                 .map((User::toDto))
                 .orElseThrow(()->new ApiException(ExceptionType.INVALID_TOKEN));
     }
+    public Optional<User> getUserById(Long userId){
+        return userRepository.findById(userId);
+    }
     @Transactional
     public User signupWithEmail(SignupRequest request) {
         if(getUserByEmail(request.getEmail()).isPresent()) //이메일 중복 체크
@@ -101,4 +104,5 @@ public class AuthService {
                 .userInfo(user.toDto())
                 .build();
     }
+
 }
