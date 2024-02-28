@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     private String[] excludePathPatterns = {
-            "/auth/**"
+            "/auth/**", "/auth/kakao/signin"
     };
 
     @Override
