@@ -1,6 +1,7 @@
 package com.muud.diary.application;
 
 import com.muud.diary.domain.Diary;
+import com.muud.diary.dto.DiaryPreviewResponse;
 import com.muud.diary.dto.DiaryRequest;
 import com.muud.diary.dto.DiaryResponse;
 import com.muud.diary.repository.DiaryRepository;
@@ -47,5 +48,12 @@ public class DiaryService {
 
     public List<Diary> getDiaryList() {
         return diaryRepository.findAll();
+    }
+
+    public List<DiaryPreviewResponse> getDiaryResponseListByEmotion(Emotion emotion) {
+        List<Diary> diaryList = diaryRepository.findByEmotion(emotion);
+        return diaryList.stream()
+                .map(DiaryPreviewResponse::from)
+                .collect(Collectors.toList());
     }
 }
