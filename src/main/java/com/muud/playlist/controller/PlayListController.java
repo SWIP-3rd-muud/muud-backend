@@ -7,19 +7,18 @@ import com.muud.global.error.ResponseError;
 import com.muud.playlist.dto.VideoDto;
 import com.muud.playlist.service.PlayListService;
 import com.muud.playlist.service.YoutubeDataService;
+import com.muud.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.io.IOException;
+
+@RestController
 @RequiredArgsConstructor
 public class PlayListController {
     private final PlayListService playListService;
