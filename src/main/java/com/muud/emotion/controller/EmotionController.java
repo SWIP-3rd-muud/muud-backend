@@ -4,6 +4,7 @@ import com.muud.diary.application.DiaryService;
 import com.muud.diary.domain.Diary;
 import com.muud.emotion.dto.EmotionCountResponse;
 import com.muud.emotion.dto.EmotionResponse;
+import com.muud.emotion.dto.QuestionResponse;
 import com.muud.emotion.service.EmotionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,5 +41,11 @@ public class EmotionController {
         List<Diary> diaryList = diaryService.getDiaryList();
         List<EmotionCountResponse> emotionCountResponse = emotionService.getEmotionCount(diaryList, ascending);
         return ResponseEntity.ok(emotionCountResponse);
+    }
+
+    @GetMapping("/emotions/questions")
+    public ResponseEntity<List<QuestionResponse>> getAllQuestionResponse() {
+        List<QuestionResponse> questionResponseList = emotionService.getAllQuestionResponse();
+        return ResponseEntity.ok(questionResponseList);
     }
 }

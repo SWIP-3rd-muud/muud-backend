@@ -9,6 +9,7 @@ import com.google.api.services.youtube.model.VideoSnippet;
 import com.muud.emotion.entity.Emotion;
 import com.muud.playlist.entity.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,13 +29,12 @@ public class YoutubeDataService {
     private final PlayListRepository playListRepository;
 
     @Transactional
-    @Scheduled(cron = "0 10 14 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 1 ? * 6", zone = "Asia/Seoul")
     public void updateVideoList() throws IOException {
         log.info("playlist data refresh schedule start");
         JsonFactory jsonFactory = new JacksonFactory();
-        //playListRepository.deleteAll();
+        playListRepository.deleteAll();
 
-        // YouTube 객체를 빌드하여 API에 접근할 수 있는 YouTube 클라이언트 생성
         YouTube youtube = new YouTube.Builder(
                 new com.google.api.client.http.javanet.NetHttpTransport(),
                 jsonFactory,

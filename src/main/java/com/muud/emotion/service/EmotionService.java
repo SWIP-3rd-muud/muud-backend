@@ -2,6 +2,7 @@ package com.muud.emotion.service;
 
 import com.muud.diary.domain.Diary;
 import com.muud.emotion.dto.EmotionCountResponse;
+import com.muud.emotion.dto.QuestionResponse;
 import com.muud.emotion.entity.Emotion;
 import com.muud.emotion.dto.EmotionResponse;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,12 @@ public class EmotionService {
         return emotionCountMap.entrySet().stream()
                 .map(entry -> new EmotionCountResponse(entry.getKey().name(), entry.getValue()))
                 .sorted(comparator)
+                .collect(Collectors.toList());
+    }
+
+    public List<QuestionResponse> getAllQuestionResponse() {
+        return Arrays.stream(Emotion.values())
+                .map(question -> new QuestionResponse(question.name(), question.getQuestion()))
                 .collect(Collectors.toList());
     }
 }

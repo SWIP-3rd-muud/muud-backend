@@ -1,6 +1,7 @@
 package com.muud.diary.repository;
 
 import com.muud.diary.domain.Diary;
+import com.muud.emotion.entity.Emotion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,4 +13,7 @@ import java.util.List;
 public interface DiaryRepository extends JpaRepository<Diary, Long> {
     @Query("SELECT d FROM Diary d WHERE MONTH(d.createdDate) = :month")
     List<Diary> findByMonth(@Param("month") int month);
+
+    @Query("SELECT d FROM Diary d WHERE d.emotion = :emotion")
+    List<Diary> findByEmotion(@Param("emotion") Emotion emotion);
 }
