@@ -11,11 +11,10 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 import java.util.List;
 public interface CollectionRepository extends JpaRepository<Collection, Long> {
-    Optional<Collection> findById(Long id);
 
     Page<Collection> findByUser(User user, Pageable pageable);
-    @Query("select c from Collection c where c.playList.videoId = :videoId")
-    Optional<Collection> findByPlayList(String videoId);
+    @Query("select c from Collection c where c.videoId = :videoId")
+    Optional<Collection> findByVideoId(String videoId);
 
-    Optional<Collection> findByUserAndPlayList(User user, PlayList playList);
+    Optional<Collection> findByUserAndVideoId(User user, String videoId);
 }
