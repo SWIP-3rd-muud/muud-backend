@@ -6,6 +6,7 @@ import com.muud.global.error.ExceptionType;
 import com.muud.playlist.dto.VideoDto;
 import com.muud.playlist.entity.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
+import com.muud.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,5 +26,10 @@ public class PlayListService {
     public PlayList getPlayList(Long playListId) {
         return playListRepository.findById(playListId)
                 .orElseThrow(()-> new ApiException(ExceptionType.BAD_REQUEST));
+    }
+
+    public PlayList getPlayListByVideoId(String videoId) {
+        return playListRepository.findByVideoId(videoId)
+                .orElseThrow(()->new ApiException(ExceptionType.BAD_REQUEST));
     }
 }

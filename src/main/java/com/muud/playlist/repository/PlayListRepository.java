@@ -8,8 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PlayListRepository extends JpaRepository<PlayList, Long> {
     @Query("SELECT p from PlayList p where p.emotion = :emotion order by rand()")
     Page<PlayList> findByEmotion(Emotion emotion, Pageable pageable);
+
+    Optional<PlayList> findByVideoId(String videoId);
 }
