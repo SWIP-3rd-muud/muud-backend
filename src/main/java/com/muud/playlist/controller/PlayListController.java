@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -22,9 +23,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class PlayListController {
     private final PlayListService playListService;
-    private final YoutubeDataService youtubeDataService;
     @GetMapping("/playlists")
-    public ResponseEntity<PageResponse> getPlayLists(@RequestParam(name = "emotion", required = true) Emotion emotion, @PageableDefault(size = 4) Pageable pageable){
+    public ResponseEntity<PageResponse> getPlayLists(@RequestParam(name = "emotion") Emotion emotion, @PageableDefault(size = 4) Pageable pageable){
         Page<VideoDto> videoDtoList = playListService.getPlayLists(emotion, pageable);
         return ResponseEntity.ok(new PageResponse<>(videoDtoList));
     }

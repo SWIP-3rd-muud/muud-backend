@@ -25,20 +25,28 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CollectionController {
     private final CollectionService collectionService;
-    private final AuthService authService;
     private final PlayListService playListService;
     @GetMapping("/collections")
     public ResponseEntity<PageResponse<CollectionDto>> getCollections(@RequestAttribute User user , Pageable pageable){
         Page<Collection> collectionPage = collectionService.getCollections(user, pageable);
         List<CollectionDto> collectionDtoList = collectionPage.map(collection -> collection.toDto()).toList();
-        return ResponseEntity.ok(new PageResponse<CollectionDto>(collectionDtoList, collectionPage.getNumberOfElements()));
+        return ResponseEntity.ok(new PageResponse<>(collectionDtoList, collectionPage.getNumberOfElements()));
     }
 
     @PostMapping("/collections")
     public ResponseEntity addCollection(@RequestAttribute User user, @RequestParam Long playListId){
         PlayList playList = playListService.getPlayList(playListId);
-        collectionService.saveCollection(user, playList);
+        collectionService.saveCollection(user, playList.getVideoId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("isCollected", true));
     }
+
+    @GetMapping("/collections/{collectionId}")
+    public ResponseEntity getCollectionDetails(@RequestAttribute User user, @PathVariable Long collectionId){
+        CollectionDto collectionDto = collectionService.getCollectionDetails(user, collectionId);
+        collectionDto.setPlaylist(playListService.getPlayListByVideoId(collectionDto.getVideoId()).toDto());
+        return ResponseEntity.ok(collectionDto);
+    }
+
+
 }
