@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,8 +31,8 @@ public class DiaryService {
                 .orElseThrow(IllegalArgumentException::new));
     }
 
-    public List<DiaryResponse> getDiaryResponseListByMonth(int month) {
-        List<Diary> diaryList = diaryRepository.findByMonth(month);
+    public List<DiaryResponse> getDiaryResponseListByYearMonth(YearMonth yearMonth) {
+        List<Diary> diaryList = diaryRepository.findByMonthAndYear(yearMonth.getMonthValue(), yearMonth.getYear());
         return diaryList.stream()
                 .map(DiaryResponse::from)
                 .collect(Collectors.toList());
