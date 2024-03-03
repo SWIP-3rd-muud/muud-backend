@@ -21,14 +21,14 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true);
     }
 
-    private String[] excludePathPatterns = {
-            "/auth/**", "/auth/kakao/signin"
-    };
+//    private String[] excludePathPatterns = {
+//            "/auth/**", "/auth/kakao/signin"
+//    };
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(jwtInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns(excludePathPatterns);
+        registry.addInterceptor(jwtInterceptor);
+//                .addPathPatterns("/**")
+//                .excludePathPatterns(excludePathPatterns);
     }
 }
