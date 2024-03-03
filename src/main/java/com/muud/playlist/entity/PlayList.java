@@ -18,6 +18,7 @@ public class PlayList extends BaseEntity {
     @Column(name = "playlist_id")
     private Long id;
     private String title;
+    @Column(unique = true)
     private String videoId;
     private String channelName;
     @Enumerated(value = EnumType.STRING)

@@ -29,7 +29,8 @@ public class YoutubeDataService {
     private final PlayListRepository playListRepository;
 
     @Transactional
-    @Scheduled(cron = "0 0 1 ? * 6", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 4 ? * 6", zone = "Asia/Seoul")
+    @PostConstruct
     public void updateVideoList() throws IOException {
         log.info("playlist data refresh schedule start");
         JsonFactory jsonFactory = new JacksonFactory();
@@ -50,6 +51,7 @@ public class YoutubeDataService {
         search.setVideoEmbeddable("true");
         search.setVideoDuration("long");
         List<PlayList> playLists = new ArrayList<>();
+        Set<String> idSet = new HashSet<>();
         for(Emotion emotion: Emotion.values()){
             // 검색어 설정
             search.setQ(emotion.getTitleEmotion()+" PlayList");
@@ -57,11 +59,12 @@ public class YoutubeDataService {
 
             List<String> ids= searchResponse.getItems().stream()
                     .map(p -> p.getId().getVideoId())
+                    .filter(id -> !idSet.contains(id))
                     .collect(Collectors.toList());
-            List<PlayList> playListList = getVideoDetails(emotion, ids);
-            savePlayList(playListList);
+            idSet.addAll(ids);
+            playLists.addAll(getVideoDetails(emotion, ids));
         }
-
+        savePlayList(playLists);
     }
     public void savePlayList(List<PlayList> playListList){
         playListRepository.saveAll(playListList);
