@@ -48,4 +48,9 @@ public class CollectionService {
         }
         return collection;
     }
+
+    public Page<CollectionDto> getLikedCollections(User user, Pageable pageable) {
+        return collectionRepository.findByUserAndLiked(user, true, pageable)
+                .map(collection -> collection.toDto());
+    }
 }

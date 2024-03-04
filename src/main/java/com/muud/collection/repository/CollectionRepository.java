@@ -14,6 +14,6 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     Page<Collection> findByUser(User user, Pageable pageable);
     @Query("select c from Collection c where c.videoId = :videoId")
     Optional<Collection> findByVideoId(String videoId);
-
     Optional<Collection> findByUserAndVideoId(User user, String videoId);
+    Page<Collection> findByUserAndLiked(User user, Boolean liked, Pageable pageable);
 }
