@@ -29,15 +29,15 @@ public class CollectionController {
 
     @Auth
     @PostMapping("/collections")
-    public ResponseEntity addCollection(@RequestAttribute User user, @RequestParam Long playListId){
+    public ResponseEntity<CollectionDto> addCollection(@RequestAttribute User user, @RequestParam Long playListId){
         PlayList playList = playListService.getPlayList(playListId);
-        CollectionDto collection = collectionService.saveCollection(user, playList.getVideoId());
-        return ResponseEntity.created(URI.create("/collections/"+collection.getCollectionId()))
-                .body(collection);
+        CollectionDto collectionDto = collectionService.saveCollection(user, playList.getVideoId());
+        return ResponseEntity.created(URI.create("/collections/"+collectionDto.getCollectionId()))
+                .body(collectionDto);
     }
     @Auth
     @GetMapping("/collections/{collectionId}")
-    public ResponseEntity getCollectionDetails(@RequestAttribute User user, @PathVariable Long collectionId){
+    public ResponseEntity<CollectionDto> getCollectionDetails(@RequestAttribute User user, @PathVariable Long collectionId){
         CollectionDto collectionDto = collectionService.getCollectionDetails(user, collectionId).toDto();
         collectionDto.setPlaylist(playListService.getPlayListByVideoId(collectionDto.getVideoId()).toDto());
         return ResponseEntity.ok(collectionDto);
@@ -45,8 +45,15 @@ public class CollectionController {
 
     @Auth
     @PatchMapping("/collections/{collectionId}/like")
-    public ResponseEntity likeCollection(@RequestAttribute User user, @PathVariable Long collectionId){
+    public ResponseEntity<CollectionDto> likeCollection(@RequestAttribute User user, @PathVariable Long collectionId){
         CollectionDto collectionDto = collectionService.changeLikeState(user, collectionId);
         return ResponseEntity.ok(collectionDto);
+    }
+
+    @Auth
+    @GetMapping("/collections/like")
+    public ResponseEntity<PageResponse<CollectionDto>> getLikedCollections(@RequestAttribute User user, Pageable pageable){
+        Page<CollectionDto> collectionDtoPage = collectionService.getLikedCollections(user, pageable);
+        return ResponseEntity.ok(new PageResponse<>(collectionDtoPage));
     }
 }
