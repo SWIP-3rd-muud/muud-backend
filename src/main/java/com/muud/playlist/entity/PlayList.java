@@ -56,4 +56,9 @@ public class PlayList extends BaseEntity {
             return Arrays.stream(tags.split(";")).toList();
         return Collections.EMPTY_LIST;
     }
+    public void updateDetails(String title, String channelName, String tags){
+        this.title = title;
+        this.channelName = channelName;
+        this.tags = tags;
+    }
 }

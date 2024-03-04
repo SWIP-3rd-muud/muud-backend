@@ -1,6 +1,7 @@
 package com.muud.collection.repository;
 
 import com.muud.collection.entity.Collection;
+import com.muud.playlist.entity.PlayList;
 import com.muud.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,8 +13,6 @@ import java.util.Optional;
 public interface CollectionRepository extends JpaRepository<Collection, Long> {
 
     Page<Collection> findByUser(User user, Pageable pageable);
-    @Query("select c from Collection c where c.videoId = :videoId")
-    Optional<Collection> findByVideoId(String videoId);
-    Optional<Collection> findByUserAndVideoId(User user, String videoId);
+    Optional<Collection> findByUserAndPlayList(User user, PlayList playList);
     Page<Collection> findByUserAndLiked(User user, Boolean liked, Pageable pageable);
 }
