@@ -31,15 +31,14 @@ public class CollectionController {
     @PostMapping("/collections")
     public ResponseEntity<CollectionDto> addCollection(@RequestAttribute User user, @RequestParam Long playListId){
         PlayList playList = playListService.getPlayList(playListId);
-        CollectionDto collectionDto = collectionService.saveCollection(user, playList.getVideoId());
+        CollectionDto collectionDto = collectionService.saveCollection(user, playList);
         return ResponseEntity.created(URI.create("/collections/"+collectionDto.getCollectionId()))
                 .body(collectionDto);
     }
     @Auth
     @GetMapping("/collections/{collectionId}")
     public ResponseEntity<CollectionDto> getCollectionDetails(@RequestAttribute User user, @PathVariable Long collectionId){
-        CollectionDto collectionDto = collectionService.getCollectionDetails(user, collectionId).toDto();
-        collectionDto.setPlaylist(playListService.getPlayListByVideoId(collectionDto.getVideoId()).toDto());
+        CollectionDto collectionDto = collectionService.getCollectionDetails(user, collectionId).toDetailDto();
         return ResponseEntity.ok(collectionDto);
     }
 

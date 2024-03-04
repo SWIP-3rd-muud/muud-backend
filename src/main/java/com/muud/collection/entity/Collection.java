@@ -20,26 +20,31 @@ public class Collection extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "playlist_id")
-//    private PlayList playList;
-    private String videoId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "playlist_id")
+    private PlayList playList;
     private boolean liked;
     @Builder
-    public Collection(User user, String videoId, boolean like) {
+    public Collection(User user, PlayList playList, boolean like) {
         this.user = user;
-        this.videoId = videoId;
+        this.playList = playList;
         this.liked = like;
     }
 
+    public CollectionDto toDetailDto(){
+        return CollectionDto.builder()
+                .collectionId(id)
+                .like(liked)
+                .playList(playList.toDto())
+                .build();
+    }
     public CollectionDto toDto(){
         return CollectionDto.builder()
                 .collectionId(id)
-                .videoId(videoId)
                 .like(liked)
+                .videoId(playList.getVideoId())
                 .build();
     }
-
     public void changeLikeState() {
         this.liked = !this.liked;
     }
