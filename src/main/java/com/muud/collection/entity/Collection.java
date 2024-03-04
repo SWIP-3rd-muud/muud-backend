@@ -39,4 +39,8 @@ public class Collection extends BaseEntity {
                 .like(liked)
                 .build();
     }
+
+    public void changeLikeState() {
+        this.liked = !this.liked;
+    }
 }

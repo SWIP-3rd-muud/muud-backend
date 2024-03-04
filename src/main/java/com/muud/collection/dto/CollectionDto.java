@@ -2,15 +2,12 @@ package com.muud.collection.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.muud.playlist.dto.VideoDto;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
+@Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CollectionDto {
     private Long collectionId;
@@ -23,9 +20,5 @@ public class CollectionDto {
         this.collectionId = collectionId;
         this.videoId = videoId;
         this.like = like;
-    }
-
-    public void setPlaylist(VideoDto playlist) {
-        this.playlist = playlist;
     }
 }
