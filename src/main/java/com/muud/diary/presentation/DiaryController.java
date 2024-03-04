@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -32,8 +34,9 @@ public class DiaryController {
     }
 
     @GetMapping("/diaries/month")
-    public ResponseEntity<List<DiaryResponse>> getDiaryResponseListByMonth(@RequestParam(name = "month", required = true) int month) {
-        return ResponseEntity.ok(diaryService.getDiaryResponseListByMonth(month));
+    public ResponseEntity<List<DiaryResponse>> getDiaryResponseListByYearMonth(@RequestParam(name = "date", required = true) String date) {
+        YearMonth yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy-MM"));
+        return ResponseEntity.ok(diaryService.getDiaryResponseListByYearMonth(yearMonth));
     }
 
     @PutMapping("/diaries/{diaryId}")
