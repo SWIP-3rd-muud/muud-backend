@@ -2,6 +2,7 @@ package com.muud.playlist.entity;
 
 import com.muud.emotion.entity.Emotion;
 import com.muud.global.common.BaseEntity;
+import com.muud.playlist.dto.PlayListRequest;
 import com.muud.playlist.dto.VideoDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -40,6 +41,15 @@ public class PlayList extends BaseEntity {
                 .title(title)
                 .tags(convertTagsToList(tags))
                 .channelName(channelName)
+                .build();
+    }
+    public static PlayList from(PlayListRequest request){
+        return PlayList.builder()
+                .videoId(request.getVideoId())
+                .title(request.getTitle())
+                .emotion(request.getEmotion())
+                .channelName(request.getChannelName())
+                .tags(request.getTags())
                 .build();
     }
     public String convertTagsToString(List<String> tagList){
