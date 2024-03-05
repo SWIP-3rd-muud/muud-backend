@@ -27,7 +27,8 @@ public class DiaryService {
         return diaryRepository.save(
                 new Diary(diaryRequest.content(),
                         Emotion.valueOf(diaryRequest.emotionName().toUpperCase()),
-                        user));
+                        user,
+                        diaryRequest.referenceDate()));
     }
 
     public DiaryResponse getDiaryResponse(Long userId, Long diaryId) {
