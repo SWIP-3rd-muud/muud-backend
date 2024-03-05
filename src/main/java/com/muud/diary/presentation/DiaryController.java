@@ -25,10 +25,11 @@ public class DiaryController {
 
     @Auth
     @PostMapping("/diaries")
-    public ResponseEntity<Object> writeDiary(@RequestAttribute("user") User user,
+    public ResponseEntity<Long> writeDiary(@RequestAttribute("user") User user,
                                              @Valid @RequestBody DiaryRequest diaryRequest) {
         Diary diary = diaryService.writeDiary(user, diaryRequest);
-        return ResponseEntity.created(URI.create("/diaries/"+diary.getId())).build();
+        return ResponseEntity.created(URI.create("/diaries/"+diary.getId()))
+                .body(diary.getId());
     }
 
     @Auth
