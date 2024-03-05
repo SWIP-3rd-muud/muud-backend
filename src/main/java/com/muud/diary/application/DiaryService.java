@@ -6,6 +6,7 @@ import com.muud.diary.dto.DiaryRequest;
 import com.muud.diary.dto.DiaryResponse;
 import com.muud.diary.repository.DiaryRepository;
 import com.muud.emotion.entity.Emotion;
+import com.muud.user.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,11 @@ public class DiaryService {
     private final DiaryRepository diaryRepository;
 
     @Transactional
-    public Diary writeDiary(DiaryRequest diaryRequest) {
+    public Diary writeDiary(User user, DiaryRequest diaryRequest) {
         return diaryRepository.save(
                 new Diary(diaryRequest.content(),
-                        Emotion.valueOf(diaryRequest.emotionName().toUpperCase())));
+                        Emotion.valueOf(diaryRequest.emotionName().toUpperCase()),
+                        user));
     }
 
     public DiaryResponse getDiaryResponse(Long diaryId) {

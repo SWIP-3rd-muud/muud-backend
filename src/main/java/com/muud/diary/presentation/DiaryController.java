@@ -6,6 +6,7 @@ import com.muud.diary.dto.DiaryPreviewResponse;
 import com.muud.diary.dto.DiaryRequest;
 import com.muud.diary.dto.DiaryResponse;
 import com.muud.emotion.entity.Emotion;
+import com.muud.user.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +23,9 @@ public class DiaryController {
     private final DiaryService diaryService;
 
     @PostMapping("/diaries")
-    public ResponseEntity<Object> writeDiary(@Valid @RequestBody DiaryRequest diaryRequest) {
-
-        Diary diary = diaryService.writeDiary(diaryRequest);
+    public ResponseEntity<Object> writeDiary(@RequestAttribute("user") User user,
+                                             @Valid @RequestBody DiaryRequest diaryRequest) {
+        Diary diary = diaryService.writeDiary(user, diaryRequest);
         return ResponseEntity.created(URI.create("/diaries/"+diary.getId())).build();
     }
 
