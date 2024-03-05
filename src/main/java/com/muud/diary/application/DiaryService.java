@@ -6,6 +6,8 @@ import com.muud.diary.dto.DiaryRequest;
 import com.muud.diary.dto.DiaryResponse;
 import com.muud.diary.repository.DiaryRepository;
 import com.muud.emotion.entity.Emotion;
+import com.muud.global.error.ApiException;
+import com.muud.global.error.ExceptionType;
 import com.muud.user.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -40,9 +42,13 @@ public class DiaryService {
                 .collect(Collectors.toList());
     }
 
-    public DiaryResponse updateContent(Long diaryId, DiaryRequest diaryRequest) {
+    @Transactional
+    public DiaryResponse updateContent(Long userId, Long diaryId, DiaryRequest diaryRequest) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new);
+
+        checkForbiddenUser(userId, diary);
+
         diary.updateContent(diaryRequest.content());
         
         Diary updatedDiary = diaryRepository.save(diary);
@@ -58,5 +64,15 @@ public class DiaryService {
         return diaryList.stream()
                 .map(DiaryPreviewResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    private void checkForbiddenUser(Long userId, Diary diary) {
+        if (isOwnerOfDiary(userId, diary)) {
+            throw new ApiException(ExceptionType.FORBIDDEN_USER);
+        }
+    }
+
+    private Boolean isOwnerOfDiary(Long userId, Diary diary) {
+        return diary.getId().equals(userId);
     }
 }

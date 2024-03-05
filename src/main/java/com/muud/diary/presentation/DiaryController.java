@@ -44,10 +44,12 @@ public class DiaryController {
         return ResponseEntity.ok(diaryService.getDiaryResponseListByYearMonth(user.getId(), yearMonth));
     }
 
+    @Auth
     @PutMapping("/diaries/{diaryId}")
-    public ResponseEntity<DiaryResponse> updatePost(@PathVariable("diaryId") Long diaryId,
+    public ResponseEntity<DiaryResponse> updatePost(@RequestAttribute("user") User user,
+                                                    @PathVariable("diaryId") Long diaryId,
                                                     @Valid @RequestBody DiaryRequest diaryRequest) {
-        return ResponseEntity.ok(diaryService.updateContent(diaryId, diaryRequest));
+        return ResponseEntity.ok(diaryService.updateContent(user.getId(), diaryId, diaryRequest));
     }
 
     @GetMapping("/diaries/emotion")
