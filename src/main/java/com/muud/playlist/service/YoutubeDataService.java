@@ -7,8 +7,10 @@ import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoSnippet;
 import com.muud.emotion.entity.Emotion;
+import com.muud.playlist.dto.PlayListRequest;
 import com.muud.playlist.entity.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +35,7 @@ public class YoutubeDataService {
     public void updateVideoList() throws IOException {
         log.info("playlist data refresh schedule start");
         JsonFactory jsonFactory = new JacksonFactory();
+
         YouTube youtube = new YouTube.Builder(
                 new com.google.api.client.http.javanet.NetHttpTransport(),
                 jsonFactory,
@@ -60,6 +63,12 @@ public class YoutubeDataService {
             idSet.addAll(ids);
             playLists.addAll(getVideoDetails(emotion, ids));
         }
+        savePlayList(playLists);
+    }
+    public void addPlayList(List<PlayListRequest> playListRequestList){
+        List<PlayList> playLists = playListRequestList.stream()
+                .map(request -> PlayList.from(request))
+                .collect(Collectors.toList());
         savePlayList(playLists);
     }
     public void savePlayList(List<PlayList> playListList){
