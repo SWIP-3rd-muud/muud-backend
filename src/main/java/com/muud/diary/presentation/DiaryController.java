@@ -1,5 +1,6 @@
 package com.muud.diary.presentation;
 
+import com.muud.auth.jwt.Auth;
 import com.muud.diary.application.DiaryService;
 import com.muud.diary.domain.Diary;
 import com.muud.diary.dto.DiaryPreviewResponse;
@@ -22,6 +23,7 @@ import java.util.List;
 public class DiaryController {
     private final DiaryService diaryService;
 
+    @Auth
     @PostMapping("/diaries")
     public ResponseEntity<Object> writeDiary(@RequestAttribute("user") User user,
                                              @Valid @RequestBody DiaryRequest diaryRequest) {
@@ -34,10 +36,12 @@ public class DiaryController {
         return ResponseEntity.ok(diaryService.getDiaryResponse(diaryId));
     }
 
+    @Auth
     @GetMapping("/diaries/month")
-    public ResponseEntity<List<DiaryResponse>> getDiaryResponseListByYearMonth(@RequestParam(name = "date", required = true) String date) {
+    public ResponseEntity<List<DiaryResponse>> getDiaryResponseListByYearMonth(@RequestAttribute("user") User user,
+                                                                               @RequestParam(name = "date", required = true) String date) {
         YearMonth yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy-MM"));
-        return ResponseEntity.ok(diaryService.getDiaryResponseListByYearMonth(yearMonth));
+        return ResponseEntity.ok(diaryService.getDiaryResponseListByYearMonth(user.getId(), yearMonth));
     }
 
     @PutMapping("/diaries/{diaryId}")

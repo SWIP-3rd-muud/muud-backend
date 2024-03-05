@@ -33,8 +33,8 @@ public class DiaryService {
                 .orElseThrow(IllegalArgumentException::new));
     }
 
-    public List<DiaryResponse> getDiaryResponseListByYearMonth(YearMonth yearMonth) {
-        List<Diary> diaryList = diaryRepository.findByMonthAndYear(yearMonth.getMonthValue(), yearMonth.getYear());
+    public List<DiaryResponse> getDiaryResponseListByYearMonth(Long userId, YearMonth yearMonth) {
+        List<Diary> diaryList = diaryRepository.findByMonthAndYear(userId, yearMonth.getMonthValue(), yearMonth.getYear());
         return diaryList.stream()
                 .map(DiaryResponse::from)
                 .collect(Collectors.toList());
