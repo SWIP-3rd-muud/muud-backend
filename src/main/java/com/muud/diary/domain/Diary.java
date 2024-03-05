@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -28,6 +29,9 @@ public class Diary extends BaseEntity {
     @Column
     private String content;
 
+    @Column
+    private LocalDate referenceDate;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "emotion")
     private Emotion emotion;
@@ -46,11 +50,12 @@ public class Diary extends BaseEntity {
     @OneToMany(mappedBy = "diary")
     private List<Bookmark> bookmarkList;
 
-    public Diary(String content, Emotion emotion, User user) {
+    public Diary(String content, Emotion emotion, User user, LocalDate referenceDate) {
         this.id = null;
         this.content = content;
         this.emotion = emotion;
         this.user = user;
+        this.referenceDate = referenceDate;
     }
 
     public void updateContent(String content) {

@@ -14,8 +14,8 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
     @Query("SELECT d " +
             "FROM Diary d " +
             "WHERE d.user.id = :userId " +
-            "AND MONTH(d.createdDate) = :month " +
-            "AND YEAR(d.createdDate) = :year")
+            "AND MONTH(d.referenceDate) = :month " +
+            "AND YEAR(d.referenceDate) = :year")
     List<Diary> findByMonthAndYear(@Param("userId") Long userId,
                                    @Param("month") int month,
                                    @Param("year") int year);
