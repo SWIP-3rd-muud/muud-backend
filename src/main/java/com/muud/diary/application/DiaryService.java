@@ -59,20 +59,25 @@ public class DiaryService {
         return diaryRepository.findAll();
     }
 
-    public List<DiaryPreviewResponse> getDiaryResponseListByEmotion(Emotion emotion) {
-        List<Diary> diaryList = diaryRepository.findByEmotion(emotion);
+    public List<DiaryPreviewResponse> getDiaryResponseListByEmotion(Long userId, Emotion emotion) {
+        List<Diary> diaryList = diaryRepository.findByEmotion(userId, emotion);
+
+        if (!diaryList.isEmpty()) {
+            checkForbiddenUser(userId, diaryList.get(0));
+        }
+
         return diaryList.stream()
                 .map(DiaryPreviewResponse::from)
                 .collect(Collectors.toList());
     }
 
     private void checkForbiddenUser(Long userId, Diary diary) {
-        if (isOwnerOfDiary(userId, diary)) {
+        if (!isOwnerOfDiary(userId, diary)) {
             throw new ApiException(ExceptionType.FORBIDDEN_USER);
         }
     }
 
     private Boolean isOwnerOfDiary(Long userId, Diary diary) {
-        return diary.getId().equals(userId);
+        return diary.getUser().getId().equals(userId);
     }
 }

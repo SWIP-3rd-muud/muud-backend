@@ -52,8 +52,10 @@ public class DiaryController {
         return ResponseEntity.ok(diaryService.updateContent(user.getId(), diaryId, diaryRequest));
     }
 
+    @Auth
     @GetMapping("/diaries/emotion")
-    public ResponseEntity<List<DiaryPreviewResponse>> getDiaryResponseListByEmotion(@RequestParam(name = "emotion", required = true) Emotion emotion) {
-        return ResponseEntity.ok(diaryService.getDiaryResponseListByEmotion(emotion));
+    public ResponseEntity<List<DiaryPreviewResponse>> getDiaryResponseListByEmotion(@RequestAttribute("user") User user,
+                                                                                    @RequestParam(name = "emotion", required = true) Emotion emotion) {
+        return ResponseEntity.ok(diaryService.getDiaryResponseListByEmotion(user.getId(), emotion));
     }
 }

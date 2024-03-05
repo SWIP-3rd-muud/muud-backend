@@ -20,6 +20,10 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
                                    @Param("month") int month,
                                    @Param("year") int year);
 
-    @Query("SELECT d FROM Diary d WHERE d.emotion = :emotion")
-    List<Diary> findByEmotion(@Param("emotion") Emotion emotion);
+    @Query("SELECT d " +
+            "FROM Diary d " +
+            "WHERE d.user.id = :userId " +
+            "AND d.emotion = :emotion")
+    List<Diary> findByEmotion(@Param("userId") Long userId,
+                              @Param("emotion") Emotion emotion);
 }
