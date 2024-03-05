@@ -57,8 +57,8 @@ public class DiaryService {
         return DiaryResponse.from(updatedDiary);
     }
 
-    public List<Diary> getDiaryList() {
-        return diaryRepository.findAll();
+    public List<Diary> getDiaryList(Long userId) {
+        return diaryRepository.findByUserId(userId);
     }
 
     public List<DiaryPreviewResponse> getDiaryResponseListByEmotion(Long userId, Emotion emotion) {
