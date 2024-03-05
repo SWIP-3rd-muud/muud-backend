@@ -26,4 +26,7 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
             "AND d.emotion = :emotion")
     List<Diary> findByEmotion(@Param("userId") Long userId,
                               @Param("emotion") Emotion emotion);
+
+    @Query("SELECT d FROM Diary d WHERE d.user.id = :userId")
+    List<Diary> findByUserId(@Param("userId") Long userId);
 }
