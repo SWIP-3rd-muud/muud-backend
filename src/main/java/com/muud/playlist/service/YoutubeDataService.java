@@ -9,7 +9,6 @@ import com.google.api.services.youtube.model.VideoSnippet;
 import com.muud.emotion.entity.Emotion;
 import com.muud.playlist.entity.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,12 +30,9 @@ public class YoutubeDataService {
     private final String SEARCH_FILTER = " -교회 -찬양 -찬송";
     @Transactional
     @Scheduled(cron = "0 0 4 ? * 6", zone = "Asia/Seoul")
-    @PostConstruct
     public void updateVideoList() throws IOException {
         log.info("playlist data refresh schedule start");
         JsonFactory jsonFactory = new JacksonFactory();
-        //playListRepository.deleteAll();
-
         YouTube youtube = new YouTube.Builder(
                 new com.google.api.client.http.javanet.NetHttpTransport(),
                 jsonFactory,
