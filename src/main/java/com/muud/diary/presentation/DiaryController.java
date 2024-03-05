@@ -31,9 +31,11 @@ public class DiaryController {
         return ResponseEntity.created(URI.create("/diaries/"+diary.getId())).build();
     }
 
+    @Auth
     @GetMapping("/diaries/{diaryId}")
-    public ResponseEntity<DiaryResponse> getDiaryResponse(@PathVariable("diaryId") Long diaryId) {
-        return ResponseEntity.ok(diaryService.getDiaryResponse(diaryId));
+    public ResponseEntity<DiaryResponse> getDiaryResponse(@RequestAttribute("user") User user,
+                                                          @PathVariable("diaryId") Long diaryId) {
+        return ResponseEntity.ok(diaryService.getDiaryResponse(user.getId(), diaryId));
     }
 
     @Auth

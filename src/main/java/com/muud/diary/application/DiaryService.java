@@ -30,9 +30,11 @@ public class DiaryService {
                         user));
     }
 
-    public DiaryResponse getDiaryResponse(Long diaryId) {
-        return DiaryResponse.from(diaryRepository.findById(diaryId)
-                .orElseThrow(IllegalArgumentException::new));
+    public DiaryResponse getDiaryResponse(Long userId, Long diaryId) {
+        Diary diary = diaryRepository.findById(diaryId)
+                .orElseThrow(IllegalArgumentException::new);
+        checkForbiddenUser(userId, diary);
+        return DiaryResponse.from(diary);
     }
 
     public List<DiaryResponse> getDiaryResponseListByYearMonth(Long userId, YearMonth yearMonth) {
