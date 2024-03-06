@@ -58,9 +58,10 @@ jobs:
       - name: Check if container is running
         run: |
           if [ $(docker ps -q -f name=${{ secrets.SERVER_CONTAINER_NAME }}) ]; then
-          echo "container_running=true" >> $GITHUB_ENV
+            echo "container_running=true" >> $GITHUB_ENV
           else
-          echo "container_running=false" >> $GITHUB_ENV
+            echo "container_running=false" >> $GITHUB_ENV
+          fi
       - name: docker stop container
         if: env.container_running == 'true'
         run: sudo docker stop ${{ secrets.SERVER_CONTAINER_NAME }}
