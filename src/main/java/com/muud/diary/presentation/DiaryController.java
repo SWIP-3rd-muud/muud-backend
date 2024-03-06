@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
 import java.time.YearMonth;
@@ -26,8 +27,9 @@ public class DiaryController {
     @Auth
     @PostMapping("/diaries")
     public ResponseEntity<Long> writeDiary(@RequestAttribute("user") User user,
-                                             @Valid @RequestBody DiaryRequest diaryRequest) {
-        Diary diary = diaryService.writeDiary(user, diaryRequest);
+                                           @ModelAttribute DiaryRequest diaryRequest,
+                                           @RequestPart(name = "multipartFile", required = false) MultipartFile multipartFile) {
+        Diary diary = diaryService.writeDiary(user, diaryRequest, multipartFile);
         return ResponseEntity.created(URI.create("/diaries/"+diary.getId()))
                 .body(diary.getId());
     }

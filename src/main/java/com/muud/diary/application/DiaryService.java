@@ -8,10 +8,13 @@ import com.muud.diary.repository.DiaryRepository;
 import com.muud.emotion.entity.Emotion;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
+import com.muud.global.util.PhotoManager;
 import com.muud.user.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.YearMonth;
 import java.util.List;
@@ -21,14 +24,26 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DiaryService {
     private final DiaryRepository diaryRepository;
+    private final PhotoManager photoManager;
+
+    @Value("${cloud.aws.s3.image-directory}")
+    private String imageDirectory;
 
     @Transactional
-    public Diary writeDiary(User user, DiaryRequest diaryRequest) {
+    public Diary writeDiary(User user, DiaryRequest diaryRequest, MultipartFile image) {
         return diaryRepository.save(
                 new Diary(diaryRequest.content(),
                         Emotion.valueOf(diaryRequest.emotionName().toUpperCase()),
                         user,
-                        diaryRequest.referenceDate()));
+                        diaryRequest.referenceDate(),
+                        saveImage(image)));
+    }
+
+    private String saveImage(MultipartFile image) {
+        if (image == null || image.isEmpty()) {
+            return null;
+        }
+        return photoManager.upload(image, imageDirectory);
     }
 
     public DiaryResponse getDiaryResponse(Long userId, Long diaryId) {

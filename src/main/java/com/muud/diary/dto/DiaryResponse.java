@@ -11,7 +11,8 @@ public record DiaryResponse(Long id,
                             Emotion emotion,
                             LocalDateTime createdDate,
                             LocalDateTime updatedDate,
-                            LocalDate referenceDate) {
+                            LocalDate referenceDate,
+                            String imageUrl) {
     public static DiaryResponse from(Diary diary) {
         return new DiaryResponse(
                 diary.getId(),
@@ -19,6 +20,7 @@ public record DiaryResponse(Long id,
                 diary.getEmotion(),
                 diary.getCreatedDate(),
                 diary.getUpdatedDate(),
-                diary.getReferenceDate());
+                diary.getReferenceDate(),
+                diary.getImageUrl());
     }
 }
