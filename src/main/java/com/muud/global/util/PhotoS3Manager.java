@@ -13,7 +13,6 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class PhotoS3Manager implements PhotoManager {
 
     private static final String SLASH = "/";
@@ -36,20 +35,13 @@ public class PhotoS3Manager implements PhotoManager {
     }
 
     private String uploadPhoto(MultipartFile multipartFile, String workingDirectory) {
-        log.info("multipartFile={}, workingDirectory={}", multipartFile, workingDirectory);
         try {
             String fileName = PhotoNameGenerator.of(multipartFile.getOriginalFilename());
-            log.info("fileName = {}", fileName);
             File uploadDirectory = loadDirectory(getLocalDirectoryPath(workingDirectory));
-            log.info("uploadDirectory = {}", uploadDirectory);
             File uploadPath = new File(uploadDirectory, fileName);
-            log.info("uploadPath = {}", uploadPath);
             File file = uploadFileInLocal(multipartFile, uploadPath);
-            log.info("file = {}", file);
             s3Client.putObject(new PutObjectRequest(bucket + workingDirectory, fileName, file));
-            log.info("s3Client = {}", s3Client);
             file.delete();
-            log.info("imageUrl = {}", rootPath + workingDirectory + SLASH + fileName);
             return rootPath + workingDirectory + SLASH + fileName;
         } catch (Exception e) {
             throw new IllegalStateException("파일 업로드를 실패했습니다.");
