@@ -32,7 +32,7 @@ jobs:
         kakao.auth.client-secret: ${{ secrets.KAKAO_CLIENT_SECRET }}
         kakao.auth.redirect-url: ${{ secrets.KAKAO_REDIRECT_URL }}
         youtube.api-key: ${{ secrets.YOUTUBE_API_KEY }}
-        admin-key: ${{ secrets.ADMIN_KEY }}
+        admin-code: ${{ secrets.ADMIN_KEY }}
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:
