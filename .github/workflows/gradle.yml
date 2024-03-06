@@ -48,13 +48,21 @@ jobs:
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
     - name: docker Hub push
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.SERVER_CONTAINER_NAME }}
+
   run-docker-image-on-ec2:
     needs: build-docker-image
     runs-on: self-hosted
     steps:
       - name: docker pull
         run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.SERVER_CONTAINER_NAME }}
+      - name: Check if container is running
+        run: |
+          if [ $(docker ps -q -f name=${{ secrets.SERVER_CONTAINER_NAME }}) ]; then
+          echo "container_running=true" >> $GITHUB_ENV
+          else
+          echo "container_running=false" >> $GITHUB_ENV
       - name: docker stop container
+        if: env.container_running == 'true'
         run: sudo docker stop ${{ secrets.SERVER_CONTAINER_NAME }}
       - name: docker run new container
         run: sudo docker run --name ${{ secrets.SERVER_CONTAINER_NAME }} --rm -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.SERVER_CONTAINER_NAME }}
