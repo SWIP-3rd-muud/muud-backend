@@ -3,6 +3,7 @@ package com.muud.diary.domain;
 import com.muud.bookmark.domain.Bookmark;
 import com.muud.emotion.entity.Emotion;
 import com.muud.global.common.BaseEntity;
+import com.muud.playlist.entity.PlayList;
 import com.muud.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -36,12 +37,16 @@ public class Diary extends BaseEntity {
     @Column(name = "emotion")
     private Emotion emotion;
 
-//    @Column
-//    private String imageUrl;
+    @Column
+    private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "playlist_id")
+    private PlayList playList;
 
 //    @NotNull
 //    @ManyToOne(fetch = FetchType.LAZY)
@@ -50,12 +55,13 @@ public class Diary extends BaseEntity {
     @OneToMany(mappedBy = "diary")
     private List<Bookmark> bookmarkList;
 
-    public Diary(String content, Emotion emotion, User user, LocalDate referenceDate) {
+    public Diary(String content, Emotion emotion, User user, LocalDate referenceDate, String imageUrl) {
         this.id = null;
         this.content = content;
         this.emotion = emotion;
         this.user = user;
         this.referenceDate = referenceDate;
+        this.imageUrl = imageUrl;
     }
 
     public void updateContent(String content) {
