@@ -36,3 +36,4 @@ kakao:
     redirect-url: ${KAKAO_REDIRECT_URL}
 youtube:
   api-key: ${YOUTUBE_API_KEY}
+admin-code: ${ADMIN_KEY}
