@@ -10,7 +10,6 @@ import com.muud.emotion.entity.Emotion;
 import com.muud.playlist.dto.PlayListRequest;
 import com.muud.playlist.entity.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,8 +30,8 @@ public class YoutubeDataService {
     private final String SEARCH_KEYWORD = "PlayList ";
     private final String SEARCH_FILTER = " -교회 -찬양 -찬송";
     @Transactional
-    @Scheduled(cron = "0 0 4 ? * 6", zone = "Asia/Seoul")
-    public void updateVideoList() throws IOException {
+    //@Scheduled(cron = "0 0 4 ? * 6", zone = "Asia/Seoul")
+    public int updateVideoList() throws IOException {
         log.info("playlist data refresh schedule start");
         JsonFactory jsonFactory = new JacksonFactory();
 
@@ -53,7 +52,8 @@ public class YoutubeDataService {
         List<PlayList> playLists = new ArrayList<>();
         Set<String> idSet = new HashSet<>();
         for(Emotion emotion: Emotion.values()){
-            search.setQ(SEARCH_KEYWORD + emotion.getTitleEmotion()+ SEARCH_FILTER);
+            String query = emotion.equals(Emotion.CALM) ? "잔잔한" : emotion.getTitleEmotion();
+            search.setQ(SEARCH_KEYWORD + query+ SEARCH_FILTER);
             SearchListResponse searchResponse = search.execute();
 
             List<String> ids= searchResponse.getItems().stream()
@@ -63,7 +63,7 @@ public class YoutubeDataService {
             idSet.addAll(ids);
             playLists.addAll(getVideoDetails(emotion, ids));
         }
-        savePlayList(playLists);
+        return savePlayList(playLists).size();
     }
     public void addPlayList(List<PlayListRequest> playListRequestList){
         List<PlayList> playLists = playListRequestList.stream()
@@ -71,7 +71,7 @@ public class YoutubeDataService {
                 .collect(Collectors.toList());
         savePlayList(playLists);
     }
-    public void savePlayList(List<PlayList> playListList){
+    public List<PlayList> savePlayList(List<PlayList> playListList){
         List<PlayList> playLists = new ArrayList<>();
         playListList.forEach(p -> {
             PlayList modifiedPlaylist = playListRepository.findByVideoId(p.getVideoId())
@@ -82,7 +82,7 @@ public class YoutubeDataService {
                     .orElse(p);
             playLists.add(modifiedPlaylist);
         });
-        playListRepository.saveAll(playLists);
+        return playListRepository.saveAll(playLists);
     }
 
     public List<PlayList> getVideoDetails(Emotion emotion, List<String> videoIds) throws IOException {
