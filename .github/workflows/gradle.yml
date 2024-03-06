@@ -57,7 +57,7 @@ jobs:
         run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.SERVER_CONTAINER_NAME }}
       - name: Check if container is running
         run: |
-          if [ $(docker ps -q -f name=${{ secrets.SERVER_CONTAINER_NAME }}) ]; then
+          if [ $(sudo docker ps -q -f name=${{ secrets.SERVER_CONTAINER_NAME }}) ]; then
             echo "container_running=true" >> $GITHUB_ENV
           else
             echo "container_running=false" >> $GITHUB_ENV
