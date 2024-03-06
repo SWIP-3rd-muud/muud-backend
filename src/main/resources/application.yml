@@ -13,18 +13,20 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
-  cloud:
-    aws:
-      s3:
-        bucket: bucket-name
-      credentials:
-        access-key: access-key
-        secret-key: secret-key
-      region:
-        static: region
-        auto: false
-      stack:
-        auto: false
+cloud:
+  aws:
+    s3:
+      bucket: bucket-name
+      root-path: root-path
+      image-directory: image-directory
+    credentials:
+      access-key: access-key
+      secret-key: secret-key
+    region:
+      static: region
+      auto: false
+    stack:
+      auto: false
 
 #인증&인가 설정 파일
 jwt:
