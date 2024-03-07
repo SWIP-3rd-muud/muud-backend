@@ -1,6 +1,7 @@
 package com.muud.diary.application;
 
 import com.muud.diary.domain.Diary;
+import com.muud.diary.dto.ContentUpdateRequest;
 import com.muud.diary.dto.DiaryPreviewResponse;
 import com.muud.diary.dto.DiaryRequest;
 import com.muud.diary.dto.DiaryResponse;
@@ -64,14 +65,11 @@ public class DiaryService {
     }
 
     @Transactional
-    public DiaryResponse updateContent(Long userId, Long diaryId, DiaryRequest diaryRequest) {
+    public DiaryResponse updateContent(Long userId, Long diaryId, ContentUpdateRequest contentUpdateRequest) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new);
-
         checkForbiddenUser(userId, diary);
-
-        diary.updateContent(diaryRequest.content());
-        
+        diary.updateContent(contentUpdateRequest.content());
         Diary updatedDiary = diaryRepository.save(diary);
         return DiaryResponse.from(updatedDiary);
     }

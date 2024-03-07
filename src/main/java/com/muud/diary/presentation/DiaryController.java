@@ -3,6 +3,7 @@ package com.muud.diary.presentation;
 import com.muud.auth.jwt.Auth;
 import com.muud.diary.application.DiaryService;
 import com.muud.diary.domain.Diary;
+import com.muud.diary.dto.ContentUpdateRequest;
 import com.muud.diary.dto.DiaryPreviewResponse;
 import com.muud.diary.dto.DiaryRequest;
 import com.muud.diary.dto.DiaryResponse;
@@ -53,8 +54,8 @@ public class DiaryController {
     @PutMapping("/diaries/{diaryId}")
     public ResponseEntity<DiaryResponse> updatePost(@RequestAttribute("user") User user,
                                                     @PathVariable("diaryId") Long diaryId,
-                                                    @Valid @RequestBody DiaryRequest diaryRequest) {
-        return ResponseEntity.ok(diaryService.updateContent(user.getId(), diaryId, diaryRequest));
+                                                    @Valid @RequestBody ContentUpdateRequest contentUpdateRequest) {
+        return ResponseEntity.ok(diaryService.updateContent(user.getId(), diaryId, contentUpdateRequest));
     }
 
     @Auth
