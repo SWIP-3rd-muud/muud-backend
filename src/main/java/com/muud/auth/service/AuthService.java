@@ -28,28 +28,21 @@ public class AuthService {
     public Optional<User> getUserByEmail(String email){
         return userRepository.findByEmail(email);
     }
-
-    public UserInfo getUserInfoFromToken(Long id, String email){
-        return userRepository.findByIdAndEmail(id, email)
-                .map((User::toDto))
-                .orElseThrow(()->new ApiException(ExceptionType.INVALID_TOKEN));
-    }
     public Optional<User> getUserById(Long userId){
         return userRepository.findById(userId);
     }
     @Transactional
-    public User signupWithEmail(SignupRequest request) {
-        if(getUserByEmail(request.getEmail()).isPresent()) //이메일 중복 체크
-            throw new ApiException(ExceptionType.ALREADY_EXIST_EMAIL);
-        User user = User.builder()
-                .email(request.getEmail())
-                .nickname(request.getNickname())
-                .password(passwordEncoder.encrypt(request.getEmail(), request.getPassword()))
-                .loginType(LoginType.EMAIL)
-                .build();
-        return userRepository.save(user);
+    public Long signupWithEmail(SignupRequest request) {
+        User user = buildUser(request);
+        return userRepository.save(user).getId();
     }
 
+    @Transactional
+    public Long signupAdmin(SignupRequest request){
+        User user = buildUser(request);
+        user.grantAdminAuth();
+        return userRepository.save(user).getId();
+    }
     @Transactional
     public SigninResponse signinWithEmail(SigninRequest signinRequest){
         //확인 후 토큰 발급
@@ -87,21 +80,14 @@ public class AuthService {
                 .build();
 
     }
-
-    @Transactional
-    public SigninResponse signupWithKakao(String code, String nickname) {
-        User user = User.builder()
-                .socialId(code)
-                .nickname(nickname)
-                .loginType(LoginType.KAKAO)
-                .build();
-        userRepository.save(user);
-        JwtToken token = jwtTokenUtils.createToken(user);
-        user.updateRefreshToken(token.getRefreshToken());
-        return SigninResponse.builder()
-                .accessToken(token.getAccessToken())
-                .refreshToken(token.getRefreshToken())
-                .userInfo(user.toDto())
+    public User buildUser(SignupRequest request){
+        if(getUserByEmail(request.getEmail()).isPresent())
+            throw new ApiException(ExceptionType.ALREADY_EXIST_EMAIL);
+        return User.builder()
+                .email(request.getEmail())
+                .nickname(request.getNickname())
+                .password(passwordEncoder.encrypt(request.getEmail(), request.getPassword()))
+                .loginType(LoginType.EMAIL)
                 .build();
     }
 

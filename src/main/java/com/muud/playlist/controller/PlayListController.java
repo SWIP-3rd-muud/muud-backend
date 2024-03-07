@@ -16,11 +16,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Map;
+
+import static com.muud.auth.jwt.Auth.Role.ADMIN;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,22 +36,15 @@ public class PlayListController {
         return ResponseEntity.ok(new PageResponse<>(videoDtoList));
     }
 
-    @Auth
+    @Auth(role=ADMIN)
     @PostMapping("/playlists")
     public ResponseEntity updatePlayLists(@RequestBody Map<String, String> code){
-        String admin_code = code.get("code");
-        if(admin_code==null)
+        try {
+            int resultCount = youtubeDataService.updateVideoList();
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Map.of("resultCount", resultCount));
+        } catch (IOException e) {
             throw new ApiException(ExceptionType.BAD_REQUEST);
-        if(ADMIN_CODE.equals(admin_code)){
-            try {
-                int resultCount = youtubeDataService.updateVideoList();
-                return ResponseEntity.status(HttpStatus.CREATED)
-                        .body(Map.of("resultCount", resultCount));
-            } catch (IOException e) {
-                throw new ApiException(ExceptionType.BAD_REQUEST);
-            }
-        }else{
-            throw new ApiException(ExceptionType.FORBIDDEN_USER);
         }
     }
 

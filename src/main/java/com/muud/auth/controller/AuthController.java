@@ -6,12 +6,16 @@ import com.muud.auth.dto.SigninResponse;
 import com.muud.auth.dto.SignupRequest;
 import com.muud.auth.service.AuthService;
 import com.muud.auth.service.KakaoService;
+import com.muud.global.error.ApiException;
+import com.muud.global.error.ExceptionType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.Map;
 
 @RestController
@@ -19,6 +23,8 @@ import java.util.Map;
 public class AuthController {
     private final AuthService authService;
     private final KakaoService kakaoService;
+    @Value("${admin-code}")
+    private String ADMIN_CODE;
     @PostMapping("/auth/signup")
     public ResponseEntity signupWithEmail(@Valid @RequestBody SignupRequest request){
         authService.signupWithEmail(request);
@@ -41,5 +47,13 @@ public class AuthController {
                     .body(signinResponse);
         }
         return ResponseEntity.ok(signinResponse);
+    }
+    @PostMapping("/auth/signup/admin")
+    public ResponseEntity signupAdmin(@RequestBody SignupRequest signupRequest, @RequestHeader(name = "Auth_Code") String authCode){
+        if(!authCode.equals(ADMIN_CODE))
+            throw new ApiException(ExceptionType.FORBIDDEN_USER);
+        Long userId = authService.signupAdmin(signupRequest);
+        return ResponseEntity.created(URI.create("/users/"+userId))
+                .body(Map.of("message", "회원가입이 완료되었습니다."));
     }
 }
