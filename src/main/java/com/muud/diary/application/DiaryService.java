@@ -9,6 +9,7 @@ import com.muud.emotion.entity.Emotion;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
 import com.muud.global.util.PhotoManager;
+import com.muud.playlist.service.PlayListService;
 import com.muud.user.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 public class DiaryService {
     private final DiaryRepository diaryRepository;
     private final PhotoManager photoManager;
+    private final PlayListService playListService;
 
     @Value("${cloud.aws.s3.image-directory}")
     private String imageDirectory;
@@ -36,7 +38,8 @@ public class DiaryService {
                         Emotion.valueOf(diaryRequest.emotionName().toUpperCase()),
                         user,
                         diaryRequest.referenceDate(),
-                        saveImage(image)));
+                        saveImage(image),
+                        playListService.getPlayList(diaryRequest.playlistId())));
     }
 
     private String saveImage(MultipartFile image) {

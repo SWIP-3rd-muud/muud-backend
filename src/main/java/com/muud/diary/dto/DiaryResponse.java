@@ -2,6 +2,8 @@ package com.muud.diary.dto;
 
 import com.muud.diary.domain.Diary;
 import com.muud.emotion.entity.Emotion;
+import com.muud.playlist.dto.VideoDto;
+import com.muud.playlist.entity.PlayList;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,7 +14,8 @@ public record DiaryResponse(Long id,
                             LocalDateTime createdDate,
                             LocalDateTime updatedDate,
                             LocalDate referenceDate,
-                            String imageUrl) {
+                            String imageUrl,
+                            VideoDto playlist) {
     public static DiaryResponse from(Diary diary) {
         return new DiaryResponse(
                 diary.getId(),
@@ -21,6 +24,7 @@ public record DiaryResponse(Long id,
                 diary.getCreatedDate(),
                 diary.getUpdatedDate(),
                 diary.getReferenceDate(),
-                diary.getImageUrl());
+                diary.getImageUrl(),
+                diary.getPlayList().toDto());
     }
 }
