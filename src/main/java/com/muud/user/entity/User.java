@@ -1,6 +1,7 @@
 package com.muud.user.entity;
 import com.muud.auth.dto.KakaoInfoResponse;
 import com.muud.auth.dto.SignupRequest;
+import com.muud.auth.jwt.Auth;
 import com.muud.global.common.BaseEntity;
 import com.muud.user.dto.UserInfo;
 import jakarta.persistence.*;
@@ -16,14 +17,14 @@ public class User extends BaseEntity{
     private Long id;
     @Column(nullable = false, unique = true)
     private String email;
-    //@Column(nullable = false)
     private String password;
     @Column(nullable = false, length = 10)
     private String nickname;
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
     private String socialId; //카카오 로그인시, 이메일 로그인 유저는 null
-
+    @Enumerated(EnumType.STRING)
+    private Authority role;
     private String refreshToken;
     @Builder
     public User(String email, String password, String nickname, LoginType loginType, String socialId) {
@@ -32,6 +33,7 @@ public class User extends BaseEntity{
         this.nickname = nickname;
         this.loginType = loginType;
         this.socialId = socialId;
+        this.role = Authority.ROLE_USER;
     }
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
@@ -47,7 +49,12 @@ public class User extends BaseEntity{
                 .build();
     }
 
+
     public void updateNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void grantAdminAuth(){
+        this.role = Authority.ROLE_ADMIN;
     }
 }
