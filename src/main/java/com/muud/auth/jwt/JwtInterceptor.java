@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import java.util.Map;
 
@@ -28,6 +29,9 @@ public class JwtInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if(request.getMethod().equals("OPTIONS")) {
+            return true;
+        }
+        if (handler instanceof ResourceHttpRequestHandler) {
             return true;
         }
         Auth auth = ((HandlerMethod)handler).getMethodAnnotation(Auth.class);

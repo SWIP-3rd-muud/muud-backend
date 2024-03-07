@@ -32,4 +32,8 @@ public class PlayListService {
         return playListRepository.findByVideoId(videoId)
                 .orElseThrow(()->new ApiException(ExceptionType.BAD_REQUEST));
     }
+
+    public void removePlayList(Long playlistId) {
+        playListRepository.deleteById(playlistId);
+    }
 }
