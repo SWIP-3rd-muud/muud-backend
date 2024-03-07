@@ -18,15 +18,11 @@ import java.util.List;
 @Getter
 public class Diary extends BaseEntity {
 
-//    private static final int MAX_CONTENT_LENGTH = 200;
-
     @Id
     @Column(name = "diary_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @NotNull
-//    @Size(max = MAX_CONTENT_LENGTH)
     @Column
     private String content;
 
@@ -48,20 +44,17 @@ public class Diary extends BaseEntity {
     @JoinColumn(name = "playlist_id")
     private PlayList playList;
 
-//    @NotNull
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    private PlaylistId playlistId;
-
     @OneToMany(mappedBy = "diary")
     private List<Bookmark> bookmarkList;
 
-    public Diary(String content, Emotion emotion, User user, LocalDate referenceDate, String imageUrl) {
+    public Diary(String content, Emotion emotion, User user, LocalDate referenceDate, String imageUrl, PlayList playList) {
         this.id = null;
         this.content = content;
         this.emotion = emotion;
         this.user = user;
         this.referenceDate = referenceDate;
         this.imageUrl = imageUrl;
+        this.playList = playList;
     }
 
     public void updateContent(String content) {
