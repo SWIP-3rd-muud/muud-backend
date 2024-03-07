@@ -58,7 +58,7 @@ public class PlayListController {
                 .body(Map.of("message", "success"));
 
     }
-    @Auth(role = USER)
+    @Auth(role = ADMIN)
     @DeleteMapping("/playlists/{playlistId}")
     public ResponseEntity deletePlayList(@PathVariable Long playlistId){
         playListService.removePlayList(playlistId);
