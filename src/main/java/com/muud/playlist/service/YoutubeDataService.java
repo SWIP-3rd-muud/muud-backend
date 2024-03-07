@@ -7,13 +7,14 @@ import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoSnippet;
 import com.muud.emotion.entity.Emotion;
+import com.muud.global.error.ApiException;
+import com.muud.global.error.ExceptionType;
 import com.muud.playlist.dto.PlayListRequest;
 import com.muud.playlist.entity.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +31,6 @@ public class YoutubeDataService {
     private final String SEARCH_KEYWORD = "PlayList ";
     private final String SEARCH_FILTER = " -교회 -찬양 -찬송";
     @Transactional
-    //@Scheduled(cron = "0 0 4 ? * 6", zone = "Asia/Seoul")
     public int updateVideoList() throws IOException {
         log.info("playlist data refresh schedule start");
         JsonFactory jsonFactory = new JacksonFactory();
@@ -65,11 +65,18 @@ public class YoutubeDataService {
         }
         return savePlayList(playLists).size();
     }
-    public void addPlayList(List<PlayListRequest> playListRequestList){
-        List<PlayList> playLists = playListRequestList.stream()
-                .map(request -> PlayList.from(request))
-                .collect(Collectors.toList());
-        savePlayList(playLists);
+    @Transactional
+    public void addPlayList(PlayListRequest playListRequestList){
+        playListRequestList.getPlayLists()
+                        .forEach((emotion, strings) -> {
+                            try {
+                                List<PlayList> playLists = getVideoDetails(emotion, strings);
+                                savePlayList(playLists);
+                            } catch (IOException e) {
+                                log.error(e.getMessage());
+                                throw new ApiException(ExceptionType.SYSTEM_ERROR);
+                            }
+                        });
     }
     public List<PlayList> savePlayList(List<PlayList> playListList){
         List<PlayList> playLists = new ArrayList<>();

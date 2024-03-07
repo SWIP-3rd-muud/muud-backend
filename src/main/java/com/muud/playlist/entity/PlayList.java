@@ -43,15 +43,6 @@ public class PlayList extends BaseEntity {
                 .channelName(channelName)
                 .build();
     }
-    public static PlayList from(PlayListRequest request){
-        return PlayList.builder()
-                .videoId(request.getVideoId())
-                .title(request.getTitle())
-                .emotion(request.getEmotion())
-                .channelName(request.getChannelName())
-                .tags(request.getTags())
-                .build();
-    }
     public String convertTagsToString(List<String> tagList){
         if(tagList==null) return null;
         if(tagList.size()>3){

@@ -6,6 +6,7 @@ import com.muud.global.common.PageResponse;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
 import com.muud.global.error.ResponseError;
+import com.muud.playlist.dto.PlayListRequest;
 import com.muud.playlist.dto.VideoDto;
 import com.muud.playlist.service.PlayListService;
 import com.muud.playlist.service.YoutubeDataService;
@@ -19,9 +20,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import static com.muud.auth.jwt.Auth.Role.ADMIN;
+import static com.muud.auth.jwt.Auth.Role.USER;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,17 +40,30 @@ public class PlayListController {
     }
 
     @Auth(role=ADMIN)
-    @PostMapping("/playlists")
-    public ResponseEntity updatePlayLists(@RequestBody Map<String, String> code){
+    @PostMapping("/playlists/data")
+    public ResponseEntity updatePlayLists(){
         try {
-            int resultCount = youtubeDataService.updateVideoList();
+            youtubeDataService.updateVideoList();
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(Map.of("resultCount", resultCount));
+                    .body(Map.of("message", "success"));
         } catch (IOException e) {
-            throw new ApiException(ExceptionType.BAD_REQUEST);
+            throw new ApiException(ExceptionType.SYSTEM_ERROR);
         }
     }
+    @Auth(role = ADMIN)
+    @PostMapping("/playlists")
+    public ResponseEntity addPlayList(@RequestBody PlayListRequest playListRequestList){
+        youtubeDataService.addPlayList(playListRequestList);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "success"));
 
+    }
+    @Auth(role = USER)
+    @DeleteMapping("/playlists/{playlistId}")
+    public ResponseEntity deletePlayList(@PathVariable Long playlistId){
+        playListService.removePlayList(playlistId);
+        return ResponseEntity.noContent().build();
+    }
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ResponseError> handleInvalidEnumValueException(IllegalArgumentException ex) {
