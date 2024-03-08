@@ -13,6 +13,10 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
+  cors:
+    origin:
+      local: local
+      server: server
 cloud:
   aws:
     s3:
