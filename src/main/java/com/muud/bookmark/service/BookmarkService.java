@@ -25,7 +25,7 @@ public class BookmarkService {
     private final DiaryRepository diaryRepository;
 
     @Transactional
-    public Bookmark addBookmark(Long userId, Long diaryId) {
+    public Bookmark addBookmark(final Long userId, final Long diaryId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()->new ApiException(ExceptionType.NOT_FOUND));
 
@@ -39,20 +39,20 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void removeBookmark(Long userId, Long diaryId) {
+    public void removeBookmark(final Long userId, final Long diaryId) {
         Bookmark bookmark = bookmarkRepository.findByUserIdAndDiaryId(userId, diaryId)
                 .orElseThrow(() -> new ApiException(ExceptionType.NOT_FOUND));
         bookmarkRepository.delete(bookmark);
     }
 
-    public List<BookmarkResponse> getBookmarkList(Long userId) {
+    public List<BookmarkResponse> getBookmarkList(final Long userId) {
         List<Bookmark> bookmarkList = bookmarkRepository.findByUserId(userId);
         return bookmarkList.stream()
                 .map(BookmarkResponse::from)
                 .collect(Collectors.toList());
     }
 
-    public boolean isBookmarked(Long userId, Long diaryId) {
+    public boolean isBookmarked(final Long userId, final Long diaryId) {
         return bookmarkRepository.findByUserIdAndDiaryId(userId, diaryId).isPresent();
     }
 }
