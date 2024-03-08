@@ -19,15 +19,15 @@ public class BookmarkController {
 
     @Auth
     @GetMapping("/diaries/bookmarks")
-    public ResponseEntity<List<BookmarkResponse>> getBookmarkResponseList(@RequestAttribute("user") User user) {
-        return ResponseEntity.ok(bookmarkService.getBookmarkResponseListByUser(user.getId()));
+    public ResponseEntity<List<BookmarkResponse>> getBookmarkList(@RequestAttribute("user") User user) {
+        return ResponseEntity.ok(bookmarkService.getBookmarkList(user.getId()));
     }
 
     @Auth
     @GetMapping("/diaries/{diaryId}/bookmarks")
     public ResponseEntity<Boolean> checkBookmark(@RequestAttribute("user") User user,
                                                  @PathVariable("diaryId") Long diaryId) {
-        boolean isBookmarked = bookmarkService.isBookmarkedByUser(user.getId(), diaryId);
+        boolean isBookmarked = bookmarkService.isBookmarked(user.getId(), diaryId);
         return ResponseEntity.ok(isBookmarked);
     }
 

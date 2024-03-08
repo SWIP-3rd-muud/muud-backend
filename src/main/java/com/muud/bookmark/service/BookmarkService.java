@@ -9,15 +9,16 @@ import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
 import com.muud.user.entity.User;
 import com.muud.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
     private final UserRepository userRepository;
@@ -31,7 +32,7 @@ public class BookmarkService {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(()->new ApiException(ExceptionType.NOT_FOUND));
 
-        if (isBookmarkedByUser(userId, diaryId)) {
+        if (isBookmarked(userId, diaryId)) {
             throw new ApiException(ExceptionType.BAD_REQUEST);
         }
         return bookmarkRepository.save(new Bookmark(user, diary));
@@ -44,15 +45,15 @@ public class BookmarkService {
         bookmarkRepository.delete(bookmark);
     }
 
-    public List<BookmarkResponse> getBookmarkResponseListByUser(Long userId) {
+    public List<BookmarkResponse> getBookmarkList(Long userId) {
         List<Bookmark> bookmarkList = bookmarkRepository.findByUserId(userId);
         return bookmarkList.stream()
                 .map(BookmarkResponse::from)
                 .collect(Collectors.toList());
     }
 
-    public boolean isBookmarkedByUser(Long userId, Long postId) {
-        return bookmarkRepository.findByUserIdAndDiaryId(userId, postId).isPresent();
+    public boolean isBookmarked(Long userId, Long diaryId) {
+        return bookmarkRepository.findByUserIdAndDiaryId(userId, diaryId).isPresent();
     }
 }
 
