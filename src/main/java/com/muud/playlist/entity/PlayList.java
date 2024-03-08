@@ -1,8 +1,7 @@
 package com.muud.playlist.entity;
 
-import com.muud.emotion.entity.Emotion;
+import com.muud.emotion.domain.Emotion;
 import com.muud.global.common.BaseEntity;
-import com.muud.playlist.dto.PlayListRequest;
 import com.muud.playlist.dto.VideoDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

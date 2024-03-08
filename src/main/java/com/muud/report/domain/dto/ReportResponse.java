@@ -1,4 +1,4 @@
-package com.muud.report.dto;
+package com.muud.report.domain.dto;
 
 public record ReportResponse(int diaryCount,
                              EmotionReport emotionReport,

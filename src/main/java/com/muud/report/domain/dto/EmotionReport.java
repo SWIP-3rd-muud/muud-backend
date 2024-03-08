@@ -1,4 +1,4 @@
-package com.muud.report.dto;
+package com.muud.report.domain.dto;
 
 import java.util.List;
 

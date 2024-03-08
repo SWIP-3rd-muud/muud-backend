@@ -1,6 +1,6 @@
-package com.muud.emotion.dto;
+package com.muud.emotion.domain.dto;
 
-import com.muud.emotion.entity.Emotion;
+import com.muud.emotion.domain.Emotion;
 
 public record EmotionResponse(
         String titleEmotion,

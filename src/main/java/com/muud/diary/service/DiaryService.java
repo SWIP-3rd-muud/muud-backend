@@ -1,12 +1,12 @@
-package com.muud.diary.application;
+package com.muud.diary.service;
 
 import com.muud.diary.domain.Diary;
-import com.muud.diary.dto.ContentUpdateRequest;
-import com.muud.diary.dto.DiaryPreviewResponse;
-import com.muud.diary.dto.DiaryRequest;
-import com.muud.diary.dto.DiaryResponse;
+import com.muud.diary.domain.dto.ContentUpdateRequest;
+import com.muud.diary.domain.dto.DiaryPreviewResponse;
+import com.muud.diary.domain.dto.DiaryRequest;
+import com.muud.diary.domain.dto.DiaryResponse;
 import com.muud.diary.repository.DiaryRepository;
-import com.muud.emotion.entity.Emotion;
+import com.muud.emotion.domain.Emotion;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
 import com.muud.global.util.PhotoManager;

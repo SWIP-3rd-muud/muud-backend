@@ -2,13 +2,13 @@ package com.muud.report.service;
 
 import com.muud.diary.domain.Diary;
 import com.muud.diary.repository.DiaryRepository;
-import com.muud.emotion.entity.Emotion;
+import com.muud.emotion.domain.Emotion;
 import com.muud.playlist.entity.PlayList;
-import com.muud.report.dto.RankDto;
+import com.muud.report.domain.dto.RankDto;
 import com.muud.playlist.dto.VideoDto;
-import com.muud.report.dto.EmotionReport;
-import com.muud.report.dto.PlaylistReport;
-import com.muud.report.dto.ReportResponse;
+import com.muud.report.domain.dto.EmotionReport;
+import com.muud.report.domain.dto.PlaylistReport;
+import com.muud.report.domain.dto.ReportResponse;
 import com.muud.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
-package com.muud.bookmark.presentation;
+package com.muud.bookmark.controller;
 
 import com.muud.auth.jwt.Auth;
-import com.muud.bookmark.application.BookmarkService;
+import com.muud.bookmark.service.BookmarkService;
 import com.muud.bookmark.domain.Bookmark;
 import com.muud.bookmark.domain.dto.BookmarkResponse;
 import com.muud.user.entity.User;

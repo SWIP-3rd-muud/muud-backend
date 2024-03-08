@@ -1,10 +1,10 @@
 package com.muud.emotion.service;
 
 import com.muud.diary.domain.Diary;
-import com.muud.emotion.dto.EmotionCountResponse;
-import com.muud.emotion.dto.QuestionResponse;
-import com.muud.emotion.entity.Emotion;
-import com.muud.emotion.dto.EmotionResponse;
+import com.muud.emotion.domain.dto.EmotionCountResponse;
+import com.muud.emotion.domain.dto.QuestionResponse;
+import com.muud.emotion.domain.Emotion;
+import com.muud.emotion.domain.dto.EmotionResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

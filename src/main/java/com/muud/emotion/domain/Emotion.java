@@ -1,4 +1,4 @@
-package com.muud.emotion.entity;
+package com.muud.emotion.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;

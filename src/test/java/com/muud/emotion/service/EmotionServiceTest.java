@@ -1,6 +1,6 @@
 package com.muud.emotion.service;
 
-import com.muud.emotion.dto.EmotionResponse;
+import com.muud.emotion.domain.dto.EmotionResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

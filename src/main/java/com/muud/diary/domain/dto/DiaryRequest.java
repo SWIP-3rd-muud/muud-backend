@@ -1,4 +1,4 @@
-package com.muud.diary.dto;
+package com.muud.diary.domain.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
