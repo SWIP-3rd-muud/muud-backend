@@ -2,7 +2,7 @@ package com.muud.bookmark.service;
 
 import com.muud.bookmark.domain.Bookmark;
 import com.muud.bookmark.domain.dto.BookmarkResponse;
-import com.muud.bookmark.domain.repository.BookmarkRepository;
+import com.muud.bookmark.repository.BookmarkRepository;
 import com.muud.diary.domain.Diary;
 import com.muud.diary.repository.DiaryRepository;
 import com.muud.global.error.ApiException;
