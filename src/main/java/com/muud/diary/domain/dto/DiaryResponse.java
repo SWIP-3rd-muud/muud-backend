@@ -1,9 +1,8 @@
-package com.muud.diary.dto;
+package com.muud.diary.domain.dto;
 
 import com.muud.diary.domain.Diary;
-import com.muud.emotion.entity.Emotion;
+import com.muud.emotion.domain.Emotion;
 import com.muud.playlist.dto.VideoDto;
-import com.muud.playlist.entity.PlayList;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -1,7 +1,7 @@
 package com.muud.diary.domain;
 
 import com.muud.bookmark.domain.Bookmark;
-import com.muud.emotion.entity.Emotion;
+import com.muud.emotion.domain.Emotion;
 import com.muud.global.common.BaseEntity;
 import com.muud.playlist.entity.PlayList;
 import com.muud.user.entity.User;

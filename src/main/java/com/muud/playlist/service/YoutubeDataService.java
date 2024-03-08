@@ -6,7 +6,7 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoSnippet;
-import com.muud.emotion.entity.Emotion;
+import com.muud.emotion.domain.Emotion;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
 import com.muud.playlist.dto.PlayListRequest;

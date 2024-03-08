@@ -1,7 +1,7 @@
 package com.muud.report.controller;
 
 import com.muud.auth.jwt.Auth;
-import com.muud.report.dto.ReportResponse;
+import com.muud.report.domain.dto.ReportResponse;
 import com.muud.report.service.ReportService;
 import com.muud.user.entity.User;
 import lombok.RequiredArgsConstructor;

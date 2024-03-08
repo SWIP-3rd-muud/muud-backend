@@ -1,11 +1,11 @@
 package com.muud.emotion.controller;
 
 import com.muud.auth.jwt.Auth;
-import com.muud.diary.application.DiaryService;
+import com.muud.diary.service.DiaryService;
 import com.muud.diary.domain.Diary;
-import com.muud.emotion.dto.EmotionCountResponse;
-import com.muud.emotion.dto.EmotionResponse;
-import com.muud.emotion.dto.QuestionResponse;
+import com.muud.emotion.domain.dto.EmotionCountResponse;
+import com.muud.emotion.domain.dto.EmotionResponse;
+import com.muud.emotion.domain.dto.QuestionResponse;
 import com.muud.emotion.service.EmotionService;
 import com.muud.user.entity.User;
 import lombok.RequiredArgsConstructor;

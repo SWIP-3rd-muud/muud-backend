@@ -1,7 +1,7 @@
 package com.muud.playlist.controller;
 
 import com.muud.auth.jwt.Auth;
-import com.muud.emotion.entity.Emotion;
+import com.muud.emotion.domain.Emotion;
 import com.muud.global.common.PageResponse;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
@@ -20,11 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import static com.muud.auth.jwt.Auth.Role.ADMIN;
-import static com.muud.auth.jwt.Auth.Role.USER;
 
 @RestController
 @RequiredArgsConstructor

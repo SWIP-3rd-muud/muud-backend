@@ -1,6 +1,6 @@
 package com.muud.playlist.dto;
 
-import com.muud.emotion.entity.Emotion;
+import com.muud.emotion.domain.Emotion;
 import lombok.Getter;
 
 import java.util.List;

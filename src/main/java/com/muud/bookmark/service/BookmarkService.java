@@ -1,4 +1,4 @@
-package com.muud.bookmark.application;
+package com.muud.bookmark.service;
 
 import com.muud.bookmark.domain.Bookmark;
 import com.muud.bookmark.domain.dto.BookmarkResponse;

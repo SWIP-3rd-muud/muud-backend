@@ -1,7 +1,7 @@
 package com.muud.diary.repository;
 
 import com.muud.diary.domain.Diary;
-import com.muud.emotion.entity.Emotion;
+import com.muud.emotion.domain.Emotion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
