@@ -23,6 +23,8 @@ jobs:
         spring.datasource.url: ${{ secrets.DB_URL }}
         spring.datasource.username: ${{ secrets.DB_USERNAME }}
         spring.datasource.password: ${{ secrets.DB_PASSWORD }}
+        spring.cors.origin.local: ${{ secrets.ORIGIN_LOCAL }}
+        spring.cors.origin.server: ${{ secrets.ORIGIN_SERVER }}
         cloud.aws.s3.bucket: ${{ secrets.S3_BUCKET_NAME }}
         cloud.aws.s3.root-path: ${{ secrets.S3_ROOT_PATH }}
         cloud.aws.s3.image-directory: ${{ secrets.S3_IMAGE_DIRECTORY }}
