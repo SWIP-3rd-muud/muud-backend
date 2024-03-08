@@ -16,7 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry
                 .addMapping("/**")
                 .allowedHeaders("*")
-                .allowedOrigins("http://localhost:5173")
+                .allowedOrigins("https://muud.swygbro.com")
                 .allowedMethods("*")
                 .allowCredentials(true);
     }
