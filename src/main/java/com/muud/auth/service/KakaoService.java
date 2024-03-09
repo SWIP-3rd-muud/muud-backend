@@ -34,7 +34,8 @@ public class KakaoService {
             Map<String, String> tokenResponse = getKakaoToken(code);
             return getUserInfoWithToken(tokenResponse.get("accessToken"));
         } catch (Exception e) {
-            throw new ApiException(ExceptionType.BAD_REQUEST); //code 오류 등
+            e.printStackTrace();
+            throw new ApiException(ExceptionType.BAD_REQUEST, e.getMessage()); //code 오류 등
         }
     }
 
@@ -70,7 +71,7 @@ public class KakaoService {
             System.out.println(accessToken);
             refreshToken = result.get("refresh_token");
         } catch (Exception e) {
-            e.printStackTrace();
+            throw e;
         }
 
         return Map.of("accessToken", accessToken, "refreshToken", refreshToken);
