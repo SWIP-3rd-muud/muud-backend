@@ -15,8 +15,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Map;
 
@@ -66,8 +64,10 @@ public class AuthController {
     }
 
     @PostMapping("/auth/refresh")
-    public ResponseEntity reIssueToken(HttpServletRequest request){
-        String refreshToken = authService.getRefreshToken(request);
+    public ResponseEntity reIssueToken(@CookieValue String refreshToken){
+        System.out.println("refresh: "+refreshToken);
+        if(refreshToken==null)
+            throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
         String token = authService.reIssueToken(refreshToken);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .headers(authService.setTokenCookie(refreshToken))

@@ -99,6 +99,7 @@ public class AuthService {
                 .build();
     }
     public String reIssueToken(String refreshToken){
+        jwtTokenUtils.validToken(refreshToken);
         Long userId = Long.valueOf(jwtTokenUtils.getUserIdFromToken(refreshToken));
         User user = getLoginUser(userId);
         if(user.validRefreshToken(refreshToken)){
@@ -107,21 +108,6 @@ public class AuthService {
             throw new ApiException(ExceptionType.TOKEN_EXPIRED);
         }
     }
-
-    public String getRefreshToken(HttpServletRequest request) {
-        String refreshToken = null;
-        for(Cookie cookie : request.getCookies()){
-            if (cookie.getName().equals("refreshToken")){
-                refreshToken = cookie.getValue();
-                break;
-            }
-        }
-        if(refreshToken == null){
-            throw new ApiException(ExceptionType.INVALID_TOKEN);
-        }
-        return refreshToken;
-    }
-
     public HttpHeaders setTokenCookie(String token) {
         HttpHeaders headers = new HttpHeaders();
         ResponseCookie cookie = ResponseCookie.from("refreshToken", token)
