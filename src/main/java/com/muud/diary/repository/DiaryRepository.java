@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -29,4 +30,8 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
 
     @Query("SELECT d FROM Diary d WHERE d.user.id = :userId")
     List<Diary> findByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT COUNT(d) FROM Diary d WHERE d.user.id = :userId AND d.referenceDate = :referenceDate")
+    int countDiariesByUserIdAndReferenceDate(@Param("userId") Long userId,
+                                             @Param("referenceDate") LocalDate referenceDate);
 }

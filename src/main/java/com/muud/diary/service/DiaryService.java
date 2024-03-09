@@ -34,6 +34,7 @@ public class DiaryService {
 
     @Transactional
     public Diary writeDiary(User user, DiaryRequest diaryRequest, MultipartFile image) {
+        checkWritable(user, diaryRequest);
         return diaryRepository.save(
                 new Diary(diaryRequest.content(),
                         Emotion.valueOf(diaryRequest.emotionName().toUpperCase()),
@@ -98,5 +99,12 @@ public class DiaryService {
 
     private Boolean isOwnerOfDiary(Long userId, Diary diary) {
         return diary.getUser().getId().equals(userId);
+    }
+
+    private void checkWritable(User user, DiaryRequest diaryRequest) {
+        int count = diaryRepository.countDiariesByUserIdAndReferenceDate(user.getId(), diaryRequest.referenceDate());
+        if (count > 0) {
+            throw new ApiException(ExceptionType.BAD_REQUEST);
+        }
     }
 }
