@@ -1,4 +1,4 @@
-package com.muud.bookmark.domain.repository;
+package com.muud.bookmark.repository;
 
 import com.muud.bookmark.domain.Bookmark;
 import org.springframework.data.jpa.repository.JpaRepository;
