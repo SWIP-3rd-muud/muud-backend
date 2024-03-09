@@ -11,10 +11,12 @@ import com.muud.global.error.ExceptionType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Map;
 
@@ -35,18 +37,24 @@ public class AuthController {
     @PostMapping("/auth/signin")
     public ResponseEntity<SigninResponse> signinWithEmail(@Valid @RequestBody SigninRequest signinRequest) {
         SigninResponse signinResponse = authService.signinWithEmail(signinRequest);
-        return ResponseEntity.ok().body(signinResponse);
+        return ResponseEntity.ok()
+                .headers(authService.setTokenCookie(signinResponse.getRefreshToken()))
+                .body(signinResponse);
     }
 
     @PostMapping("/auth/kakao/signin")
     public ResponseEntity signinWithKakao(@RequestBody Map<String, String> mapCode){
         KakaoInfoResponse kakaoInfoResponse = kakaoService.getKakaoInfo(mapCode.get("code"));
         SigninResponse signinResponse = authService.signinWithKakao(kakaoInfoResponse);
+        HttpHeaders headers = authService.setTokenCookie(signinResponse.getRefreshToken());
         if(signinResponse.isNewUser){
             return ResponseEntity.status(HttpStatus.CREATED)
+                    .headers(headers)
                     .body(signinResponse);
         }
-        return ResponseEntity.ok(signinResponse);
+        return ResponseEntity.status(HttpStatus.OK)
+                .headers(headers)
+                .body(signinResponse);
     }
     @PostMapping("/auth/signup/admin")
     public ResponseEntity signupAdmin(@RequestBody SignupRequest signupRequest, @RequestHeader(name = "Auth_Code") String authCode){
@@ -55,5 +63,14 @@ public class AuthController {
         Long userId = authService.signupAdmin(signupRequest);
         return ResponseEntity.created(URI.create("/users/"+userId))
                 .body(Map.of("message", "회원가입이 완료되었습니다."));
+    }
+
+    @PostMapping("/auth/refresh")
+    public ResponseEntity reIssueToken(HttpServletRequest request){
+        String refreshToken = authService.getRefreshToken(request);
+        String token = authService.reIssueToken(refreshToken);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .headers(authService.setTokenCookie(refreshToken))
+                .body(Map.of("accessToken", token));
     }
 }

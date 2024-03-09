@@ -7,6 +7,8 @@ import com.muud.auth.dto.SignupRequest;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
 import com.muud.user.dto.UserInfo;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import com.muud.auth.jwt.JwtToken;
@@ -17,6 +19,8 @@ import com.muud.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Transactional(readOnly = true)
@@ -27,6 +31,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     public Optional<User> getUserByEmail(String email){
         return userRepository.findByEmail(email);
+    }
+    public User getLoginUser(Long userId){
+        return getUserById(userId)
+                .orElseThrow(()->new ApiException(ExceptionType.INVALID_TOKEN));
     }
     public Optional<User> getUserById(Long userId){
         return userRepository.findById(userId);
@@ -49,7 +57,7 @@ public class AuthService {
         User user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow(() -> new ApiException(ExceptionType.INVALID_AUTHENTICATE));
 
         if(user.checkPassword(passwordEncoder.encrypt(signinRequest.getEmail(), signinRequest.getPassword()))){
-            JwtToken token = jwtTokenUtils.createToken(user); //로그인시 토큰 발급
+            JwtToken token = jwtTokenUtils.generateToken(user); //로그인시 토큰 발급
             user.updateRefreshToken(token.getRefreshToken());
             return SigninResponse.builder()
                     .accessToken(token.getAccessToken())
@@ -70,7 +78,7 @@ public class AuthService {
             user = userRepository.save(user);
             isNew = true;
         }
-        JwtToken token = jwtTokenUtils.createToken(user);
+        JwtToken token = jwtTokenUtils.generateToken(user);
         user.updateRefreshToken(token.getRefreshToken());
         return SigninResponse.builder()
                 .accessToken(token.getAccessToken())
@@ -90,5 +98,41 @@ public class AuthService {
                 .loginType(LoginType.EMAIL)
                 .build();
     }
+    public String reIssueToken(String refreshToken){
+        Long userId = Long.valueOf(jwtTokenUtils.getUserIdFromToken(refreshToken));
+        User user = getLoginUser(userId);
+        if(user.validRefreshToken(refreshToken)){
+           return jwtTokenUtils.createToken(user, "access");
+        }else{
+            throw new ApiException(ExceptionType.TOKEN_EXPIRED);
+        }
+    }
 
+    public String getRefreshToken(HttpServletRequest request) {
+        String refreshToken = null;
+        for(Cookie cookie : request.getCookies()){
+            if (cookie.getName().equals("refreshToken")){
+                refreshToken = cookie.getValue();
+                break;
+            }
+        }
+        if(refreshToken == null){
+            throw new ApiException(ExceptionType.INVALID_TOKEN);
+        }
+        return refreshToken;
+    }
+
+    public HttpHeaders setTokenCookie(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", token)
+                .path("/")
+                .maxAge(60*60*24*7) // 쿠키 유효기간 7일로 설정
+                .secure(true)
+                .sameSite("None")
+                .httpOnly(true)
+                .build();
+        headers.add("Set-cookie", cookie.toString());
+
+        return headers;
+    }
 }

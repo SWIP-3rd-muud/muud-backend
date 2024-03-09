@@ -26,33 +26,27 @@ public class JwtTokenUtils {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public JwtToken createToken(User user) {
+    public String createToken(User user, String type){
         Claims claims = Jwts.claims().setSubject(String.valueOf(user.getId()));
         claims.put("email", user.getEmail());
         claims.put("nickname", user.getNickname());
-
         Date now = new Date();
-        Date accessTokenExpiresIn = new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME);
-        Date refreshTokenExpiresIn = new Date(now.getTime() + REFRESH_TOKEN_EXPIRE_TIME);
-
-        String accessToken =  Jwts.builder()
+        Date tokenExpiresIn = type.equals("access") ?
+                new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME) : new Date(now.getTime() + REFRESH_TOKEN_EXPIRE_TIME);
+        return Jwts.builder()
                 .setClaims(claims) // 정보 저장
                 .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME)) // set Expire Time
+                .setExpiration(tokenExpiresIn) // set Expire Time
                 .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과
                 .compact();
-
-        String refreshToken = Jwts.builder()
-                .setClaims(claims) // 정보 저장
-                .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(refreshTokenExpiresIn) // set Expire Time
-                .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과
-                .compact();
+    }
+    public JwtToken generateToken(User user) {
+        String accessToken = createToken(user, "access");
+        String refreshToken = createToken(user, "refresh");
 
         return JwtToken.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
                 .build();
     }
 

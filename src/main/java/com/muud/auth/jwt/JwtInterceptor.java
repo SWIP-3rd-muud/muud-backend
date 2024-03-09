@@ -3,22 +3,17 @@ package com.muud.auth.jwt;
 import com.muud.auth.service.AuthService;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
-import com.muud.user.dto.UserInfo;
-import com.muud.user.entity.Authority;
 import com.muud.user.entity.User;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
-
-import java.util.Map;
+import static com.muud.auth.jwt.Auth.Role.ADMIN;
+import static com.muud.user.entity.Authority.ROLE_ADMIN;
 
 @Component
 @RequiredArgsConstructor
@@ -44,9 +39,8 @@ public class JwtInterceptor implements HandlerInterceptor {
             }else{
                 token = token.substring(7, token.length());
             }
-            User user = authService.getUserById(Long.valueOf(jwtTokenUtils.getUserIdFromToken(token)))
-                    .orElseThrow(() -> new ApiException(ExceptionType.INVALID_TOKEN));
-            if(auth.role().compareTo(Auth.Role.ADMIN)==0 && !user.getRole().equals(Authority.ROLE_ADMIN)){
+            User user = authService.getLoginUser(Long.valueOf(jwtTokenUtils.getUserIdFromToken(token)));
+            if(auth.role().compareTo(ADMIN)==0 && !user.getRole().equals(ROLE_ADMIN)){
                 throw new ApiException(ExceptionType.FORBIDDEN_USER);
             }
             request.setAttribute("user", user);
