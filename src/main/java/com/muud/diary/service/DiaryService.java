@@ -12,10 +12,10 @@ import com.muud.global.error.ExceptionType;
 import com.muud.global.util.PhotoManager;
 import com.muud.playlist.service.PlayListService;
 import com.muud.user.entity.User;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.YearMonth;
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class DiaryService {
     private final DiaryRepository diaryRepository;
