@@ -53,17 +53,17 @@ public class DiaryService {
         return photoManager.upload(image, imageDirectory);
     }
 
-    public DiaryResponse getDiaryResponse(final Long userId, Long diaryId) {
+    public DiaryResponse getDiary(final Long userId, Long diaryId) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new);
-        checkForbiddenUser(userId, diary);
+        checkAuthorized(userId, diary);
         return DiaryResponse.from(diary);
     }
 
-    public List<DiaryResponse> getDiaryResponseListByYearMonth(final Long userId,
-                                                               final YearMonth yearMonth) {
-        List<Diary> diaryList = diaryRepository.findByMonthAndYear(userId, yearMonth.getMonthValue(), yearMonth.getYear());
-        return diaryList.stream()
+    public List<DiaryResponse> getMonthlyDiaryList(final Long userId,
+                                                   final YearMonth yearMonth) {
+        return diaryRepository.findByMonthAndYear(userId, yearMonth.getMonthValue(), yearMonth.getYear())
+                .stream()
                 .map(DiaryResponse::from)
                 .collect(Collectors.toList());
     }
@@ -74,7 +74,7 @@ public class DiaryService {
                                        final ContentUpdateRequest contentUpdateRequest) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new);
-        checkForbiddenUser(userId, diary);
+        checkAuthorized(userId, diary);
         diary.updateContent(contentUpdateRequest.content());
         Diary updatedDiary = diaryRepository.save(diary);
         return DiaryResponse.from(updatedDiary);
@@ -84,21 +84,20 @@ public class DiaryService {
         return diaryRepository.findByUserId(userId);
     }
 
-    public List<DiaryPreviewResponse> getDiaryResponseListByEmotion(final Long userId,
-                                                                    final Emotion emotion) {
+    public List<DiaryPreviewResponse> getDiaryPreviewListByEmotion(final Long userId,
+                                                                   final Emotion emotion) {
         List<Diary> diaryList = diaryRepository.findByEmotion(userId, emotion);
 
         if (!diaryList.isEmpty()) {
-            checkForbiddenUser(userId, diaryList.get(0));
+            checkAuthorized(userId, diaryList.get(0));
         }
-
         return diaryList.stream()
                 .map(DiaryPreviewResponse::from)
                 .collect(Collectors.toList());
     }
 
-    private void checkForbiddenUser(final Long userId,
-                                    final Diary diary) {
+    private void checkAuthorized(final Long userId,
+                                 final Diary diary) {
         if (!isOwnerOfDiary(userId, diary)) {
             throw new ApiException(ExceptionType.FORBIDDEN_USER);
         }
@@ -111,7 +110,7 @@ public class DiaryService {
 
     private void checkWritable(final User user,
                                final DiaryRequest diaryRequest) {
-        int count = diaryRepository.countDiariesByUserIdAndReferenceDate(user.getId(), diaryRequest.referenceDate());
+        int count = diaryRepository.countDiaryOnDate(user.getId(), diaryRequest.referenceDate());
         if (count > 0) {
             throw new ApiException(ExceptionType.BAD_REQUEST);
         }

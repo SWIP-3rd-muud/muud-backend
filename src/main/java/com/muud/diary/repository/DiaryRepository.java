@@ -32,6 +32,6 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
     List<Diary> findByUserId(@Param("userId") final Long userId);
 
     @Query("SELECT COUNT(d) FROM Diary d WHERE d.user.id = :userId AND d.referenceDate = :referenceDate")
-    int countDiariesByUserIdAndReferenceDate(@Param("userId") final Long userId,
-                                             @Param("referenceDate") final LocalDate referenceDate);
+    int countDiaryOnDate(@Param("userId") final Long userId,
+                         @Param("referenceDate") final LocalDate referenceDate);
 }
