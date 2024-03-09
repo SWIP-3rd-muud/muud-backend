@@ -28,6 +28,10 @@ public class AuthService {
     public Optional<User> getUserByEmail(String email){
         return userRepository.findByEmail(email);
     }
+    public User getLoginUser(Long userId){
+        return getUserById(userId)
+                .orElseThrow(()->new ApiException(ExceptionType.INVALID_TOKEN));
+    }
     public Optional<User> getUserById(Long userId){
         return userRepository.findById(userId);
     }

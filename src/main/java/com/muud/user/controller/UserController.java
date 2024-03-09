@@ -16,13 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
 
-import static com.muud.auth.jwt.Auth.Role.USER;
-
 @Controller
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    @Auth()
+    @Auth
     @PatchMapping("/users/{userId}/nickname")
     public ResponseEntity updateUserNickname(@RequestAttribute User user, @PathVariable("userId") Long userId, @RequestBody Map<String, String> mapNickname){
         if(!user.getId().equals(userId)){
