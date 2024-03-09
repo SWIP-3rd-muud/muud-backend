@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 public class EmotionService {
 
-    public EmotionResponse getEmotionResponse(String emotionName) {
+    public EmotionResponse getEmotionResponse(final String emotionName) {
         return Arrays.stream(Emotion.values()).filter(emotion -> emotion.name().equalsIgnoreCase(emotionName))
                 .findFirst()
                 .map(EmotionResponse::from)
@@ -26,7 +26,8 @@ public class EmotionService {
                 .collect(Collectors.toList());
     }
 
-    public List<EmotionCountResponse> getEmotionCount(List<Diary> diaryList, boolean ascending) {
+    public List<EmotionCountResponse> getEmotionCount(final List<Diary> diaryList,
+                                                      final boolean ascending) {
         Map<Emotion, Long> emotionCountMap = new HashMap<>();
 
         for (Emotion emotionValue : Emotion.values()) {

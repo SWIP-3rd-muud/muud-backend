@@ -25,18 +25,19 @@ import java.util.stream.Collectors;
 public class ReportService {
     private final DiaryRepository diaryRepository;
 
-    public ReportResponse generate(User user, YearMonth date) {
+    public ReportResponse generate(final User user,
+                                   final YearMonth date) {
         List<Diary> diaryList = diaryRepository.findByMonthAndYear(user.getId(), date.getMonthValue(), date.getYear());
         return ReportResponse.of(getDiaryCount(diaryList),
                 getEmotionReport(diaryList),
                 getPlaylistReport(diaryList));
     }
 
-    private int getDiaryCount(List<Diary> diaryList) {
+    private int getDiaryCount(final List<Diary> diaryList) {
         return diaryList.size();
     }
 
-    private EmotionReport getEmotionReport(List<Diary> diaryList) {
+    private EmotionReport getEmotionReport(final List<Diary> diaryList) {
         AtomicInteger rankCounter = new AtomicInteger(1);
         List<RankDto<String>> emotionRankList = diaryList.stream()
                 .collect(Collectors.groupingBy(diary -> diary.getEmotion(), Collectors.counting()))
@@ -48,7 +49,7 @@ public class ReportService {
         return new EmotionReport(emotionRankList.size(), emotionRankList);
     }
 
-    private PlaylistReport getPlaylistReport(List<Diary> diaryList) {
+    private PlaylistReport getPlaylistReport(final List<Diary> diaryList) {
         AtomicInteger rankCounter = new AtomicInteger(1);
         List<RankDto<VideoDto>> playlistRankList = diaryList.stream()
                 .collect(Collectors.groupingBy(diary -> diary.getPlayList(), Collectors.counting()))

@@ -17,7 +17,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class EmotionController {
-
     private final EmotionService emotionService;
     private final DiaryService diaryService;
 
@@ -31,7 +30,7 @@ public class EmotionController {
 
     @Auth
     @GetMapping("/emotions/{emotionName}")
-    public ResponseEntity<EmotionResponse> getEmotionResponse(@PathVariable("emotionName") String emotionName) {
+    public ResponseEntity<EmotionResponse> getEmotionResponse(@PathVariable("emotionName") final String emotionName) {
 
         EmotionResponse emotionResponse = emotionService.getEmotionResponse(emotionName);
         return ResponseEntity.ok(emotionResponse);
@@ -39,8 +38,8 @@ public class EmotionController {
 
     @Auth
     @GetMapping("/emotions/ranking")
-    public ResponseEntity<List<EmotionCountResponse>> getEmotionCount(@RequestAttribute("user") User user,
-                                                                      @RequestParam(name = "ascending", required = true) boolean ascending) {
+    public ResponseEntity<List<EmotionCountResponse>> getEmotionCount(@RequestAttribute("user") final User user,
+                                                                      @RequestParam(name = "ascending", required = true) final boolean ascending) {
         List<Diary> diaryList = diaryService.getDiaryList(user.getId());
         List<EmotionCountResponse> emotionCountResponse = emotionService.getEmotionCount(diaryList, ascending);
         return ResponseEntity.ok(emotionCountResponse);
