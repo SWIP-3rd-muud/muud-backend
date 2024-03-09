@@ -17,21 +17,21 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
             "WHERE d.user.id = :userId " +
             "AND MONTH(d.referenceDate) = :month " +
             "AND YEAR(d.referenceDate) = :year")
-    List<Diary> findByMonthAndYear(@Param("userId") Long userId,
-                                   @Param("month") int month,
-                                   @Param("year") int year);
+    List<Diary> findByMonthAndYear(@Param("userId") final Long userId,
+                                   @Param("month") final int month,
+                                   @Param("year") final int year);
 
     @Query("SELECT d " +
             "FROM Diary d " +
             "WHERE d.user.id = :userId " +
             "AND d.emotion = :emotion")
-    List<Diary> findByEmotion(@Param("userId") Long userId,
-                              @Param("emotion") Emotion emotion);
+    List<Diary> findByEmotion(@Param("userId") final Long userId,
+                              @Param("emotion") final Emotion emotion);
 
     @Query("SELECT d FROM Diary d WHERE d.user.id = :userId")
-    List<Diary> findByUserId(@Param("userId") Long userId);
+    List<Diary> findByUserId(@Param("userId") final Long userId);
 
     @Query("SELECT COUNT(d) FROM Diary d WHERE d.user.id = :userId AND d.referenceDate = :referenceDate")
-    int countDiariesByUserIdAndReferenceDate(@Param("userId") Long userId,
-                                             @Param("referenceDate") LocalDate referenceDate);
+    int countDiariesByUserIdAndReferenceDate(@Param("userId") final Long userId,
+                                             @Param("referenceDate") final LocalDate referenceDate);
 }
