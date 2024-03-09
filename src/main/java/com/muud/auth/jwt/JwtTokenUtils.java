@@ -53,24 +53,16 @@ public class JwtTokenUtils {
     public boolean validToken(String token){
         try {
             Claims claims = Jwts.parser()
-                    .setSigningKey(secretKey.getBytes())
+                    .setSigningKey(secretKey)
                     .parseClaimsJws(token) //토큰 파싱
                     .getBody();
             return true;  //유효하다면 true 반환
         } catch (MalformedJwtException | UnsupportedJwtException | SignatureException e) {
+            e.printStackTrace();
             throw new ApiException(ExceptionType.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
+            e.printStackTrace();
             throw new ApiException(ExceptionType.TOKEN_EXPIRED);
-        }
-    }
-    public Claims parseJwtToken(String token) {
-        try {
-            return Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (JwtException e) {
-            throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
         }
     }
     // 토큰에서 회원 Id 정보 추출
