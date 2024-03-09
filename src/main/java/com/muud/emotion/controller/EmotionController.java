@@ -22,33 +22,31 @@ public class EmotionController {
 
     @Auth
     @GetMapping("/emotions")
-    public ResponseEntity<List<EmotionResponse>> getEmotionResponseList() {
-
-        List<EmotionResponse> emotionResponseList = emotionService.getEmotionResponseList();
-        return ResponseEntity.ok(emotionResponseList);
+    public ResponseEntity<List<EmotionResponse>> getEmotionList() {
+        List<EmotionResponse> emotionList = emotionService.getEmotionList();
+        return ResponseEntity.ok(emotionList);
     }
 
     @Auth
     @GetMapping("/emotions/{emotionName}")
-    public ResponseEntity<EmotionResponse> getEmotionResponse(@PathVariable("emotionName") final String emotionName) {
-
-        EmotionResponse emotionResponse = emotionService.getEmotionResponse(emotionName);
-        return ResponseEntity.ok(emotionResponse);
+    public ResponseEntity<EmotionResponse> getEmotionByName(@PathVariable("emotionName") final String emotionName) {
+        EmotionResponse emotion = emotionService.getEmotionByName(emotionName);
+        return ResponseEntity.ok(emotion);
     }
 
     @Auth
     @GetMapping("/emotions/ranking")
-    public ResponseEntity<List<EmotionCountResponse>> getEmotionCount(@RequestAttribute("user") final User user,
-                                                                      @RequestParam(name = "ascending", required = true) final boolean ascending) {
+    public ResponseEntity<List<EmotionCountResponse>> getEmotionAndCount(@RequestAttribute("user") final User user,
+                                                                         @RequestParam(name = "ascending", required = true) final boolean ascending) {
         List<Diary> diaryList = diaryService.getDiaryList(user.getId());
-        List<EmotionCountResponse> emotionCountResponse = emotionService.getEmotionCount(diaryList, ascending);
-        return ResponseEntity.ok(emotionCountResponse);
+        List<EmotionCountResponse> emotionCount = emotionService.getEmotionAndCount(diaryList, ascending);
+        return ResponseEntity.ok(emotionCount);
     }
 
     @Auth
     @GetMapping("/emotions/questions")
-    public ResponseEntity<List<QuestionResponse>> getAllQuestionResponse() {
-        List<QuestionResponse> questionResponseList = emotionService.getAllQuestionResponse();
-        return ResponseEntity.ok(questionResponseList);
+    public ResponseEntity<List<QuestionResponse>> getAllQuestionList() {
+        List<QuestionResponse> questionList = emotionService.getAllQuestionList();
+        return ResponseEntity.ok(questionList);
     }
 }

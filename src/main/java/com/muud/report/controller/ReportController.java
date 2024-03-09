@@ -17,8 +17,8 @@ public class ReportController {
 
     @Auth
     @GetMapping("/reports")
-    public ResponseEntity<ReportResponse> getReportResponse(@RequestAttribute("user") final User user,
-                                                            @RequestParam(name = "date", required = false) final YearMonth inputDate) {
+    public ResponseEntity<ReportResponse> getReport(@RequestAttribute("user") final User user,
+                                                    @RequestParam(name = "date", required = false) final YearMonth inputDate) {
         YearMonth date = (inputDate != null) ? inputDate : YearMonth.now();
         return ResponseEntity.ok(reportService.generate(user, date));
     }
