@@ -64,13 +64,12 @@ public class AuthController {
     }
 
     @PostMapping("/auth/refresh")
-    public ResponseEntity reIssueToken(@CookieValue String refreshToken){
-        System.out.println("refresh: "+refreshToken);
+    public ResponseEntity reIssueToken(@RequestBody Map<String, String> mapToken){
+        String refreshToken = mapToken.get("refreshToken");
         if(refreshToken==null)
             throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
         String token = authService.reIssueToken(refreshToken);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .headers(authService.setTokenCookie(refreshToken))
                 .body(Map.of("accessToken", token));
     }
 }
