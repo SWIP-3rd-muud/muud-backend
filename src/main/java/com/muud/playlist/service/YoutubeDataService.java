@@ -12,6 +12,7 @@ import com.muud.global.error.ExceptionType;
 import com.muud.playlist.dto.PlayListRequest;
 import com.muud.playlist.entity.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,8 +29,9 @@ public class YoutubeDataService {
     @Value("${youtube.api-key}")
     private String apiKey;
     private final PlayListRepository playListRepository;
-    private final String SEARCH_KEYWORD = "PlayList ";
     private final String SEARCH_FILTER = " -교회 -찬양 -찬송";
+
+    private final Map<Emotion, String> queryMap = new HashMap<>();
     @Transactional
     public int updateVideoList() throws IOException {
         log.info("playlist data refresh schedule start");
@@ -52,10 +54,8 @@ public class YoutubeDataService {
         List<PlayList> playLists = new ArrayList<>();
         Set<String> idSet = new HashSet<>();
         for(Emotion emotion: Emotion.values()){
-            String query = emotion.equals(Emotion.CALM) ? "잔잔한" : emotion.getTitleEmotion();
-            search.setQ(SEARCH_KEYWORD + query+ SEARCH_FILTER);
+            search.setQ(getQueryByEmotion(emotion));
             SearchListResponse searchResponse = search.execute();
-
             List<String> ids= searchResponse.getItems().stream()
                     .map(p -> p.getId().getVideoId())
                     .filter(id -> !idSet.contains(id))
@@ -115,5 +115,18 @@ public class YoutubeDataService {
                     .emotion(emotion)
                     .build();
         }).collect(Collectors.toList());
+    }
+
+    @PostConstruct
+    public void init(){
+        queryMap.put(Emotion.JOY, "기쁠 때 들으면 좋은 PlayList");
+        queryMap.put(Emotion.SAD, "슬플 때 들으면 좋은 PlayList | 슬픔을 극복할 수 있는 PlayList");
+        queryMap.put(Emotion.CALM, "잔잔할 때 들으면 좋은 PlayList | 텐션업 PlayList");
+        queryMap.put(Emotion.BLUE, "우울할 때 들으면 좋은 PlayList | 위로가 되는 PlayList");
+        queryMap.put(Emotion.ANGER, "화날 때 들으면 좋은 PlayList");
+        queryMap.put(Emotion.TIRED, "피곤할 때 들으면 좋은 PlayList | 잠깨는 PlayList");
+    }
+    public String getQueryByEmotion(Emotion emotion){
+        return queryMap.get(emotion) + SEARCH_FILTER;
     }
 }
