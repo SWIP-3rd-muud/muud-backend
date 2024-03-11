@@ -33,6 +33,7 @@ cloud:
       auto: false
 youtube:
   api-key: ${YOUTUBE_API_KEY}
+
 #인증&인가 설정 파일
 jwt:
   secretKey: ${JWT_KEY}
@@ -42,3 +43,7 @@ kakao:
     client-secret: ${KAKAO_CLIENT_SECRET}
     redirect-url: ${KAKAO_REDIRECT_URL}
 admin-code: ${ADMIN_KEY}
+
+# logback
+logging:
+  config: classpath:logback/Logback.xml
