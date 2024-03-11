@@ -1,4 +1,4 @@
-package com.muud.auth.dto;
+package com.muud.auth.domain.dto;
 
 import com.muud.user.entity.User;
 import jakarta.validation.constraints.Email;

@@ -1,6 +1,6 @@
 package com.muud.auth.service;
 
-import com.muud.auth.dto.KakaoInfoResponse;
+import com.muud.auth.domain.dto.KakaoInfoResponse;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
 import org.json.simple.JSONObject;
@@ -102,9 +102,6 @@ public class KakaoService {
         String nickname = (String) profile.get("nickname");
         String email = (String) account.get("email");
 
-        return KakaoInfoResponse.builder()
-                .socialId(id)
-                .email(email)
-                .nickname(nickname).build();
+        return KakaoInfoResponse.of(id, email, nickname);
     }
 }
