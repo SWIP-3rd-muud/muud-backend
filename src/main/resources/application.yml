@@ -46,4 +46,4 @@ admin-code: ${ADMIN_KEY}
 
 # logback
 logging:
-  config: classpath:logback/Logback.xml
+  config: classpath:logback/logback.xml
