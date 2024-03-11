@@ -20,7 +20,6 @@ import static com.muud.user.entity.Authority.ROLE_ADMIN;
 public class JwtInterceptor implements HandlerInterceptor {
     private final JwtTokenUtils jwtTokenUtils;
     private final AuthService authService;
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if(request.getMethod().equals("OPTIONS")) {
@@ -33,12 +32,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         if(auth == null){
             return true;
         }else{
-            String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-            if (token == null || !token.startsWith("Bearer ")) {
-                throw new ApiException(ExceptionType.ACCESS_DENIED_EXCEPTION);
-            }else{
-                token = token.substring(7, token.length());
-            }
+            String token = jwtTokenUtils.getTokenFromHeader(request);
             User user = authService.getLoginUser(Long.valueOf(jwtTokenUtils.getUserIdFromToken(token)));
             if(auth.role().compareTo(ADMIN)==0 && !user.getRole().equals(ROLE_ADMIN)){
                 throw new ApiException(ExceptionType.FORBIDDEN_USER);

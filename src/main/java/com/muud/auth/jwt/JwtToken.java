@@ -1,10 +1,7 @@
 package com.muud.auth.jwt;
 
-import lombok.Builder;
-import lombok.Getter;
-@Getter @Builder
-public class JwtToken {
-    private String accessToken;
-    private String refreshToken;
-    private Long accessTokenExpiresIn;
+public record JwtToken(String accessToken, String refreshToken, Long accessTokenExpiresIn) {
+    public static JwtToken of(String accessToken, String refreshToken, Long accessTokenExpiresIn){
+        return new JwtToken(accessToken, refreshToken, accessTokenExpiresIn);
+    }
 }

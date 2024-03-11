@@ -1,12 +1,11 @@
 package com.muud.auth.service;
 
-import com.muud.auth.dto.KakaoInfoResponse;
-import com.muud.auth.dto.SigninRequest;
-import com.muud.auth.dto.SigninResponse;
-import com.muud.auth.dto.SignupRequest;
+import com.muud.auth.domain.dto.KakaoInfoResponse;
+import com.muud.auth.domain.dto.SigninRequest;
+import com.muud.auth.domain.dto.SigninResponse;
+import com.muud.auth.domain.dto.SignupRequest;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
-import com.muud.user.dto.UserInfo;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
@@ -19,8 +18,6 @@ import com.muud.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Transactional(readOnly = true)
@@ -55,15 +52,10 @@ public class AuthService {
     public SigninResponse signinWithEmail(SigninRequest signinRequest){
         //확인 후 토큰 발급
         User user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow(() -> new ApiException(ExceptionType.INVALID_AUTHENTICATE));
-
         if(user.checkPassword(passwordEncoder.encrypt(signinRequest.getEmail(), signinRequest.getPassword()))){
             JwtToken token = jwtTokenUtils.generateToken(user); //로그인시 토큰 발급
-            user.updateRefreshToken(token.getRefreshToken());
-            return SigninResponse.builder()
-                    .accessToken(token.getAccessToken())
-                    .refreshToken(token.getRefreshToken())
-                    .userInfo(user.toDto())
-                    .build();
+            user.updateRefreshToken(token.refreshToken());
+            return SigninResponse.of(token.accessToken(), token.refreshToken(), user.toDto(), false);
         }else{
             throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
         }
@@ -71,7 +63,7 @@ public class AuthService {
 
     @Transactional
     public SigninResponse signinWithKakao(KakaoInfoResponse kakaoInfoResponse){
-        User user = userRepository.findByEmailAndSocialId(kakaoInfoResponse.getEmail(), kakaoInfoResponse.getSocialId())
+        User user = userRepository.findByEmailAndSocialId(kakaoInfoResponse.email(), kakaoInfoResponse.socialId())
                 .orElse(kakaoInfoResponse.toEntity());
         boolean isNew = false;
         if(user.getId() == null){
@@ -79,14 +71,8 @@ public class AuthService {
             isNew = true;
         }
         JwtToken token = jwtTokenUtils.generateToken(user);
-        user.updateRefreshToken(token.getRefreshToken());
-        return SigninResponse.builder()
-                .accessToken(token.getAccessToken())
-                .refreshToken(token.getRefreshToken())
-                .userInfo(user.toDto())
-                .isNewUser(isNew)
-                .build();
-
+        user.updateRefreshToken(token.refreshToken());
+        return SigninResponse.of(token.accessToken(), token.refreshToken(), user.toDto(), isNew);
     }
     public User buildUser(SignupRequest request){
         if(getUserByEmail(request.getEmail()).isPresent())

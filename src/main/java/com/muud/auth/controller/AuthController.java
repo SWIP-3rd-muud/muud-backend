@@ -1,9 +1,9 @@
 package com.muud.auth.controller;
 
-import com.muud.auth.dto.KakaoInfoResponse;
-import com.muud.auth.dto.SigninRequest;
-import com.muud.auth.dto.SigninResponse;
-import com.muud.auth.dto.SignupRequest;
+import com.muud.auth.domain.dto.KakaoInfoResponse;
+import com.muud.auth.domain.dto.SigninRequest;
+import com.muud.auth.domain.dto.SigninResponse;
+import com.muud.auth.domain.dto.SignupRequest;
 import com.muud.auth.service.AuthService;
 import com.muud.auth.service.KakaoService;
 import com.muud.global.error.ApiException;
@@ -36,7 +36,7 @@ public class AuthController {
     public ResponseEntity<SigninResponse> signinWithEmail(@Valid @RequestBody SigninRequest signinRequest) {
         SigninResponse signinResponse = authService.signinWithEmail(signinRequest);
         return ResponseEntity.ok()
-                .headers(authService.setTokenCookie(signinResponse.getRefreshToken()))
+                //.headers(authService.setTokenCookie(signinResponse.refreshToken()))
                 .body(signinResponse);
     }
 
@@ -44,14 +44,12 @@ public class AuthController {
     public ResponseEntity signinWithKakao(@RequestBody Map<String, String> mapCode){
         KakaoInfoResponse kakaoInfoResponse = kakaoService.getKakaoInfo(mapCode.get("code"));
         SigninResponse signinResponse = authService.signinWithKakao(kakaoInfoResponse);
-        HttpHeaders headers = authService.setTokenCookie(signinResponse.getRefreshToken());
-        if(signinResponse.isNewUser){
+        //HttpHeaders headers = authService.setTokenCookie(signinResponse.refreshToken());
+        if(signinResponse.isNewUser()){
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .headers(headers)
                     .body(signinResponse);
         }
         return ResponseEntity.status(HttpStatus.OK)
-                .headers(headers)
                 .body(signinResponse);
     }
     @PostMapping("/auth/signup/admin")
