@@ -1,7 +1,7 @@
 package com.muud.collection.service;
 
-import com.muud.collection.dto.CollectionDto;
-import com.muud.collection.entity.Collection;
+import com.muud.collection.domain.dto.CollectionDto;
+import com.muud.collection.domain.Collection;
 import com.muud.collection.repository.CollectionRepository;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;

@@ -1,6 +1,6 @@
-package com.muud.collection.entity;
+package com.muud.collection.domain;
 
-import com.muud.collection.dto.CollectionDto;
+import com.muud.collection.domain.dto.CollectionDto;
 import com.muud.global.common.BaseEntity;
 import com.muud.playlist.entity.PlayList;
 import com.muud.user.entity.User;

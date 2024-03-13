@@ -1,7 +1,7 @@
 package com.muud.collection.controller;
 
 import com.muud.auth.jwt.Auth;
-import com.muud.collection.dto.CollectionDto;
+import com.muud.collection.domain.dto.CollectionDto;
 import com.muud.collection.service.CollectionService;
 import com.muud.global.common.PageResponse;
 import com.muud.playlist.entity.PlayList;

@@ -1,4 +1,4 @@
-package com.muud.collection.dto;
+package com.muud.collection.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.muud.playlist.dto.VideoDto;
