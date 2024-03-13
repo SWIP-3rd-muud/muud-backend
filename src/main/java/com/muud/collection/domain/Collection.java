@@ -11,7 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED) @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @Table(name = "collections")
 public class Collection extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,21 +30,6 @@ public class Collection extends BaseEntity {
         this.user = user;
         this.playList = playList;
         this.liked = like;
-    }
-
-    public CollectionDto toDetailDto(){
-        return CollectionDto.builder()
-                .collectionId(id)
-                .like(liked)
-                .playList(playList.toDto())
-                .build();
-    }
-    public CollectionDto toDto(){
-        return CollectionDto.builder()
-                .collectionId(id)
-                .like(liked)
-                .videoId(playList.getVideoId())
-                .build();
     }
     public void changeLikeState() {
         this.liked = !this.liked;
