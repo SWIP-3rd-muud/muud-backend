@@ -48,8 +48,7 @@ public class User extends BaseEntity{
     public boolean checkPassword(String password){
         return this.password.equals(password);
     }
-
-
+  
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
@@ -57,6 +56,7 @@ public class User extends BaseEntity{
     public void grantAdminAuth(){
         this.role = Authority.ROLE_ADMIN;
     }
+  
     public boolean validRefreshToken(String refreshToken){
         if(refreshToken == null || !refreshToken.equals(this.refreshToken))
             return false;
