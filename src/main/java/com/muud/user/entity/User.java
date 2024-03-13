@@ -1,7 +1,4 @@
 package com.muud.user.entity;
-import com.muud.auth.dto.KakaoInfoResponse;
-import com.muud.auth.dto.SignupRequest;
-import com.muud.auth.jwt.Auth;
 import com.muud.global.common.BaseEntity;
 import com.muud.user.dto.UserInfo;
 import jakarta.persistence.*;
@@ -35,18 +32,21 @@ public class User extends BaseEntity{
         this.socialId = socialId;
         this.role = Authority.ROLE_USER;
     }
-    public void updateRefreshToken(String refreshToken){
-        this.refreshToken = refreshToken;
-    }
-    public boolean checkPassword(String password){
-        return this.password.equals(password);
-    }
-
     public UserInfo toDto(){
         return UserInfo.builder()
                 .id(id)
                 .nickname(nickname)
                 .build();
+    }
+
+    public boolean checkValidId(Long id){
+        return id == this.id;
+    }
+    public void updateRefreshToken(String refreshToken){
+        this.refreshToken = refreshToken;
+    }
+    public boolean checkPassword(String password){
+        return this.password.equals(password);
     }
 
 
