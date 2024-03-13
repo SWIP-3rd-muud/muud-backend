@@ -1,7 +1,7 @@
 package com.muud.collection.controller;
 
 import com.muud.auth.jwt.Auth;
-import com.muud.collection.dto.CollectionDto;
+import com.muud.collection.domain.dto.CollectionDto;
 import com.muud.collection.service.CollectionService;
 import com.muud.global.common.PageResponse;
 import com.muud.playlist.entity.PlayList;
@@ -32,13 +32,13 @@ public class CollectionController {
     public ResponseEntity<CollectionDto> addCollection(@RequestAttribute User user, @RequestParam Long playListId){
         PlayList playList = playListService.getPlayList(playListId);
         CollectionDto collectionDto = collectionService.saveCollection(user, playList);
-        return ResponseEntity.created(URI.create("/collections/"+collectionDto.getCollectionId()))
+        return ResponseEntity.created(URI.create("/collections/"+collectionDto.collectionId()))
                 .body(collectionDto);
     }
     @Auth
     @GetMapping("/collections/{collectionId}")
     public ResponseEntity<CollectionDto> getCollectionDetails(@RequestAttribute User user, @PathVariable Long collectionId){
-        CollectionDto collectionDto = collectionService.getCollectionDetails(user, collectionId).toDetailDto();
+        CollectionDto collectionDto = collectionService.getCollection(user, collectionId);
         return ResponseEntity.ok(collectionDto);
     }
 

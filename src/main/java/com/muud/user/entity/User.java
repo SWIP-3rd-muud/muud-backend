@@ -38,16 +38,17 @@ public class User extends BaseEntity{
                 .nickname(nickname)
                 .build();
     }
+
+    public boolean checkValidId(Long id){
+        return id == this.id;
+    }
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
     }
     public boolean checkPassword(String password){
         return this.password.equals(password);
     }
-
-    public boolean checkLoginId(Long userId){
-        return id.equals(userId);
-    }
+  
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
@@ -55,6 +56,7 @@ public class User extends BaseEntity{
     public void grantAdminAuth(){
         this.role = Authority.ROLE_ADMIN;
     }
+  
     public boolean validRefreshToken(String refreshToken){
         if(refreshToken == null || !refreshToken.equals(this.refreshToken))
             return false;

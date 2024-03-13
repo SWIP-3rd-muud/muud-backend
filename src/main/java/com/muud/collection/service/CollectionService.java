@@ -1,7 +1,7 @@
 package com.muud.collection.service;
 
-import com.muud.collection.dto.CollectionDto;
-import com.muud.collection.entity.Collection;
+import com.muud.collection.domain.dto.CollectionDto;
+import com.muud.collection.domain.Collection;
 import com.muud.collection.repository.CollectionRepository;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
@@ -19,12 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CollectionService {
     private final CollectionRepository collectionRepository;
-    private final PlayListRepository playListRepository;
     public Page<CollectionDto> getCollections(User user, Pageable pageable) {
         Page<Collection> collectionPage = collectionRepository.findByUser(user, pageable);
-        return collectionPage.map(collection -> collection.toDto());
+        return collectionPage.map(collection -> CollectionDto.of(collection.getId(), collection.isLiked(), collection.getPlayList().getVideoId()));
     }
 
+    public CollectionDto getCollection(User user, Long collectionId){
+        Collection collection = getCollectionDetails(user, collectionId);
+        return CollectionDto.from(collection);
+    }
     @Transactional
     public CollectionDto saveCollection(User user, PlayList playList) {
         Collection collection = collectionRepository.findByUserAndPlayList(user, playList)
@@ -32,14 +35,15 @@ public class CollectionService {
                         user(user)
                         .playList(playList)
                         .build());
-        return collectionRepository.save(collection).toDto();
+        collectionRepository.save(collection);
+        return CollectionDto.of(collection.getId(), collection.isLiked(), playList.getVideoId());
     }
 
     @Transactional
     public CollectionDto changeLikeState(User user, Long collectionId) {
         Collection collection = getCollectionDetails(user, collectionId);
         collection.changeLikeState();
-        return collection.toDto();
+        return CollectionDto.of(collection.getId(), collection.isLiked(), collection.getPlayList().getVideoId());
     }
 
     public Collection getCollectionDetails(User user, Long collectionId) {
@@ -53,6 +57,6 @@ public class CollectionService {
 
     public Page<CollectionDto> getLikedCollections(User user, Pageable pageable) {
         return collectionRepository.findByUserAndLiked(user, true, pageable)
-                .map(collection -> collection.toDetailDto());
+                .map(collection -> CollectionDto.of(collection.getId(), collection.isLiked(), collection.getPlayList().getVideoId()));
     }
 }
