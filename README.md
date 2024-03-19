@@ -25,17 +25,17 @@
 ### ⚙️ 개발 환경
 - **Language** : Java 17
 - **IDE** : IntelliJ
-- **Framework** : Springboot 3.2.2
+- **Framework** : Spring Boot 3.2.2
 - **Database** : MySQL
 - **ORM** : JPA
-- **Server** : AWS(EC2, S3)
+- **Server** : AWS
 - **CI/CD** : Github Actions
 
 ### 🔄 브랜치 전략
 ![flow](https://github.com/SWYP-3rd-muud/muud-backend/assets/143480682/97232b23-9bef-43bc-a25b-2fea467bbcb7)
 
 ### 🏗️ 서비스 아키텍쳐
-![a](https://github.com/SWYP-3rd-muud/muud-backend/assets/143480682/f436a3e9-bfbd-48d9-b4b8-3d2ac59830b3)
+![a](https://github.com/SWYP-3rd-muud/muud-backend/assets/143480682/17f08d40-ff91-4444-a9db-3852193d4716)
 
 ### ☁ CICD pipeline
 ![CICD](https://github.com/SWYP-3rd-muud/muud-backend/assets/143480682/4d63ab25-0c69-41c5-a656-9691d759a9e1)
@@ -47,8 +47,7 @@
 - JWT
 #### 회원가입 
 - 이메일 회원가입
-일기 
-#### 일기 - <a href="https://github.com/SWYP-3rd-muud/muud-backend/wiki/주요-기능-소개(Diary)" >상세보기(WIKI 이동)</a>
+#### 일기
 - 일기 CRUD
 - 책갈피
 - 월간 리포트
