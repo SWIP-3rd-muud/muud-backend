@@ -34,4 +34,13 @@ public enum Emotion {
         this.tags = tags;
         this.question = question;
     }
+
+    public static boolean isValidEmotionName(String emotionName) {
+        for (Emotion emotion : Emotion.values()) {
+            if (emotion.name().equals(emotionName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
