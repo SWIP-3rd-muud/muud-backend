@@ -113,7 +113,7 @@ public class DiaryService {
                                final DiaryRequest diaryRequest) {
         int count = diaryRepository.countDiaryOnDate(user.getId(), diaryRequest.referenceDate());
         if (count > 0) {
-            throw new ApiException(ExceptionType.BAD_REQUEST);
+            throw new ApiException(ExceptionType.BAD_REQUEST, "일기는 하루에 한개만 작성 가능합니다.");
         }
     }
 }

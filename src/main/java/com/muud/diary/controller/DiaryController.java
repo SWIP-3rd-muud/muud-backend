@@ -28,7 +28,7 @@ public class DiaryController {
     @Auth
     @PostMapping("/diaries")
     public ResponseEntity<Long> writeDiary(@RequestAttribute("user") final User user,
-                                           @ModelAttribute final DiaryRequest diaryRequest,
+                                           @Valid @ModelAttribute final DiaryRequest diaryRequest,
                                            @RequestPart(name = "multipartFile", required = false) final MultipartFile multipartFile) {
         Diary diary = diaryService.writeDiary(user, diaryRequest, multipartFile);
         return ResponseEntity.created(URI.create("/diaries/"+diary.getId()))
