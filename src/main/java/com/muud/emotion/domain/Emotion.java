@@ -6,6 +6,7 @@ import lombok.Getter;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @Getter
 public enum Emotion {
+
     JOY("기쁨", "쨍쨍한 햇빛", "반짝반짝, 햇빛 샤워", "/images/sunny-mood.png",
             new String[]{"기쁨", "설렘", "행복"}, "두근두근 기분이 좋고, 웃을 일이 많아요"),
     ANGER("분노", "우르르 쾅쾅", "화가 마음을 쾅쾅 두드려요", "/images/thunder-mood.png",

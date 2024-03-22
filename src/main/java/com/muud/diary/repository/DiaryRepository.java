@@ -12,6 +12,7 @@ import java.util.List;
 
 @Repository
 public interface DiaryRepository extends JpaRepository<Diary, Long> {
+
     @Query("SELECT d " +
             "FROM Diary d " +
             "WHERE d.user.id = :userId " +

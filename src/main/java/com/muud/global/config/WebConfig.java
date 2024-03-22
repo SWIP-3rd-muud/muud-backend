@@ -1,6 +1,5 @@
 package com.muud.global.config;
 
-//import com.muud.auth.jwt.JwtInterceptor;
 import com.muud.auth.jwt.JwtInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
     private final JwtInterceptor jwtInterceptor;
 
     @Value("${spring.cors.origin.local}")
@@ -29,14 +29,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true);
     }
 
-//    private String[] excludePathPatterns = {
-//            "/auth/**", "/auth/kakao/signin"
-//    };
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor);
-//                .addPathPatterns("/**")
-//                .excludePathPatterns(excludePathPatterns);
     }
 }
