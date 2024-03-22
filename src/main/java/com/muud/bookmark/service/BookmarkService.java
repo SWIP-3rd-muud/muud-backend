@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BookmarkService {
+
     private final BookmarkRepository bookmarkRepository;
     private final UserRepository userRepository;
     private final DiaryRepository diaryRepository;

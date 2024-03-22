@@ -23,6 +23,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class DiaryController {
+    
     private final DiaryService diaryService;
 
     @Auth

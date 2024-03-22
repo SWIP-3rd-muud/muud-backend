@@ -13,6 +13,7 @@ import java.time.YearMonth;
 @RestController
 @RequiredArgsConstructor
 public class ReportController {
+
     private final ReportService reportService;
 
     @Auth

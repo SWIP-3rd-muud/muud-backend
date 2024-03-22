@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ReportService {
+    
     private final DiaryRepository diaryRepository;
 
     private static final int INITIAL_RANK = 1;

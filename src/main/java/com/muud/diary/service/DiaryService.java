@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class DiaryService {
+
     private final DiaryRepository diaryRepository;
     private final PhotoManager photoManager;
     private final PlayListService playListService;

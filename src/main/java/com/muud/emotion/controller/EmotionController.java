@@ -17,6 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class EmotionController {
+
     private final EmotionService emotionService;
     private final DiaryService diaryService;
 

@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class BookmarkController {
+
     private final BookmarkService bookmarkService;
 
     @Auth
