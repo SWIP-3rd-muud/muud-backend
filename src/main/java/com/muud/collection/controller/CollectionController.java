@@ -4,7 +4,7 @@ import com.muud.auth.jwt.Auth;
 import com.muud.collection.domain.dto.CollectionDto;
 import com.muud.collection.service.CollectionService;
 import com.muud.global.common.PageResponse;
-import com.muud.playlist.entity.PlayList;
+import com.muud.playlist.domain.PlayList;
 import com.muud.playlist.service.PlayListService;
 import com.muud.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +18,10 @@ import java.net.URI;
 @RestController
 @RequiredArgsConstructor
 public class CollectionController {
+
     private final CollectionService collectionService;
     private final PlayListService playListService;
+
     @Auth
     @GetMapping("/collections")
     public ResponseEntity<PageResponse<CollectionDto>> getCollections(@RequestAttribute User user , Pageable pageable){
@@ -35,6 +37,7 @@ public class CollectionController {
         return ResponseEntity.created(URI.create("/collections/"+collectionDto.collectionId()))
                 .body(collectionDto);
     }
+
     @Auth
     @GetMapping("/collections/{collectionId}")
     public ResponseEntity<CollectionDto> getCollectionDetails(@RequestAttribute User user, @PathVariable Long collectionId){

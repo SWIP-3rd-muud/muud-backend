@@ -18,8 +18,10 @@ import static com.muud.user.entity.Authority.ROLE_ADMIN;
 @Component
 @RequiredArgsConstructor
 public class JwtInterceptor implements HandlerInterceptor {
+
     private final JwtTokenUtils jwtTokenUtils;
     private final AuthService authService;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if(request.getMethod().equals("OPTIONS")) {

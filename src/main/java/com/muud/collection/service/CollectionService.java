@@ -5,8 +5,7 @@ import com.muud.collection.domain.Collection;
 import com.muud.collection.repository.CollectionRepository;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
-import com.muud.playlist.entity.PlayList;
-import com.muud.playlist.repository.PlayListRepository;
+import com.muud.playlist.domain.PlayList;
 import com.muud.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,7 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CollectionService {
+
     private final CollectionRepository collectionRepository;
+
     public Page<CollectionDto> getCollections(User user, Pageable pageable) {
         Page<Collection> collectionPage = collectionRepository.findByUser(user, pageable);
         return collectionPage.map(collection -> CollectionDto.of(collection.getId(), collection.isLiked(), collection.getPlayList().getVideoId()));
@@ -28,6 +29,7 @@ public class CollectionService {
         Collection collection = getCollectionDetails(user, collectionId);
         return CollectionDto.from(collection);
     }
+
     @Transactional
     public CollectionDto saveCollection(User user, PlayList playList) {
         Collection collection = collectionRepository.findByUserAndPlayList(user, playList)

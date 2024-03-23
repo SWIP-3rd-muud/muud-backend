@@ -1,8 +1,7 @@
 package com.muud.collection.domain;
 
-import com.muud.collection.domain.dto.CollectionDto;
 import com.muud.global.common.BaseEntity;
-import com.muud.playlist.entity.PlayList;
+import com.muud.playlist.domain.PlayList;
 import com.muud.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

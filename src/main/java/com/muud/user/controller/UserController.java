@@ -19,7 +19,9 @@ import java.util.Map;
 @Controller
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
+
     @Auth
     @PatchMapping("/users/{userId}/nickname")
     public ResponseEntity updateUserNickname(@RequestAttribute User user, @PathVariable("userId") Long userId, @RequestBody Map<String, String> mapNickname){

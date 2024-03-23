@@ -1,6 +1,6 @@
 package com.muud.report.domain.dto;
 
-import com.muud.playlist.dto.VideoDto;
+import com.muud.playlist.domain.dto.VideoDto;
 
 import java.util.List;
 
