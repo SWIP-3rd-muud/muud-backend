@@ -1,4 +1,4 @@
-package com.muud.playlist.dto;
+package com.muud.playlist.domain.dto;
 
 import com.muud.emotion.domain.Emotion;
 import lombok.Getter;
