@@ -9,8 +9,8 @@ import com.google.api.services.youtube.model.VideoSnippet;
 import com.muud.emotion.domain.Emotion;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
-import com.muud.playlist.dto.PlayListRequest;
-import com.muud.playlist.entity.PlayList;
+import com.muud.playlist.domain.dto.PlayListRequest;
+import com.muud.playlist.domain.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +26,14 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor @Slf4j
 public class YoutubeDataService {
+
     @Value("${youtube.api-key}")
     private String apiKey;
     private final PlayListRepository playListRepository;
     private final String SEARCH_FILTER = " -교회 -찬양 -찬송";
 
     private final Map<Emotion, String> queryMap = new HashMap<>();
+
     @Transactional
     public int updateVideoList() throws IOException {
         log.info("playlist data refresh schedule start");
@@ -65,6 +67,7 @@ public class YoutubeDataService {
         }
         return savePlayList(playLists).size();
     }
+
     @Transactional
     public void addPlayList(PlayListRequest playListRequestList){
         playListRequestList.getPlayLists()
@@ -78,6 +81,7 @@ public class YoutubeDataService {
                             }
                         });
     }
+
     public List<PlayList> savePlayList(List<PlayList> playListList){
         List<PlayList> playLists = new ArrayList<>();
         playListList.forEach(p -> {
@@ -126,6 +130,7 @@ public class YoutubeDataService {
         queryMap.put(Emotion.ANGER, "화날 때 들으면 좋은 PlayList");
         queryMap.put(Emotion.TIRED, "피곤할 때 들으면 좋은 PlayList | 잠깨는 PlayList");
     }
+
     public String getQueryByEmotion(Emotion emotion){
         return queryMap.get(emotion) + SEARCH_FILTER;
     }

@@ -2,10 +2,7 @@ package com.muud.collection.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.muud.collection.domain.Collection;
-import com.muud.playlist.dto.VideoDto;
-import lombok.*;
-
-import java.util.List;
+import com.muud.playlist.domain.dto.VideoDto;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record CollectionDto(Long collectionId, Boolean like, VideoDto playlist, String videoId) {

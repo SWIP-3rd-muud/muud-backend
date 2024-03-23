@@ -16,6 +16,7 @@ import java.util.Map;
 
 @Service
 public class KakaoService {
+
     @Value("${kakao.auth.api-key}")
     private String KAKAO_CLIENT_ID;
 
@@ -93,7 +94,7 @@ public class KakaoService {
         );
 
         //Response 데이터 파싱
-        //**추후 협의 후 필요한 정보 추가
+        //추후 협의 후 필요한 정보 추가
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObj    = (JSONObject) jsonParser.parse(response.getBody());
         JSONObject account = (JSONObject) jsonObj.get("kakao_account");

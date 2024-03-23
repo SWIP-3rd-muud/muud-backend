@@ -23,9 +23,11 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 @Service @RequiredArgsConstructor
 public class AuthService {
+
     private final UserRepository userRepository;
     private final JwtTokenUtils jwtTokenUtils;
     private final PasswordEncoder passwordEncoder;
+
     public Optional<User> getUserByEmail(String email){
         return userRepository.findByEmail(email);
     }
@@ -33,9 +35,11 @@ public class AuthService {
         return getUserById(userId)
                 .orElseThrow(()->new ApiException(ExceptionType.INVALID_TOKEN));
     }
+
     public Optional<User> getUserById(Long userId){
         return userRepository.findById(userId);
     }
+
     @Transactional
     public Long signupWithEmail(SignupRequest request) {
         User user = buildUser(request);
@@ -48,6 +52,7 @@ public class AuthService {
         user.grantAdminAuth();
         return userRepository.save(user).getId();
     }
+
     @Transactional
     public SigninResponse signinWithEmail(SigninRequest signinRequest){
         //확인 후 토큰 발급
@@ -74,6 +79,7 @@ public class AuthService {
         user.updateRefreshToken(token.refreshToken());
         return SigninResponse.of(token.accessToken(), token.refreshToken(), user.toDto(), isNew);
     }
+
     public User buildUser(SignupRequest request){
         if(getUserByEmail(request.getEmail()).isPresent())
             throw new ApiException(ExceptionType.ALREADY_EXIST_EMAIL);
@@ -84,6 +90,7 @@ public class AuthService {
                 .loginType(LoginType.EMAIL)
                 .build();
     }
+
     public String reIssueToken(String refreshToken){
         jwtTokenUtils.validToken(refreshToken);
         Long userId = Long.valueOf(jwtTokenUtils.getUserIdFromToken(refreshToken));
@@ -94,6 +101,7 @@ public class AuthService {
             throw new ApiException(ExceptionType.TOKEN_EXPIRED);
         }
     }
+
     public HttpHeaders setTokenCookie(String token) {
         HttpHeaders headers = new HttpHeaders();
         ResponseCookie cookie = ResponseCookie.from("refreshToken", token)

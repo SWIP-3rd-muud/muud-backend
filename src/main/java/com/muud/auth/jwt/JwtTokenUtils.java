@@ -16,13 +16,14 @@ import java.util.Date;
 @RequiredArgsConstructor
 @Component
 public class JwtTokenUtils {
+
     @Value("${jwt.secretKey}")
     private String secretKey;
-    // 토큰 유효시간 30분
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;
     private static final String ACCESS = "access";
     private static final String REFRESH = "refresh";
+
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
@@ -51,6 +52,7 @@ public class JwtTokenUtils {
             return token.substring(7, token.length());
         }
     }
+
     public JwtToken generateToken(User user) {
         String accessToken = createToken(user, ACCESS);
         String refreshToken = createToken(user, REFRESH);
@@ -72,6 +74,7 @@ public class JwtTokenUtils {
             throw new ApiException(ExceptionType.TOKEN_EXPIRED);
         }
     }
+
     // 토큰에서 회원 Id 정보 추출
     public String getUserIdFromToken(String token) {
         try {
