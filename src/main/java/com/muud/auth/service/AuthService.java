@@ -1,13 +1,9 @@
 package com.muud.auth.service;
 
-import com.muud.auth.domain.dto.KakaoInfoResponse;
-import com.muud.auth.domain.dto.SigninRequest;
-import com.muud.auth.domain.dto.SigninResponse;
-import com.muud.auth.domain.dto.SignupRequest;
+import com.muud.auth.domain.dto.*;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
+import org.antlr.v4.runtime.Token;
 import org.springframework.stereotype.Service;
 
 import com.muud.auth.jwt.JwtToken;
@@ -17,7 +13,6 @@ import com.muud.user.entity.User;
 import com.muud.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Optional;
 
 @Transactional(readOnly = true)
@@ -28,16 +23,10 @@ public class AuthService {
     private final JwtTokenUtils jwtTokenUtils;
     private final PasswordEncoder passwordEncoder;
 
-    public Optional<User> getUserByEmail(String email){
-        return userRepository.findByEmail(email);
-    }
+
     public User getLoginUser(Long userId){
         return getUserById(userId)
                 .orElseThrow(()->new ApiException(ExceptionType.INVALID_TOKEN));
-    }
-
-    public Optional<User> getUserById(Long userId){
-        return userRepository.findById(userId);
     }
 
     @Transactional
@@ -90,29 +79,23 @@ public class AuthService {
                 .loginType(LoginType.EMAIL)
                 .build();
     }
+    public Optional<User> getUserByEmail(String email){
+        return userRepository.findByEmail(email);
+    }
 
-    public String reIssueToken(String refreshToken){
+    public Optional<User> getUserById(Long userId){
+        return userRepository.findById(userId);
+    }
+
+    public TokenResponse reIssueToken(String refreshToken){
         jwtTokenUtils.validToken(refreshToken);
         Long userId = Long.valueOf(jwtTokenUtils.getUserIdFromToken(refreshToken));
         User user = getLoginUser(userId);
         if(user.validRefreshToken(refreshToken)){
-           return jwtTokenUtils.createToken(user, "access");
+           String token =  jwtTokenUtils.createToken(user, "access");
+           return TokenResponse.of(token);
         }else{
             throw new ApiException(ExceptionType.TOKEN_EXPIRED);
         }
-    }
-
-    public HttpHeaders setTokenCookie(String token) {
-        HttpHeaders headers = new HttpHeaders();
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", token)
-                .path("/")
-                .maxAge(60*60*24*7) // 쿠키 유효기간 7일로 설정
-                .secure(true)
-                .sameSite("None")
-                .httpOnly(true)
-                .build();
-        headers.add("Set-cookie", cookie.toString());
-
-        return headers;
     }
 }

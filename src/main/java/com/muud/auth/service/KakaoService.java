@@ -5,6 +5,7 @@ import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -17,14 +18,18 @@ import java.util.Map;
 @Service
 public class KakaoService {
 
-    @Value("${kakao.auth.api-key}")
     private String KAKAO_CLIENT_ID;
 
-    @Value("${kakao.auth.client-secret}")
     private String KAKAO_CLIENT_SECRET;
 
-    @Value("${kakao.auth.redirect-url}")
     private String KAKAO_REDIRECT_URL;
+
+    @Autowired
+    public KakaoService(@Value("${kakao.auth.api-key}") String KAKAO_CLIENT_ID, @Value("${kakao.auth.client-secret}") String KAKAO_CLIENT_SECRET,  @Value("${kakao.auth.redirect-url}") String KAKAO_REDIRECT_URL) {
+        this.KAKAO_CLIENT_ID = KAKAO_CLIENT_ID;
+        this.KAKAO_CLIENT_SECRET = KAKAO_CLIENT_SECRET;
+        this.KAKAO_REDIRECT_URL = KAKAO_REDIRECT_URL;
+    }
 
     private final static String KAKAO_AUTH_URI = "https://kauth.kakao.com/oauth/token";
     private final static String KAKAO_API_URI = "https://kapi.kakao.com";
