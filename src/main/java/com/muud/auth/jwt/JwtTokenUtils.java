@@ -40,7 +40,7 @@ public class JwtTokenUtils {
     }
 
     public String reIssueToken(User user){
-        return  createToken(user, new Date(), REFRESH_TOKEN_EXPIRE_TIME);
+        return  createToken(user, new Date(), ACCESS_TOKEN_EXPIRE_TIME);
     }
 
     public String getTokenFromHeader(HttpServletRequest request){
