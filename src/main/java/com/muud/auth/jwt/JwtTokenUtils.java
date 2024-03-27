@@ -21,27 +21,26 @@ public class JwtTokenUtils {
     private String secretKey;
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;
-    private static final String ACCESS = "access";
-    private static final String REFRESH = "refresh";
 
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(User user, String tokenType){
+    public String createToken(User user, Date issueDate, Long expireTerm){
         Claims claims = Jwts.claims().setSubject(String.valueOf(user.getId()));
         claims.put("email", user.getEmail());
         claims.put("nickname", user.getNickname());
-        Date now = new Date();
-        Date tokenExpiresIn = tokenType.equals(ACCESS) ? new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME) :
-                new Date(now.getTime() + REFRESH_TOKEN_EXPIRE_TIME);
         return Jwts.builder()
                 .setClaims(claims) // 정보 저장
-                .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(tokenExpiresIn) // set Expire Time
+                .setIssuedAt(issueDate) // 토큰 발행 시간 정보
+                .setExpiration(new Date(issueDate.getTime() + expireTerm)) // set Expire Time
                 .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과
                 .compact();
+    }
+
+    public String reIssueToken(User user){
+        return  createToken(user, new Date(), REFRESH_TOKEN_EXPIRE_TIME);
     }
 
     public String getTokenFromHeader(HttpServletRequest request){
@@ -54,8 +53,9 @@ public class JwtTokenUtils {
     }
 
     public JwtToken generateToken(User user) {
-        String accessToken = createToken(user, ACCESS);
-        String refreshToken = createToken(user, REFRESH);
+        Date now = new Date();
+        String accessToken = createToken(user, now, ACCESS_TOKEN_EXPIRE_TIME);
+        String refreshToken = createToken(user, now, REFRESH_TOKEN_EXPIRE_TIME);
         return JwtToken.of(accessToken, refreshToken, ACCESS_TOKEN_EXPIRE_TIME);
     }
 
