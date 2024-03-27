@@ -23,7 +23,6 @@ public class AuthService {
     private final JwtTokenUtils jwtTokenUtils;
     private final PasswordEncoder passwordEncoder;
 
-
     public User getLoginUser(Long userId){
         return getUserById(userId)
                 .orElseThrow(()->new ApiException(ExceptionType.INVALID_TOKEN));
@@ -79,6 +78,7 @@ public class AuthService {
                 .loginType(LoginType.EMAIL)
                 .build();
     }
+
     public Optional<User> getUserByEmail(String email){
         return userRepository.findByEmail(email);
     }
@@ -92,7 +92,7 @@ public class AuthService {
         Long userId = Long.valueOf(jwtTokenUtils.getUserIdFromToken(refreshToken));
         User user = getLoginUser(userId);
         if(user.validRefreshToken(refreshToken)){
-           String token =  jwtTokenUtils.createToken(user, "access");
+           String token =  jwtTokenUtils.reIssueToken(user);
            return TokenResponse.of(token);
         }else{
             throw new ApiException(ExceptionType.TOKEN_EXPIRED);
