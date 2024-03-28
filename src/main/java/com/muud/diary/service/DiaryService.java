@@ -1,5 +1,6 @@
 package com.muud.diary.service;
 
+import com.muud.diary.config.ImageDirectoryConfig;
 import com.muud.diary.domain.Diary;
 import com.muud.diary.domain.dto.ContentUpdateRequest;
 import com.muud.diary.domain.dto.DiaryPreviewResponse;
@@ -13,7 +14,6 @@ import com.muud.global.util.PhotoManager;
 import com.muud.playlist.service.PlayListService;
 import com.muud.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,9 +30,8 @@ public class DiaryService {
     private final DiaryRepository diaryRepository;
     private final PhotoManager photoManager;
     private final PlayListService playListService;
+    private final ImageDirectoryConfig imageDirectoryConfig;
 
-    @Value("${cloud.aws.s3.image-directory}")
-    private String imageDirectory;
 
     @Transactional
     public Diary writeDiary(final User user,
@@ -52,7 +51,7 @@ public class DiaryService {
         if (image == null || image.isEmpty()) {
             return null;
         }
-        return photoManager.upload(image, imageDirectory);
+        return photoManager.upload(image, imageDirectoryConfig.getImageDirectory());
     }
 
     public DiaryResponse getDiary(final Long userId, Long diaryId) {
