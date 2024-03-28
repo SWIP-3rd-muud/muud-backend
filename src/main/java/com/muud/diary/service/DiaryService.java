@@ -32,19 +32,12 @@ public class DiaryService {
     private final PlayListService playListService;
     private final ImageDirectoryConfig imageDirectoryConfig;
 
-
     @Transactional
     public Diary writeDiary(final User user,
                             final DiaryRequest diaryRequest,
                             final MultipartFile image) {
         checkWritable(user, diaryRequest);
-        return diaryRepository.save(
-                new Diary(diaryRequest.content(),
-                        Emotion.valueOf(diaryRequest.emotionName().toUpperCase()),
-                        user,
-                        diaryRequest.referenceDate(),
-                        saveImage(image),
-                        playListService.getPlayList(diaryRequest.playlistId())));
+        return diaryRepository.save(Diary.of(user, diaryRequest, saveImage(image), playListService.getPlayList(diaryRequest.playlistId())));
     }
 
     private String saveImage(final MultipartFile image) {
