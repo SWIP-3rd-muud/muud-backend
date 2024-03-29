@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class DiaryService {
 
@@ -47,6 +46,7 @@ public class DiaryService {
         return photoManager.upload(image, imageDirectoryConfig.getImageDirectory());
     }
 
+    @Transactional(readOnly = true)
     public DiaryResponse getDiary(final Long userId, Long diaryId) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new);
@@ -54,6 +54,7 @@ public class DiaryService {
         return DiaryResponse.from(diary);
     }
 
+    @Transactional(readOnly = true)
     public List<DiaryResponse> getMonthlyDiaryList(final Long userId,
                                                    final YearMonth yearMonth) {
         return diaryRepository.findByMonthAndYear(userId, yearMonth.getMonthValue(), yearMonth.getYear())
@@ -74,10 +75,12 @@ public class DiaryService {
         return DiaryResponse.from(updatedDiary);
     }
 
+    @Transactional(readOnly = true)
     public List<Diary> getDiaryList(final Long userId) {
         return diaryRepository.findByUserId(userId);
     }
 
+    @Transactional(readOnly = true)
     public List<DiaryPreviewResponse> getDiaryPreviewListByEmotion(final Long userId,
                                                                    final Emotion emotion) {
         List<Diary> diaryList = diaryRepository.findByEmotion(userId, emotion);
