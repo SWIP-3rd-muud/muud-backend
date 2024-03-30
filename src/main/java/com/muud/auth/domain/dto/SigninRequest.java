@@ -7,8 +7,13 @@ import lombok.Getter;
 
 @Getter
 public class SigninRequest {
-    @NotBlank @Email
+
+    @NotBlank
+    @Email
     private String email;
-    @NotBlank @Size(min = 8, max = 15)
+
+    @NotBlank
+    @Size(min = 8, max = 15)
     private String password;
+
 }
