@@ -2,7 +2,9 @@ package com.muud.auth.domain.dto;
 
 import com.muud.user.entity.LoginType;
 import com.muud.user.entity.User;
-public record KakaoInfoResponse(String socialId, String email, String nickname) {
+public record KakaoInfoResponse(String socialId,
+                                String email,
+                                String nickname) {
 
     public static KakaoInfoResponse of(String socialId, String email, String nickname) {
         return new KakaoInfoResponse(socialId, email, nickname);
