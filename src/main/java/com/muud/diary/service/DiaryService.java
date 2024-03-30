@@ -51,7 +51,7 @@ public class DiaryService {
                                   final Long diaryId) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new);
-        checkAuthorized(user, diary);
+        validateDiaryOwnership(user, diary);
         return DiaryResponse.from(diary);
     }
 
@@ -70,7 +70,7 @@ public class DiaryService {
                                        final ContentUpdateRequest contentUpdateRequest) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new);
-        checkAuthorized(user, diary);
+        validateDiaryOwnership(user, diary);
         diary.updateContent(contentUpdateRequest.content());
         Diary updatedDiary = diaryRepository.save(diary);
         return DiaryResponse.from(updatedDiary);
@@ -87,23 +87,18 @@ public class DiaryService {
         List<Diary> diaryList = diaryRepository.findByEmotion(user.getId(), emotion);
 
         if (!diaryList.isEmpty()) {
-            checkAuthorized(user, diaryList.get(0));
+            validateDiaryOwnership(user, diaryList.get(0));
         }
         return diaryList.stream()
                 .map(DiaryPreviewResponse::from)
                 .collect(Collectors.toList());
     }
 
-    private void checkAuthorized(final User user,
-                                 final Diary diary) {
-        if (!isOwnerOfDiary(user, diary)) {
+    private void validateDiaryOwnership(final User user,
+                                        final Diary diary) {
+        if (!user.checkValidId(diary.getUser().getId())) {
             throw new ApiException(ExceptionType.FORBIDDEN_USER);
         }
-    }
-
-    private Boolean isOwnerOfDiary(final User user,
-                                   final Diary diary) {
-        return diary.getUser().getId().equals(user.getId());
     }
 
     private void checkWritable(final User user,
