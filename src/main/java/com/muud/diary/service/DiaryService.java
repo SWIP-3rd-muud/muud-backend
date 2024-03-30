@@ -47,62 +47,63 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
-    public DiaryResponse getDiary(final Long userId, Long diaryId) {
+    public DiaryResponse getDiary(final User user,
+                                  final Long diaryId) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new);
-        checkAuthorized(userId, diary);
+        checkAuthorized(user, diary);
         return DiaryResponse.from(diary);
     }
 
     @Transactional(readOnly = true)
-    public List<DiaryResponse> getMonthlyDiaryList(final Long userId,
+    public List<DiaryResponse> getMonthlyDiaryList(final User user,
                                                    final YearMonth yearMonth) {
-        return diaryRepository.findByMonthAndYear(userId, yearMonth.getMonthValue(), yearMonth.getYear())
+        return diaryRepository.findByMonthAndYear(user.getId(), yearMonth.getMonthValue(), yearMonth.getYear())
                 .stream()
                 .map(DiaryResponse::from)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public DiaryResponse updateContent(final Long userId,
+    public DiaryResponse updateContent(final User user,
                                        final Long diaryId,
                                        final ContentUpdateRequest contentUpdateRequest) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new);
-        checkAuthorized(userId, diary);
+        checkAuthorized(user, diary);
         diary.updateContent(contentUpdateRequest.content());
         Diary updatedDiary = diaryRepository.save(diary);
         return DiaryResponse.from(updatedDiary);
     }
 
     @Transactional(readOnly = true)
-    public List<Diary> getDiaryList(final Long userId) {
-        return diaryRepository.findByUserId(userId);
+    public List<Diary> getDiaryList(final User user) {
+        return diaryRepository.findByUserId(user.getId());
     }
 
     @Transactional(readOnly = true)
-    public List<DiaryPreviewResponse> getDiaryPreviewListByEmotion(final Long userId,
+    public List<DiaryPreviewResponse> getDiaryPreviewListByEmotion(final User user,
                                                                    final Emotion emotion) {
-        List<Diary> diaryList = diaryRepository.findByEmotion(userId, emotion);
+        List<Diary> diaryList = diaryRepository.findByEmotion(user.getId(), emotion);
 
         if (!diaryList.isEmpty()) {
-            checkAuthorized(userId, diaryList.get(0));
+            checkAuthorized(user, diaryList.get(0));
         }
         return diaryList.stream()
                 .map(DiaryPreviewResponse::from)
                 .collect(Collectors.toList());
     }
 
-    private void checkAuthorized(final Long userId,
+    private void checkAuthorized(final User user,
                                  final Diary diary) {
-        if (!isOwnerOfDiary(userId, diary)) {
+        if (!isOwnerOfDiary(user, diary)) {
             throw new ApiException(ExceptionType.FORBIDDEN_USER);
         }
     }
 
-    private Boolean isOwnerOfDiary(final Long userId,
+    private Boolean isOwnerOfDiary(final User user,
                                    final Diary diary) {
-        return diary.getUser().getId().equals(userId);
+        return diary.getUser().getId().equals(user.getId());
     }
 
     private void checkWritable(final User user,

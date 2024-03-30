@@ -59,9 +59,9 @@ public class Diary extends BaseEntity {
     }
 
     public static Diary of(final User user,
-                                    final DiaryRequest diaryRequest,
-                                    final String imageUrl,
-                                    final PlayList playList) {
+                           final DiaryRequest diaryRequest,
+                           final String imageUrl,
+                           final PlayList playList) {
         return new Diary(diaryRequest.content(),
                         Emotion.valueOf(diaryRequest.emotionName().toUpperCase()),
                         user,

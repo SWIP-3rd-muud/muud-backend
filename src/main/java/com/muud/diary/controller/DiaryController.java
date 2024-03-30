@@ -40,7 +40,7 @@ public class DiaryController {
     @GetMapping("/diaries/{diaryId}")
     public ResponseEntity<DiaryResponse> getDiary(@RequestAttribute("user") final User user,
                                                   @PathVariable("diaryId") final Long diaryId) {
-        return ResponseEntity.ok(diaryService.getDiary(user.getId(), diaryId));
+        return ResponseEntity.ok(diaryService.getDiary(user, diaryId));
     }
 
     @Auth
@@ -48,7 +48,7 @@ public class DiaryController {
     public ResponseEntity<List<DiaryResponse>> getMonthlyDiaryList(@RequestAttribute("user") final User user,
                                                                    @RequestParam(name = "date", required = true) final String date) {
         YearMonth yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy-MM"));
-        return ResponseEntity.ok(diaryService.getMonthlyDiaryList(user.getId(), yearMonth));
+        return ResponseEntity.ok(diaryService.getMonthlyDiaryList(user, yearMonth));
     }
 
     @Auth
@@ -56,13 +56,13 @@ public class DiaryController {
     public ResponseEntity<DiaryResponse> updateContent(@RequestAttribute("user") final User user,
                                                        @PathVariable("diaryId") final Long diaryId,
                                                        @Valid @RequestBody final ContentUpdateRequest contentUpdateRequest) {
-        return ResponseEntity.ok(diaryService.updateContent(user.getId(), diaryId, contentUpdateRequest));
+        return ResponseEntity.ok(diaryService.updateContent(user, diaryId, contentUpdateRequest));
     }
 
     @Auth
     @GetMapping("/diaries/emotion")
     public ResponseEntity<List<DiaryPreviewResponse>> getDiaryPreviewListByEmotion(@RequestAttribute("user") final User user,
                                                                                    @RequestParam(name = "emotion", required = true) final Emotion emotion) {
-        return ResponseEntity.ok(diaryService.getDiaryPreviewListByEmotion(user.getId(), emotion));
+        return ResponseEntity.ok(diaryService.getDiaryPreviewListByEmotion(user, emotion));
     }
 }
