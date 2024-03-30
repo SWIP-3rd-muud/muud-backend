@@ -40,17 +40,16 @@ public class KakaoService {
             throw new ApiException(ExceptionType.INVALID_INPUT_VALUE);
         }
         try {
-            Map<String, String> tokenResponse = getKakaoToken(code);
-            return getUserInfoWithToken(tokenResponse.get("accessToken"));
+            String tokenResponse = getKakaoToken(code);
+            return getUserInfoWithToken(tokenResponse);
         } catch (Exception e) {
             throw new ApiException(ExceptionType.BAD_REQUEST, e.getMessage());
         }
     }
 
     //코드 -> 인증 토큰
-    public Map<String, String> getKakaoToken(String code){
+    public String getKakaoToken(String code){
         String accessToken = "";
-        String refreshToken = "";
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -74,12 +73,10 @@ public class KakaoService {
 
             Map<String, String> result = response.getBody();
             accessToken  = result.get("access_token");
-            System.out.println(accessToken);
-            refreshToken = result.get("refresh_token");
         } catch (Exception e) {
             throw e;
         }
-        return Map.of("accessToken", accessToken, "refreshToken", refreshToken);
+        return accessToken;
     }
 
     private KakaoInfoResponse getUserInfoWithToken(String accessToken) throws Exception {
