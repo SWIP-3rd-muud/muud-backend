@@ -39,7 +39,7 @@ public class EmotionController {
     @GetMapping("/emotions/ranking")
     public ResponseEntity<List<EmotionCountResponse>> getEmotionAndCount(@RequestAttribute("user") final User user,
                                                                          @RequestParam(name = "ascending", required = true) final boolean ascending) {
-        List<Diary> diaryList = diaryService.getDiaryList(user.getId());
+        List<Diary> diaryList = diaryService.getDiaryList(user);
         List<EmotionCountResponse> emotionCount = emotionService.getEmotionAndCount(diaryList, ascending);
         return ResponseEntity.ok(emotionCount);
     }

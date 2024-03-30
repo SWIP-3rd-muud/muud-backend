@@ -1,6 +1,7 @@
 package com.muud.diary.domain;
 
 import com.muud.bookmark.domain.Bookmark;
+import com.muud.diary.domain.dto.DiaryRequest;
 import com.muud.emotion.domain.Emotion;
 import com.muud.global.common.BaseEntity;
 import com.muud.playlist.domain.PlayList;
@@ -55,6 +56,18 @@ public class Diary extends BaseEntity {
         this.referenceDate = referenceDate;
         this.imageUrl = imageUrl;
         this.playList = playList;
+    }
+
+    public static Diary of(final User user,
+                           final DiaryRequest diaryRequest,
+                           final String imageUrl,
+                           final PlayList playList) {
+        return new Diary(diaryRequest.content(),
+                        Emotion.valueOf(diaryRequest.emotionName().toUpperCase()),
+                        user,
+                        diaryRequest.referenceDate(),
+                        imageUrl,
+                        playList);
     }
 
     public void updateContent(String content) {

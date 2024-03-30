@@ -1,5 +1,6 @@
 package com.muud.diary.service;
 
+import com.muud.diary.config.ImageDirectoryConfig;
 import com.muud.diary.domain.Diary;
 import com.muud.diary.domain.dto.ContentUpdateRequest;
 import com.muud.diary.domain.dto.DiaryPreviewResponse;
@@ -13,7 +14,6 @@ import com.muud.global.util.PhotoManager;
 import com.muud.playlist.service.PlayListService;
 import com.muud.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,91 +23,82 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final PhotoManager photoManager;
     private final PlayListService playListService;
-
-    @Value("${cloud.aws.s3.image-directory}")
-    private String imageDirectory;
+    private final ImageDirectoryConfig imageDirectoryConfig;
 
     @Transactional
     public Diary writeDiary(final User user,
                             final DiaryRequest diaryRequest,
                             final MultipartFile image) {
         checkWritable(user, diaryRequest);
-        return diaryRepository.save(
-                new Diary(diaryRequest.content(),
-                        Emotion.valueOf(diaryRequest.emotionName().toUpperCase()),
-                        user,
-                        diaryRequest.referenceDate(),
-                        saveImage(image),
-                        playListService.getPlayList(diaryRequest.playlistId())));
+        return diaryRepository.save(Diary.of(user, diaryRequest, saveImage(image), playListService.getPlayList(diaryRequest.playlistId())));
     }
 
     private String saveImage(final MultipartFile image) {
         if (image == null || image.isEmpty()) {
             return null;
         }
-        return photoManager.upload(image, imageDirectory);
+        return photoManager.upload(image, imageDirectoryConfig.getImageDirectory());
     }
 
-    public DiaryResponse getDiary(final Long userId, Long diaryId) {
+    @Transactional(readOnly = true)
+    public DiaryResponse getDiary(final User user,
+                                  final Long diaryId) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new);
-        checkAuthorized(userId, diary);
+        validateDiaryOwnership(user, diary);
         return DiaryResponse.from(diary);
     }
 
-    public List<DiaryResponse> getMonthlyDiaryList(final Long userId,
+    @Transactional(readOnly = true)
+    public List<DiaryResponse> getMonthlyDiaryList(final User user,
                                                    final YearMonth yearMonth) {
-        return diaryRepository.findByMonthAndYear(userId, yearMonth.getMonthValue(), yearMonth.getYear())
+        return diaryRepository.findByMonthAndYear(user.getId(), yearMonth.getMonthValue(), yearMonth.getYear())
                 .stream()
                 .map(DiaryResponse::from)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public DiaryResponse updateContent(final Long userId,
+    public DiaryResponse updateContent(final User user,
                                        final Long diaryId,
                                        final ContentUpdateRequest contentUpdateRequest) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new);
-        checkAuthorized(userId, diary);
+        validateDiaryOwnership(user, diary);
         diary.updateContent(contentUpdateRequest.content());
         Diary updatedDiary = diaryRepository.save(diary);
         return DiaryResponse.from(updatedDiary);
     }
 
-    public List<Diary> getDiaryList(final Long userId) {
-        return diaryRepository.findByUserId(userId);
+    @Transactional(readOnly = true)
+    public List<Diary> getDiaryList(final User user) {
+        return diaryRepository.findByUserId(user.getId());
     }
 
-    public List<DiaryPreviewResponse> getDiaryPreviewListByEmotion(final Long userId,
+    @Transactional(readOnly = true)
+    public List<DiaryPreviewResponse> getDiaryPreviewListByEmotion(final User user,
                                                                    final Emotion emotion) {
-        List<Diary> diaryList = diaryRepository.findByEmotion(userId, emotion);
+        List<Diary> diaryList = diaryRepository.findByEmotion(user.getId(), emotion);
 
         if (!diaryList.isEmpty()) {
-            checkAuthorized(userId, diaryList.get(0));
+            validateDiaryOwnership(user, diaryList.get(0));
         }
         return diaryList.stream()
                 .map(DiaryPreviewResponse::from)
                 .collect(Collectors.toList());
     }
 
-    private void checkAuthorized(final Long userId,
-                                 final Diary diary) {
-        if (!isOwnerOfDiary(userId, diary)) {
+    private void validateDiaryOwnership(final User user,
+                                        final Diary diary) {
+        if (!user.checkValidId(diary.getUser().getId())) {
             throw new ApiException(ExceptionType.FORBIDDEN_USER);
         }
-    }
-
-    private Boolean isOwnerOfDiary(final Long userId,
-                                   final Diary diary) {
-        return diary.getUser().getId().equals(userId);
     }
 
     private void checkWritable(final User user,
