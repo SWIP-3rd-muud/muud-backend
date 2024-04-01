@@ -24,7 +24,7 @@ public class AuthController {
     private String ADMIN_CODE;
 
     @PostMapping("/auth/signup")
-    public ResponseEntity signupWithEmail(@Valid @RequestBody SignupRequest request){
+    public ResponseEntity<SignupResponse> signupWithEmail(@Valid @RequestBody SignupRequest request){
         authService.signupWithEmail(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(SignupResponse.of());
@@ -38,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/kakao/signin")
-    public ResponseEntity signinWithKakao(@RequestBody Map<String, String> mapCode){
+    public ResponseEntity<SigninResponse> signinWithKakao(@RequestBody Map<String, String> mapCode){
         KakaoInfoResponse kakaoInfoResponse = kakaoService.getKakaoInfo(mapCode.get("code"));
         SigninResponse signinResponse = authService.signinWithKakao(kakaoInfoResponse);
         if(signinResponse.isNewUser()){
@@ -50,7 +50,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/signup/admin")
-    public ResponseEntity signupAdmin(@RequestBody SignupRequest signupRequest, @RequestHeader(name = "Auth_Code") String authCode){
+    public ResponseEntity<SignupResponse> signupAdmin(@RequestBody SignupRequest signupRequest, @RequestHeader(name = "Auth_Code") String authCode){
         if(!authCode.equals(ADMIN_CODE))
             throw new ApiException(ExceptionType.FORBIDDEN_USER);
         Long userId = authService.signupAdmin(signupRequest);
@@ -59,7 +59,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/refresh")
-    public ResponseEntity reIssueToken(@RequestBody Map<String, String> mapToken){
+    public ResponseEntity<TokenResponse> reIssueToken(@RequestBody Map<String, String> mapToken){
         String refreshToken = mapToken.get("refreshToken");
         if(refreshToken==null)
             throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
