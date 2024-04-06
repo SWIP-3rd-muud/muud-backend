@@ -21,7 +21,7 @@ public class JwtTokenUtils {
     private String secretKey;
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;
-
+    private static final String TOKEN_TYPE = "Bearer ";
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
@@ -45,7 +45,7 @@ public class JwtTokenUtils {
 
     public String getTokenFromHeader(HttpServletRequest request){
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (token == null || !token.startsWith("Bearer ")) {
+        if (token == null || !token.startsWith(TOKEN_TYPE)) {
             throw new ApiException(ExceptionType.ACCESS_DENIED_EXCEPTION);
         }else{
             return token.substring(7, token.length());
