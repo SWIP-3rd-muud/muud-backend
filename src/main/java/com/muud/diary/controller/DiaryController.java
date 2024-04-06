@@ -1,13 +1,13 @@
 package com.muud.diary.controller;
 
 import com.muud.auth.jwt.Auth;
+import com.muud.diary.config.ImageDirectoryConfig;
+import com.muud.diary.domain.dto.*;
 import com.muud.diary.service.DiaryService;
-import com.muud.diary.domain.Diary;
-import com.muud.diary.domain.dto.ContentUpdateRequest;
-import com.muud.diary.domain.dto.DiaryPreviewResponse;
-import com.muud.diary.domain.dto.DiaryRequest;
-import com.muud.diary.domain.dto.DiaryResponse;
 import com.muud.emotion.domain.Emotion;
+import com.muud.global.util.PhotoManager;
+import com.muud.playlist.domain.PlayList;
+import com.muud.playlist.service.PlayListService;
 import com.muud.user.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,15 +25,20 @@ import java.util.List;
 public class DiaryController {
     
     private final DiaryService diaryService;
+    private final PhotoManager photoManager;
+    private final PlayListService playListService;
+    private final ImageDirectoryConfig imageDirectoryConfig;
 
     @Auth
     @PostMapping("/diaries")
-    public ResponseEntity<Long> writeDiary(@RequestAttribute("user") final User user,
-                                           @Valid @ModelAttribute final DiaryRequest diaryRequest,
-                                           @RequestPart(name = "multipartFile", required = false) final MultipartFile multipartFile) {
-        Diary diary = diaryService.writeDiary(user, diaryRequest, multipartFile);
-        return ResponseEntity.created(URI.create("/diaries/"+diary.getId()))
-                .body(diary.getId());
+    public ResponseEntity<CreateDiaryResponse> createDiary(@RequestAttribute("user") final User user,
+                                                           @Valid @ModelAttribute final DiaryRequest diaryRequest,
+                                                           @RequestPart(name = "multipartFile", required = false) final MultipartFile multipartFile) {
+        PlayList playList = playListService.getPlayList(diaryRequest.playlistId());
+        String image = saveImage(multipartFile);
+        CreateDiaryResponse createDiaryResponse = diaryService.create(user, diaryRequest, image, playList);
+        return ResponseEntity.created(URI.create("/diaries/"+ createDiaryResponse.DiaryId()))
+                .body(createDiaryResponse);
     }
 
     @Auth
@@ -64,5 +69,13 @@ public class DiaryController {
     public ResponseEntity<List<DiaryPreviewResponse>> getDiaryPreviewListByEmotion(@RequestAttribute("user") final User user,
                                                                                    @RequestParam(name = "emotion", required = true) final Emotion emotion) {
         return ResponseEntity.ok(diaryService.getDiaryPreviewListByEmotion(user, emotion));
+    }
+
+    private String saveImage(final MultipartFile image) {
+        if (image == null || image.isEmpty()) {
+            return null;
+        }
+
+        return photoManager.upload(image, imageDirectoryConfig.getImageDirectory());
     }
 }

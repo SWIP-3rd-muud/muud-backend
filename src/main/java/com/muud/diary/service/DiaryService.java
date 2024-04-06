@@ -1,22 +1,16 @@
 package com.muud.diary.service;
 
-import com.muud.diary.config.ImageDirectoryConfig;
 import com.muud.diary.domain.Diary;
-import com.muud.diary.domain.dto.ContentUpdateRequest;
-import com.muud.diary.domain.dto.DiaryPreviewResponse;
-import com.muud.diary.domain.dto.DiaryRequest;
-import com.muud.diary.domain.dto.DiaryResponse;
+import com.muud.diary.domain.dto.*;
 import com.muud.diary.repository.DiaryRepository;
 import com.muud.emotion.domain.Emotion;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
-import com.muud.global.util.PhotoManager;
-import com.muud.playlist.service.PlayListService;
+import com.muud.playlist.domain.PlayList;
 import com.muud.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.YearMonth;
 import java.util.List;
@@ -27,23 +21,15 @@ import java.util.stream.Collectors;
 public class DiaryService {
 
     private final DiaryRepository diaryRepository;
-    private final PhotoManager photoManager;
-    private final PlayListService playListService;
-    private final ImageDirectoryConfig imageDirectoryConfig;
 
     @Transactional
-    public Diary writeDiary(final User user,
-                            final DiaryRequest diaryRequest,
-                            final MultipartFile image) {
+    public CreateDiaryResponse create(final User user,
+                                     final DiaryRequest diaryRequest,
+                                     final String image,
+                                     final PlayList playList) {
         checkWritable(user, diaryRequest);
-        return diaryRepository.save(Diary.of(user, diaryRequest, saveImage(image), playListService.getPlayList(diaryRequest.playlistId())));
-    }
-
-    private String saveImage(final MultipartFile image) {
-        if (image == null || image.isEmpty()) {
-            return null;
-        }
-        return photoManager.upload(image, imageDirectoryConfig.getImageDirectory());
+        Diary diary = diaryRepository.save(Diary.of(user, diaryRequest, image, playList));
+        return CreateDiaryResponse.from(diary);
     }
 
     @Transactional(readOnly = true)
