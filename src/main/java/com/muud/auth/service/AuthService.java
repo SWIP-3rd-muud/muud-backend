@@ -3,7 +3,6 @@ package com.muud.auth.service;
 import com.muud.auth.domain.dto.*;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
-import org.antlr.v4.runtime.Token;
 import org.springframework.stereotype.Service;
 
 import com.muud.auth.jwt.JwtToken;
@@ -13,7 +12,6 @@ import com.muud.user.entity.User;
 import com.muud.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional;
 
 @Transactional(readOnly = true)
 @Service @RequiredArgsConstructor
@@ -23,8 +21,9 @@ public class AuthService {
     private final JwtTokenUtils jwtTokenUtils;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public User getLoginUser(Long userId){
-        return getUserById(userId)
+        return userRepository.findById(userId)
                 .orElseThrow(()->new ApiException(ExceptionType.INVALID_TOKEN));
     }
 
@@ -69,7 +68,7 @@ public class AuthService {
     }
 
     public User buildUser(SignupRequest request){
-        if(getUserByEmail(request.getEmail()).isPresent())
+        if(userRepository.findByEmail(request.getEmail()).isPresent())
             throw new ApiException(ExceptionType.ALREADY_EXIST_EMAIL);
         return User.builder()
                 .email(request.getEmail())
@@ -77,14 +76,6 @@ public class AuthService {
                 .password(passwordEncoder.encrypt(request.getEmail(), request.getPassword()))
                 .loginType(LoginType.EMAIL)
                 .build();
-    }
-
-    public Optional<User> getUserByEmail(String email){
-        return userRepository.findByEmail(email);
-    }
-
-    public Optional<User> getUserById(Long userId){
-        return userRepository.findById(userId);
     }
 
     public TokenResponse reIssueToken(String refreshToken){
