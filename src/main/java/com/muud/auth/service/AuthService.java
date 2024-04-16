@@ -13,7 +13,7 @@ import com.muud.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(readOnly = true)
+@Transactional
 @Service @RequiredArgsConstructor
 public class AuthService {
 
@@ -21,26 +21,23 @@ public class AuthService {
     private final JwtTokenUtils jwtTokenUtils;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public User getLoginUser(Long userId){
         return userRepository.findById(userId)
                 .orElseThrow(()->new ApiException(ExceptionType.INVALID_TOKEN));
     }
 
-    @Transactional
     public Long signupWithEmail(SignupRequest request) {
         User user = buildUser(request);
         return userRepository.save(user).getId();
     }
 
-    @Transactional
     public Long signupAdmin(SignupRequest request){
         User user = buildUser(request);
         user.grantAdminAuth();
         return userRepository.save(user).getId();
     }
 
-    @Transactional
     public SigninResponse signinWithEmail(SigninRequest signinRequest){
         //확인 후 토큰 발급
         User user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow(() -> new ApiException(ExceptionType.INVALID_AUTHENTICATE));
@@ -53,7 +50,6 @@ public class AuthService {
         }
     }
 
-    @Transactional
     public SigninResponse signinWithKakao(KakaoInfoResponse kakaoInfoResponse){
         User user = userRepository.findByEmailAndSocialId(kakaoInfoResponse.email(), kakaoInfoResponse.socialId())
                 .orElse(kakaoInfoResponse.toEntity());

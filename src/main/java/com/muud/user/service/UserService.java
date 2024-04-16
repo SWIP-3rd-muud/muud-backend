@@ -9,13 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service @Transactional(readOnly = true)
+@Service
+@Transactional
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
 
-    @Transactional
     public UserInfo changeUserNickname(Long userId, String nickname) {
         if(nickname.isEmpty() || nickname.length()>10){
             throw new ApiException(ExceptionType.BAD_REQUEST);
