@@ -9,6 +9,9 @@ import com.muud.global.util.PhotoManager;
 import com.muud.playlist.domain.PlayList;
 import com.muud.playlist.service.PlayListService;
 import com.muud.user.entity.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "일기 API", description = "일기 관련 CRUD")
 public class DiaryController {
     
     private final DiaryService diaryService;
@@ -30,6 +34,8 @@ public class DiaryController {
     private final ImageDirectoryConfig imageDirectoryConfig;
 
     @Auth
+    @Operation(description = "일기 내용과 사진을 입력받아 등록한다. ", summary = "일기 작성")
+    @ApiResponse(responseCode = "201", description = "일기 작성 성공")
     @PostMapping("/diaries")
     public ResponseEntity<CreateDiaryResponse> createDiary(@RequestAttribute("user") final User user,
                                                            @Valid @ModelAttribute final DiaryRequest diaryRequest,
@@ -42,6 +48,7 @@ public class DiaryController {
     }
 
     @Auth
+    @Operation(description = "일기를 조회한다.", summary = "일기 상세 조회")
     @GetMapping("/diaries/{diaryId}")
     public ResponseEntity<DiaryResponse> getDiary(@RequestAttribute("user") final User user,
                                                   @PathVariable("diaryId") final Long diaryId) {
