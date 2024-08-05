@@ -53,7 +53,7 @@ jobs:
 
   run-docker-image-on-ec2:
     needs: build-docker-image
-    runs-on: self-hosted
+    runs-on: [self-hosted, prod]
     steps:
       - name: docker pull
         run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.SERVER_CONTAINER_NAME }}
