@@ -67,31 +67,27 @@ jobs:
       - name: docker Hub push
         run: docker push ${{ secrets.DOCKERHUB_USER }}/${{ secrets.DOCKER_DEV_CONTAINER }}
 
-    run-docker-image-on-ec2:
-      needs: build-docker-image
-      runs-on: self-hosted
-      steps:
-        - name: docker pull
-          run: sudo docker pull ${{ secrets.DOCKERHUB_USER }}/${{ secrets.DOCKER_DEV_CONTAINER }}
+  run-docker-image-on-ec2:
+    needs: build-docker-image
+    runs-on: self-hosted
+    steps:
+      - name: docker pull
+        run: sudo docker pull ${{ secrets.DOCKERHUB_USER }}/${{ secrets.DOCKER_DEV_CONTAINER }}
+      - name: Check if container is running
+        run: |
+          if [ $(sudo docker ps -q -f name=${{ secrets.DOCKER_DEV_CONTAINER }}) ]; then
+            echo "container_running=true" >> $GITHUB_ENV
+          else
+            echo "container_running=false" >> $GITHUB_ENV
+          fi
+      - name: docker stop container
+        if: env.container_running == 'true'
+        run: sudo docker stop ${{ secrets.DOCKER_DEV_CONTAINER }}
 
-        - name: Check if container is running
-          run: |
-            if [ $(sudo docker ps -q -f name=${{ secrets.DOCKER_DEV_CONTAINER }}) ]; then
-              echo "container_running=true" >> $GITHUB_ENV
-            else
-              echo "container_running=false" >> $GITHUB_ENV
-            fi
-
-        - name: docker stop container
-          if: env.container_running == 'true'
-          run: sudo docker stop ${{ secrets.DOCKER_DEV_CONTAINER }}
-
-        - name: docker remove old container
-          if: env.container_running == 'true'
-          run: sudo docker rm ${{ secrets.DOCKER_DEV_CONTAINER }}
-
-        - name: docker run new container
-          run: sudo docker run --name ${{ secrets.DOCKER_DEV_CONTAINER }} --rm -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} ${{ secrets.DOCKERHUB_USER }}/${{ secrets.DOCKER_DEV_CONTAINER }}
-
-        - name: delete old docker image
-          run: sudo docker system prune -f
+      - name: docker remove old container
+        if: env.container_running == 'true'
+        run: sudo docker rm ${{ secrets.DOCKER_DEV_CONTAINER }}
+      - name: docker run new container
+        run: sudo docker run --name ${{ secrets.DOCKER_DEV_CONTAINER }} --rm -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} ${{ secrets.DOCKERHUB_USER }}/${{ secrets.DOCKER_DEV_CONTAINER }}
+      - name: delete old docker image
+        run: sudo docker system prune -f
