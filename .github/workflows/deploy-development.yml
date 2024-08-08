@@ -74,20 +74,29 @@ jobs:
       - name: docker pull
         run: sudo docker pull ${{ secrets.DOCKERHUB_USER }}/${{ secrets.DOCKER_DEV_CONTAINER }}
       - name: Check if container is running
+        id: check_container
         run: |
-          if [ $(sudo docker ps -q -f name=${{ secrets.DOCKER_DEV_CONTAINER }}) ]; then
+          CONTAINER_ID=$(sudo docker ps -q -f name=${{ secrets.DOCKER_DEV_CONTAINER }})
+          if [ -n "$CONTAINER_ID" ]; then
             echo "container_running=true" >> $GITHUB_ENV
+            echo "Container is running."
           else
             echo "container_running=false" >> $GITHUB_ENV
+            echo "Container is not running."
           fi
+
       - name: docker stop container
         if: env.container_running == 'true'
-        run: sudo docker stop ${{ secrets.DOCKER_DEV_CONTAINER }}
+        run: |
+          CONTAINER_ID=$(sudo docker ps -q -f name=${{ secrets.DOCKER_DEV_CONTAINER }})
+          if [ -n "$CONTAINER_ID" ]; then
+            sudo docker stop ${{ secrets.DOCKER_DEV_CONTAINER }}
+          fi
 
       - name: docker remove old container
         if: env.container_running == 'true'
-        run: sudo docker rm ${{ secrets.DOCKER_DEV_CONTAINER }}
-      - name: docker run new container
-        run: sudo docker run --name ${{ secrets.DOCKER_DEV_CONTAINER }} --rm -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} ${{ secrets.DOCKERHUB_USER }}/${{ secrets.DOCKER_DEV_CONTAINER }}
-      - name: delete old docker image
-        run: sudo docker system prune -f
+        run: |
+          CONTAINER_ID=$(sudo docker ps -a -q -f name=${{ secrets.DOCKER_DEV_CONTAINER }})
+          if [ -n "$CONTAINER_ID" ]; then
+            sudo docker rm ${{ secrets.DOCKER_DEV_CONTAINER }}
+          fi
