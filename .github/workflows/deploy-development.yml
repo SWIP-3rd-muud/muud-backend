@@ -69,10 +69,11 @@ jobs:
 
   run-docker-image-on-ec2:
     needs: build-docker-image
-    runs-on: [self-hosted, dev]
+    runs-on: [ self-hosted, dev ]
     steps:
       - name: docker pull
         run: sudo docker pull ${{ secrets.DOCKERHUB_USER }}/${{ secrets.DOCKER_DEV_CONTAINER }}
+
       - name: Check if container is running
         id: check_container
         run: |
@@ -85,18 +86,14 @@ jobs:
             echo "Container is not running."
           fi
 
-      - name: docker stop container
-        if: env.container_running == 'true'
-        run: |
-          CONTAINER_ID=$(sudo docker ps -q -f name=${{ secrets.DOCKER_DEV_CONTAINER }})
-          if [ -n "$CONTAINER_ID" ]; then
-            sudo docker stop ${{ secrets.DOCKER_DEV_CONTAINER }}
-          fi
-
-      - name: docker remove old container
+      - name: Stop and remove existing container
         if: env.container_running == 'true'
         run: |
           CONTAINER_ID=$(sudo docker ps -a -q -f name=${{ secrets.DOCKER_DEV_CONTAINER }})
           if [ -n "$CONTAINER_ID" ]; then
-            sudo docker rm ${{ secrets.DOCKER_DEV_CONTAINER }}
+            sudo docker stop $CONTAINER_ID
+            sudo docker rm $CONTAINER_ID
           fi
+
+      - name: docker run new container
+        run: sudo docker run --name ${{ secrets.DOCKER_DEV_CONTAINER }} -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} ${{ secrets.DOCKERHUB_USER }}/${{ secrets.DOCKER_DEV_CONTAINER }}
