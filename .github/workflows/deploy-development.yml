@@ -93,6 +93,8 @@ jobs:
           if [ -n "$CONTAINER_ID" ]; then
             sudo docker stop $CONTAINER_ID
             sudo docker rm $CONTAINER_ID
+          else
+            echo "No stopped container found with the name ${{ secrets.DOCKER_DEV_CONTAINER }}."
           fi
 
       - name: docker run new container
