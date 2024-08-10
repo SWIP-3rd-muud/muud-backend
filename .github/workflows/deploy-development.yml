@@ -74,28 +74,24 @@ jobs:
       - name: docker pull
         run: sudo docker pull ${{ secrets.DOCKERHUB_USER }}/${{ secrets.DOCKER_DEV_CONTAINER }}
 
-      - name: Check if container is running
+      - name: Check if container exists
         id: check_container
         run: |
-          CONTAINER_ID=$(sudo docker ps -q -f name=${{ secrets.DOCKER_DEV_CONTAINER }})
+          CONTAINER_ID=$(sudo docker ps -a -q -f name=${{ secrets.DOCKER_DEV_CONTAINER }})
           if [ -n "$CONTAINER_ID" ]; then
-            echo "container_running=true" >> $GITHUB_ENV
-            echo "Container is running."
+            echo "container_exists=true" >> $GITHUB_ENV
           else
-            echo "container_running=false" >> $GITHUB_ENV
-            echo "Container is not running."
+            echo "container_exists=false" >> $GITHUB_ENV
           fi
 
       - name: Stop and remove existing container
-        if: env.container_running == 'true'
+        if: env.container_exists == 'true'
         run: |
           CONTAINER_ID=$(sudo docker ps -a -q -f name=${{ secrets.DOCKER_DEV_CONTAINER }})
           if [ -n "$CONTAINER_ID" ]; then
             sudo docker stop $CONTAINER_ID
             sudo docker rm $CONTAINER_ID
-          else
-            echo "No stopped container found with the name ${{ secrets.DOCKER_DEV_CONTAINER }}."
           fi
 
       - name: docker run new container
-        run: sudo docker run --name ${{ secrets.DOCKER_DEV_CONTAINER }} -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} ${{ secrets.DOCKERHUB_USER }}/${{ secrets.DOCKER_DEV_CONTAINER }}
+        run: sudo docker run --restart always --name ${{ secrets.DOCKER_DEV_CONTAINER }} -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} ${{ secrets.DOCKERHUB_USER }}/${{ secrets.DOCKER_DEV_CONTAINER }}
