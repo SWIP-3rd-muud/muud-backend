@@ -40,8 +40,8 @@ jobs:
           cloud.aws.s3.bucket: ${{ secrets.S3_BUCKET_NAME }}
           cloud.aws.s3.root-path: ${{ secrets.S3_ROOT_PATH }}
           cloud.aws.s3.image-directory: ${{ secrets.S3_IMAGE_DIRECTORY }}
-          cloud.aws.credentials.access-key: ${{ secrets.S3_ACCESS_KEY }}
-          cloud.aws.credentials.secret-key: ${{ secrets.S3_SECRET_KEY }}
+          cloud.aws.credentials.access-key: ${{ secrets.AWS_ACCESS_KEY }}
+          cloud.aws.credentials.secret-key: ${{ secrets.AWS_SECRET_KEY }}
           cloud.aws.region.static: ${{ secrets.S3_REGION }}
           jwt.secretKey: ${{ secrets.JWT_KEY }}
           kakao.auth.api-key: ${{ secrets.KAKAO_API_KEY }}
