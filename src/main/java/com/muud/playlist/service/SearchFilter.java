@@ -6,7 +6,6 @@ public class SearchFilter {
     public static final String EXCLUDE_ADS_TERMS = " -광고 -스폰서";
     public static final String EXCLUDE_TUTORIAL_TERMS = " -튜토리얼 -가이드 -방법";
     public static final String EXCLUDE_ADULT_TERMS = " -성인 -19금 -성적";
-
     public static final String EXCLUDE_ALL;
 
     static {
