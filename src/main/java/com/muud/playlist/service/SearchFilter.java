@@ -5,7 +5,7 @@ public class SearchFilter {
     public static final String EXCLUDE_POLITICAL_TERMS = " -정치 -대선 -국회 -의회";
     public static final String EXCLUDE_ADS_TERMS = " -광고 -스폰서";
     public static final String EXCLUDE_TUTORIAL_TERMS = " -튜토리얼 -가이드 -방법";
-    public static final String EXCLUDE_ADULT_TERMS = " -성인 -19금 -성적";
+    public static final String EXCLUDE_ADULT_TERMS = " -성인 -19금";
     public static final String EXCLUDE_ALL;
 
     static {

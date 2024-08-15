@@ -1,6 +1,8 @@
 package com.muud.playlist.service;
 
 import com.muud.emotion.domain.Emotion;
+import com.muud.global.error.ApiException;
+import com.muud.global.error.ExceptionType;
 
 public class SearchQuery {
 
@@ -19,7 +21,7 @@ public class SearchQuery {
             case BLUE: return BLUE_QUERY;
             case ANGER: return ANGER_QUERY;
             case TIRED: return TIRED_QUERY;
-            default: throw new IllegalArgumentException("Unknown emotion: " + emotion);
+            default: throw new ApiException(ExceptionType.BAD_REQUEST);
         }
     }
 

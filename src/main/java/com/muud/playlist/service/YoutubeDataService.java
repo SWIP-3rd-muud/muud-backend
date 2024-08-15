@@ -119,7 +119,7 @@ public class YoutubeDataService {
         }).collect(Collectors.toList());
     }
 
-    @Scheduled(cron = "0 0 4 */2 * *")
+    @Scheduled(cron = "0 00 12 */2 * *")
     @Transactional
     public void checkAndRemoveDeletedVideos() throws IOException {
         //모든 플레이리스트에 대해 수행
