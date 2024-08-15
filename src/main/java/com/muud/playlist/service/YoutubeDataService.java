@@ -1,7 +1,5 @@
 package com.muud.playlist.service;
 
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.Video;
@@ -14,7 +12,6 @@ import com.muud.playlist.domain.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -25,23 +22,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor @Slf4j
+@RequiredArgsConstructor
+@Slf4j
 public class YoutubeDataService {
 
+    @Value("${youtube.api-key}")
     private String apiKey;
     private final PlayListRepository playListRepository;
     private final YouTube youtube;
 
-    @Autowired
-    public YoutubeDataService(PlayListRepository playListRepository, @Value("${youtube.api-key}") String apiKey) {
-        this.playListRepository = playListRepository;
-        this.apiKey = apiKey;
-        this.youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), request -> {})
-                .setApplicationName("your-application-name")
-                .build();
-    }
-
-    //비디오 데이터 추가, 이미 DB에 존재하면 스킵
     @Transactional
     public int upsertPlayList() throws IOException {
         log.info("===playlist data upsert job start===");
@@ -119,7 +108,7 @@ public class YoutubeDataService {
         }).collect(Collectors.toList());
     }
 
-    @Scheduled(cron = "0 00 12 */2 * *")
+    @Scheduled(cron = "0 30 4 * * *")
     @Transactional
     public void checkAndRemoveDeletedVideos() throws IOException {
         //모든 플레이리스트에 대해 수행
