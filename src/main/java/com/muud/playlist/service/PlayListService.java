@@ -7,9 +7,12 @@ import com.muud.playlist.domain.dto.VideoDto;
 import com.muud.playlist.domain.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -25,11 +28,6 @@ public class PlayListService {
     public PlayList getPlayList(Long playListId) {
         return playListRepository.findById(playListId)
                 .orElseThrow(()-> new ApiException(ExceptionType.BAD_REQUEST));
-    }
-
-    public PlayList getPlayListByVideoId(String videoId) {
-        return playListRepository.findByVideoId(videoId)
-                .orElseThrow(()->new ApiException(ExceptionType.BAD_REQUEST));
     }
 
     public void removePlayList(Long playlistId) {
