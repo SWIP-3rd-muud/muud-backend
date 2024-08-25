@@ -2,6 +2,8 @@ package com.muud.emotion.service;
 
 import com.muud.diary.domain.Diary;
 import com.muud.emotion.domain.EmotionCard;
+import com.muud.emotion.domain.EmotionTag;
+import com.muud.emotion.domain.dto.TagListResponse;
 import com.muud.emotion.domain.dto.*;
 import com.muud.emotion.domain.Emotion;
 import org.springframework.stereotype.Service;
@@ -56,5 +58,12 @@ public class EmotionService {
                 .map(EmotionValue::from)
                 .toList();
         return EmotionListResponse.from(EmotionList);
+    }
+
+    public TagListResponse getEmotionTagList() {
+        List<String> tagList = Arrays.stream(EmotionTag.values())
+                .map(EmotionTag::getName)
+                .toList();
+        return TagListResponse.from(tagList);
     }
 }

@@ -2,6 +2,7 @@ package com.muud.emotion.controller.v1;
 
 import com.muud.auth.jwt.Auth;
 import com.muud.emotion.domain.dto.EmotionListResponse;
+import com.muud.emotion.domain.dto.TagListResponse;
 import com.muud.emotion.service.EmotionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,5 +25,12 @@ public class EmotionControllerV1 {
     @GetMapping
     public ResponseEntity<EmotionListResponse> getEmotionList() {
         return ResponseEntity.ok(emotionService.getEmotionValueList());
+    }
+
+    @Auth
+    @Operation(summary = "감정 태그 호출", description = "감정 태그들을 불러온다")
+    @GetMapping("/tags")
+    public ResponseEntity<TagListResponse> getEmotionTagList() {
+        return ResponseEntity.ok(emotionService.getEmotionTagList());
     }
 }
