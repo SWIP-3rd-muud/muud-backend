@@ -60,10 +60,20 @@ public class EmotionService {
         return EmotionListResponse.from(EmotionList);
     }
 
-    public TagListResponse getEmotionTagList() {
+    public TagListResponse getTagListResponse(EmotionCard emotion) {
         List<String> tagList = Arrays.stream(EmotionTag.values())
                 .map(EmotionTag::getName)
                 .toList();
-        return TagListResponse.from(tagList);
+        return TagListResponse.from(tagList, getTagByEmotion(emotion));
+    }
+
+    public String getTagByEmotion(EmotionCard emotion) {
+        return switch (emotion) {
+            case JOY -> EmotionTag.EXCITED.getName();
+            case GENERAL -> EmotionTag.RELAXED.getName();
+            case ANGRY -> EmotionTag.ANNOYED.getName();
+            case SADNESS -> EmotionTag.RESENTFUL.getName();
+            case TIRED -> EmotionTag.PRESSURED.getName();
+        };
     }
 }

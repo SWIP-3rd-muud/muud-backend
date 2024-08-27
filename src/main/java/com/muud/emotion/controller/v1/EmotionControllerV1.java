@@ -1,6 +1,7 @@
 package com.muud.emotion.controller.v1;
 
 import com.muud.auth.jwt.Auth;
+import com.muud.emotion.domain.EmotionCard;
 import com.muud.emotion.domain.dto.EmotionListResponse;
 import com.muud.emotion.domain.dto.TagListResponse;
 import com.muud.emotion.service.EmotionService;
@@ -8,9 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,9 +27,9 @@ public class EmotionControllerV1 {
     }
 
     @Auth
-    @Operation(summary = "감정 태그 호출", description = "감정 태그들을 불러온다")
+    @Operation(summary = "감정 태그 호출", description = "감정 태그들을 불러오고, 파라미터에 따른 focus 감정을 반환한다")
     @GetMapping("/tags")
-    public ResponseEntity<TagListResponse> getEmotionTagList() {
-        return ResponseEntity.ok(emotionService.getEmotionTagList());
+    public ResponseEntity<TagListResponse> getEmotionTagList(@RequestParam EmotionCard emotion) {
+        return ResponseEntity.ok(emotionService.getTagListResponse(emotion));
     }
 }
