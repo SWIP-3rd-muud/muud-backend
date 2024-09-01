@@ -30,7 +30,7 @@ public class User extends BaseEntity{
         this.nickname = nickname;
         this.loginType = loginType;
         this.socialId = socialId;
-        this.role = Authority.ROLE_USER;
+        this.role = Authority.USER;
     }
     public UserInfo toDto(){
         return UserInfo.builder()
@@ -54,7 +54,7 @@ public class User extends BaseEntity{
     }
 
     public void grantAdminAuth(){
-        this.role = Authority.ROLE_ADMIN;
+        this.role = Authority.ADMIN;
     }
   
     public boolean validRefreshToken(String refreshToken){
