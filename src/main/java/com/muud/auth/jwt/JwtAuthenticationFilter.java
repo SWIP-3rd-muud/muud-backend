@@ -1,7 +1,7 @@
 package com.muud.auth.jwt;
 
-import com.muud.auth.service.AuthService;
-import com.muud.auth.service.CustomUserDetailService;
+import com.muud.auth.service.UserPrincipalService;
+import com.muud.auth.service.UserPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -23,17 +22,14 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtils jwtTokenUtils;
-    private final CustomUserDetailService detailService;
+    private final UserPrincipalService principalService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String path = request.getRequestURI();
-        log.error("=========================================");
-        log.error(path);
         String token = jwtTokenUtils.getTokenFromHeader(request);
         if (token != null) {
             String email = jwtTokenUtils.getEmailFromToken(token);
-            UserDetails userDetails = detailService.loadUserByUsername(email);
+            UserPrincipal userDetails = principalService.loadUserByUsername(email);
             Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
