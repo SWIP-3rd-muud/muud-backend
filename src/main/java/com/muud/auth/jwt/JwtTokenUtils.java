@@ -28,22 +28,12 @@ public class JwtTokenUtils {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(User user, Date issueDate, Long expireTerm){
-        Claims claims = Jwts.claims().setSubject(String.valueOf(user.getId()));
-        claims.put("email", user.getEmail());
-        claims.put("nickname", user.getNickname());
-        return Jwts.builder()
-                .setClaims(claims) // 정보 저장
-                .setIssuedAt(issueDate) // 토큰 발행 시간 정보
-                .setExpiration(new Date(issueDate.getTime() + expireTerm)) // set Expire Time
-                .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과
-                .compact();
-    }
-
-    public String reIssueToken(User user){
-        return  createToken(user, new Date(), ACCESS_TOKEN_EXPIRE_TIME);
-    }
-
+    /**
+     * Http 헤더에서 JWT 토큰을 추출
+     *
+     * @param request 요청된 http request
+     * @return JWT 토큰
+     */
     public String getTokenFromHeader(HttpServletRequest request){
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (token == null || !token.startsWith(TOKEN_TYPE)) {
@@ -53,20 +43,20 @@ public class JwtTokenUtils {
         }
     }
 
-    public JwtToken generateToken(User user) {
-        Date now = new Date();
-        String accessToken = createToken(user, now, ACCESS_TOKEN_EXPIRE_TIME);
-        String refreshToken = createToken(user, now, REFRESH_TOKEN_EXPIRE_TIME);
-        return JwtToken.of(accessToken, refreshToken, ACCESS_TOKEN_EXPIRE_TIME);
-    }
-
-    public boolean validToken(String token){
+    /**
+     * JWT Token parsing 후 유효성 검증
+     *
+     * @param token 검증 토큰
+     * @return 유효 여부, 유효하면 true
+     * @throws ApiException 토큰이 유효하지 않거나, 만료된 경우
+     */
+    public boolean validateToken(String token){
         try {
             Claims claims = Jwts.parser()
                     .setSigningKey(secretKey)
-                    .parseClaimsJws(token) //토큰 파싱
+                    .parseClaimsJws(token)
                     .getBody();
-            return true;  //유효하다면 true 반환
+            return true;
         } catch (MalformedJwtException | UnsupportedJwtException | SignatureException e) {
             e.printStackTrace();
             throw new ApiException(ExceptionType.INVALID_TOKEN);
@@ -76,7 +66,60 @@ public class JwtTokenUtils {
         }
     }
 
-    // 토큰에서 회원 Id 정보 추출
+    /**
+     * JWT 토큰에서 이메일을 추출
+     *
+     * @param token JWT 토큰
+     * @return 토큰에서 추출한 이메일
+     * @throws ApiException 토큰이 유효하지 않거나, 만료된 경우 또는 이메일 추출에 실패한 경우
+     */
+    public String getEmailFromToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody();
+            return (String) claims.get("email");
+        } catch (MalformedJwtException | UnsupportedJwtException | SignatureException e) {
+            throw new ApiException(ExceptionType.INVALID_TOKEN);
+        } catch (ExpiredJwtException e) {
+            throw new ApiException(ExceptionType.TOKEN_EXPIRED);
+        }
+    }
+
+    /**
+     * JWT 토큰을 생성
+     *
+     * @param user 토큰 발급 대상
+     * @param issueDate 토큰 발급 날짜
+     * @param expireTerm 토큰 유효 기간
+     * @return 생성된 JWT 토큰
+     */
+    public String createToken(User user, Date issueDate, Long expireTerm){
+        Claims claims = Jwts.claims().setSubject(String.valueOf(user.getId()));
+        claims.put("email", user.getEmail());
+        claims.put("nickname", user.getNickname());
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(issueDate)
+                .setExpiration(new Date(issueDate.getTime() + expireTerm))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+    }
+
+    public String reIssueToken(User user){
+        return  createToken(user, new Date(), ACCESS_TOKEN_EXPIRE_TIME);
+    }
+
+    public JwtToken generateToken(User user) {
+        Date now = new Date();
+        String accessToken = createToken(user, now, ACCESS_TOKEN_EXPIRE_TIME);
+        String refreshToken = createToken(user, now, REFRESH_TOKEN_EXPIRE_TIME);
+        return JwtToken.of(accessToken, refreshToken, ACCESS_TOKEN_EXPIRE_TIME);
+    }
+
+
+
     public String getUserIdFromToken(String token) {
         try {
             return Jwts.parser().setSigningKey(secretKey)
