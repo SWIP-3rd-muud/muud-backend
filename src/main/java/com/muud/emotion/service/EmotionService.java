@@ -53,6 +53,11 @@ public class EmotionService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 일기 작성에 필요한 감정 리스트를 반환
+     *
+     * @return emotionList
+     */
     public EmotionListResponse getEmotionValueList() {
         List<EmotionValue> EmotionList = Arrays.stream(EmotionCard.values())
                 .map(EmotionValue::from)
@@ -67,6 +72,12 @@ public class EmotionService {
         return TagListResponse.from(tagList, getTagByEmotion(emotion));
     }
 
+    /**
+     * 파라미터로 전달받은 감정에 해당하는 focus 태그를 반환
+     *
+     * @param emotion 대표 감정
+     * @return 태그(string)
+     */
     public String getTagByEmotion(EmotionCard emotion) {
         return switch (emotion) {
             case JOY -> EmotionTag.EXCITED.getName();
