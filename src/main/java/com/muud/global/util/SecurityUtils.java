@@ -13,7 +13,7 @@ public class SecurityUtils {
     /**
      * 현재 인증된 사용자 정보 반환
      *
-     * @return UserDetails 현재 인증된 사용자 정보
+     * @return User 현재 인증된 사용자 정보
      * @throws ApiException 사용자 정보가 없을 경우
      */
     public static User getCurrentUser() {
