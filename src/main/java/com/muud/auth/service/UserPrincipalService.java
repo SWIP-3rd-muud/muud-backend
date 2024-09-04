@@ -12,11 +12,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class UserPrincipalService implements UserDetailsService {
+
     private final UserRepository userRepository;
     /**
      * @param username
      * @return
-     * @throws UsernameNotFoundException
+     * @throws ApiException
      */
     @Override
     public UserPrincipal loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -24,4 +25,5 @@ public class UserPrincipalService implements UserDetailsService {
                 .orElseThrow(() -> new ApiException(ExceptionType.INVALID_AUTHENTICATE));
         return new UserPrincipal(user);
     }
+
 }
