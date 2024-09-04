@@ -1,7 +1,9 @@
 package com.muud.emotion.service;
 
 import com.muud.emotion.domain.EmotionCard;
+import com.muud.emotion.domain.EmotionTag;
 import com.muud.emotion.domain.dto.EmotionListResponse;
+import com.muud.emotion.domain.dto.TagListResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,5 +31,17 @@ class EmotionServiceTest {
             assertTrue(response.emotionList().stream()
                     .anyMatch(emotionValue -> emotionValue.title().equals(emotionCard.getTitle())));
         }
+    }
+
+    @Test
+    @DisplayName("JOY 감정의 focus 태그를 호출한다.")
+    void getTagListResponse_JOY() {
+        EmotionCard emotion = EmotionCard.JOY;
+
+        TagListResponse response = emotionService.getTagListResponse(emotion);
+
+        assertNotNull(response);
+        assertNotNull(response.tagList());
+        assertEquals(response.focusedTag(), EmotionTag.EXCITED.getName());
     }
 }
