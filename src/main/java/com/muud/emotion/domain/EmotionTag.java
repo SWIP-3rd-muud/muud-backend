@@ -1,0 +1,71 @@
+package com.muud.emotion.domain;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public enum EmotionTag {
+
+    EXCITED("신나는"),
+    HAPPY("행복한"),
+    GLAD("반가운"),
+    PROUD("자랑스러운"),
+    RELAXED("여유로운"),
+    INDIFFERENT("무관심한"),
+    ANNOYED("짜증나는"),
+    CONTEMPTUOUS("경멸스러운"),
+    RESENTFUL("원망스러운"),
+    DISAPPOINTED("실망함"),
+    PRESSURED("압박감"),
+    LETHARGIC("무기력한"),
+    HURT("서운한"),
+    TIRED("피곤한"),
+    EXPECTANT("기대되는"),
+    HOPEFUL("희망찬"),
+    CONFIDENT("자신있는"),
+    COMFORTABLE("편안한"),
+    RELIEVED("후련한"),
+    NEUTRAL("그저그런"),
+    WORRIED("고민되는"),
+    WRONGED("억울한"),
+    SCARED("무서움"),
+    FEARFUL("두려운"),
+    ANXIOUS("불안함"),
+    LONELY("외로움"),
+    SAD("속상한"),
+    EMPTY("공허한"),
+    NERVOUS("초조한"),
+    JOYFUL("기쁨"),
+    GRATEFUL("감사한"),
+    MOVED("감동한"),
+    WELCOME("반가운"),
+    PASSIONATE("열정적인"),
+    REASSURED("든든한"),
+    EMBARRASSED("부끄러움"),
+    CONCERNED("걱정되는"),
+    FRUSTRATED("좌절스러운"),
+    DISPLEASED("언짢은"),
+    INDIGNANT("분한"),
+    IRRITATED("거슬림"),
+    STIFLED("답답한"),
+    NOSTALGIC("그리움"),
+    NEGLECTED("서운한"),
+    SATISFIED("만족스러운"),
+    FULFILLED("뿌듯한"),
+    EXCITED_ANTICIPATION("설레는"),
+    PEACEFUL("평온함"),
+    RELIEVED_ANXIETY("안도감"),
+    CALM("차분한"),
+    DROWSY("나른한"),
+    ENVIOUS("부러움"),
+    STRESSED("스트레스"),
+    DISCOURAGED("낙심함"),
+    PERPLEXED("당황스러운"),
+    GUILTY("죄책감"),
+    AWKWARD("난처한"),
+    SORRY("미안한"),
+    DEPRESSED("우울한");
+
+    private final String name;
+}
