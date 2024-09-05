@@ -40,7 +40,7 @@ public class PlayListController {
     @PostMapping("/playlists/data")
     public ResponseEntity updatePlayLists(){
         try {
-            youtubeDataService.updateVideoList();
+            youtubeDataService.upsertPlayList();
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of("message", "success"));
         } catch (IOException e) {

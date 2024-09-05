@@ -1,5 +1,12 @@
 package com.muud.user.entity;
 
-public enum Authority {
-    ROLE_ADMIN, ROLE_USER
+import org.springframework.security.core.GrantedAuthority;
+
+public enum Authority implements GrantedAuthority {
+    ADMIN, USER;
+
+    @Override
+    public String getAuthority() {
+        return name();
+    }
 }

@@ -3,6 +3,7 @@ package com.muud.auth.service;
 import com.muud.auth.domain.dto.*;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.muud.auth.jwt.JwtToken;
@@ -39,13 +40,12 @@ public class AuthService {
     }
 
     public SigninResponse signinWithEmail(SigninRequest signinRequest){
-        //확인 후 토큰 발급
         User user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow(() -> new ApiException(ExceptionType.INVALID_AUTHENTICATE));
-        if(user.checkPassword(passwordEncoder.encrypt(signinRequest.getEmail(), signinRequest.getPassword()))){
-            JwtToken token = jwtTokenUtils.generateToken(user); //로그인시 토큰 발급
+        if(passwordEncoder.matches(signinRequest.getPassword(), user.getPassword())) {
+            JwtToken token = jwtTokenUtils.generateToken(user);
             user.updateRefreshToken(token.refreshToken());
             return SigninResponse.of(token.accessToken(), token.refreshToken(), user.toDto(), false);
-        }else{
+        } else {
             throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
         }
     }
@@ -69,13 +69,13 @@ public class AuthService {
         return User.builder()
                 .email(request.getEmail())
                 .nickname(request.getNickname())
-                .password(passwordEncoder.encrypt(request.getEmail(), request.getPassword()))
+                .password(passwordEncoder.encode(request.getPassword()))
                 .loginType(LoginType.EMAIL)
                 .build();
     }
 
     public TokenResponse reIssueToken(String refreshToken){
-        jwtTokenUtils.validToken(refreshToken);
+        jwtTokenUtils.validateToken(refreshToken);
         Long userId = Long.valueOf(jwtTokenUtils.getUserIdFromToken(refreshToken));
         User user = getLoginUser(userId);
         if(user.validRefreshToken(refreshToken)){
@@ -85,4 +85,5 @@ public class AuthService {
             throw new ApiException(ExceptionType.TOKEN_EXPIRED);
         }
     }
+
 }

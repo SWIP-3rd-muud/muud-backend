@@ -21,7 +21,7 @@
         <layout>
             <pattern>[%thread] [%date] [%level] [%file:%line] - %msg%n</pattern>
         </layout>
-        <logGroupName>Muud/application-log</logGroupName>
+        <logGroupName>Muud/dev-log</logGroupName>
         <logStreamUuidPrefix>info-log-</logStreamUuidPrefix>
         <logRegion>ap-northeast-2</logRegion>
         <maxBatchLogEvents>50</maxBatchLogEvents>
