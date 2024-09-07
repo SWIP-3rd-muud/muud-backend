@@ -22,67 +22,130 @@ public class AuthService {
     private final JwtTokenUtils jwtTokenUtils;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * 주어진 사용자 ID에 해당하는 사용자 정보를 반환합니다.
+     *
+     * @param userId 사용자 ID
+     * @return User 사용자 객체
+     * @throws ApiException 사용자가 존재하지 않으면 예외를 발생시킵니다.
+     */
     @Transactional(readOnly = true)
     public User getLoginUser(Long userId){
         return userRepository.findById(userId)
                 .orElseThrow(()->new ApiException(ExceptionType.INVALID_TOKEN));
     }
 
+    /**
+     * 이메일을 통해 새로운 사용자를 등록합니다.
+     *
+     * @param request 사용자 등록 요청 정보
+     * @return Long 등록된 사용자 ID
+     * @throws ApiException 이메일이 중복되면 예외 발생
+     */
     public Long signupWithEmail(SignupRequest request) {
+        validateEmail(request.email());
         User user = buildUser(request);
         return userRepository.save(user).getId();
     }
 
+    /**
+     * 어드민 권한을 가진 사용자를 등록합니다.
+     *
+     * @param request 어드민 사용자 등록 요청 정보
+     * @return Long 등록된 어드민 사용자 ID
+     * @throws ApiException 이메일이 중복되면 예외 발생
+     */
     public Long signupAdmin(SignupRequest request){
+        validateEmail(request.email());
         User user = buildUser(request);
         user.grantAdminAuth();
         return userRepository.save(user).getId();
     }
 
+    /**
+     * 이메일과 비밀번호를 통해 사용자 인증을 수행하고, JWT 토큰을 발급합니다.
+     *
+     * @param signinRequest 로그인 요청 정보
+     * @return SigninResponse 로그인 결과와 토큰 정보를 담은 응답 객체
+     * @throws ApiException 이메일이 없거나 비밀번호가 틀리면 예외 발생
+     */
     public SigninResponse signinWithEmail(SigninRequest signinRequest){
-        User user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow(() -> new ApiException(ExceptionType.INVALID_AUTHENTICATE));
-        if(passwordEncoder.matches(signinRequest.getPassword(), user.getPassword())) {
-            JwtToken token = jwtTokenUtils.generateToken(user);
-            user.updateRefreshToken(token.refreshToken());
-            return SigninResponse.of(token.accessToken(), token.refreshToken(), user.toDto(), false);
+        User user = userRepository.findByEmail(signinRequest.email())
+                .orElseThrow(() ->
+                        new ApiException(ExceptionType.INVALID_AUTHENTICATE));
+        if(passwordEncoder.matches(signinRequest.password(), user.getPassword())) {
+            return generateSigninResponse(user, false);
         } else {
             throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
         }
     }
 
+    /**
+     * 카카오 로그인 정보를 사용하여 사용자 인증을 수행하고, JWT 토큰을 발급합니다.
+     *
+     * @param kakaoInfoResponse 카카오 사용자 정보
+     * @return SigninResponse 로그인 결과와 토큰 정보를 담은 응답 객체
+     */
     public SigninResponse signinWithKakao(KakaoInfoResponse kakaoInfoResponse){
         User user = userRepository.findByEmailAndSocialId(kakaoInfoResponse.email(), kakaoInfoResponse.socialId())
                 .orElse(kakaoInfoResponse.toEntity());
-        boolean isNew = false;
+        boolean isNewUser = false;
         if(user.getId() == null){
             user = userRepository.save(user);
-            isNew = true;
+            isNewUser = true;
         }
-        JwtToken token = jwtTokenUtils.generateToken(user);
-        user.updateRefreshToken(token.refreshToken());
-        return SigninResponse.of(token.accessToken(), token.refreshToken(), user.toDto(), isNew);
+        return generateSigninResponse(user, isNewUser);
     }
 
-    public User buildUser(SignupRequest request){
-        if(userRepository.findByEmail(request.getEmail()).isPresent())
-            throw new ApiException(ExceptionType.ALREADY_EXIST_EMAIL);
+    /**
+     * 주어진 요청을 기반으로 새로운 사용자 객체를 생성합니다.
+     *
+     * @param request 사용자 등록 요청 정보
+     * @return User 새로 생성된 사용자 객체
+     */
+    private User buildUser(SignupRequest request) {
         return User.builder()
-                .email(request.getEmail())
-                .nickname(request.getNickname())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.email())
+                .nickname(request.nickname())
+                .password(passwordEncoder.encode(request.password()))
                 .loginType(LoginType.EMAIL)
                 .build();
     }
 
-    public TokenResponse reIssueToken(String refreshToken){
+    /**
+     * 주어진 이메일이 이미 존재하는지 확인하고, 존재하면 예외를 발생시킵니다.
+     *
+     * @param email 사용자 이메일
+     * @throws ApiException 이메일이 이미 존재하는 경우 예외 발생
+     */
+    private void validateEmail(String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new ApiException(ExceptionType.ALREADY_EXIST_EMAIL);
+        }
+    }
+
+    private SigninResponse generateSigninResponse(User user, boolean isNewUser) {
+        JwtToken token = jwtTokenUtils.generateToken(user);
+        user.updateRefreshToken(token.refreshToken());
+        return SigninResponse.of(token.accessToken(), token.refreshToken(), user.toDto(), isNewUser);
+    }
+
+    /**
+     *  refreshToken을 사용하여 새로운 JWT 토큰을 발급합니다.
+     *
+     * @param refreshToken 리프레시 토큰
+     * @return TokenResponse 새로운 JWT 토큰을 담은 응답 객체
+     * @throws ApiException 리프레시 토큰이 유효하지 않거나 만료된 경우 예외 발생
+     */
+    public TokenResponse reIssueToken(String refreshToken) {
         jwtTokenUtils.validateToken(refreshToken);
         Long userId = Long.valueOf(jwtTokenUtils.getUserIdFromToken(refreshToken));
         User user = getLoginUser(userId);
-        if(user.validRefreshToken(refreshToken)){
-           String token =  jwtTokenUtils.reIssueToken(user);
-           return TokenResponse.of(token);
-        }else{
-            throw new ApiException(ExceptionType.TOKEN_EXPIRED);
+        if (user.validRefreshToken(refreshToken)) {
+            String newToken = jwtTokenUtils.reIssueToken(user);
+            return TokenResponse.of(newToken);
+        } else {
+            throw new ApiException(ExceptionType.TOKEN_EXPIRED, "Refresh token is invalid or expired");
         }
     }
 
