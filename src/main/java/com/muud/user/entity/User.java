@@ -33,7 +33,7 @@ public class User extends BaseEntity{
     private String refreshToken;
 
     @Builder
-    public User(Long id, String email, String password, String nickname, LoginType loginType, String socialId) {
+    public User(String email, String password, String nickname, LoginType loginType, String socialId) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
