@@ -8,9 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Base64;
 import java.util.Date;
@@ -23,11 +21,7 @@ class JwtTokenUtilsTest {
     @InjectMocks
     private JwtTokenUtils jwtTokenUtils;
 
-    @Mock
-    private BCryptPasswordEncoder passwordEncoder;
-
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;
     private String secretKey;
     private User user;
     private String token;
