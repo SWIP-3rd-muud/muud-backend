@@ -107,8 +107,14 @@ public class JwtTokenUtils {
                 .compact();
     }
 
+    /**
+     * Access 토큰 재발급
+     *
+     * @param user 토큰 발급 대상
+     * @return 갱신된 JWT Access 토큰
+     */
     public String reIssueToken(User user){
-        return  createToken(user, new Date(), ACCESS_TOKEN_EXPIRE_TIME);
+        return createToken(user, new Date(), ACCESS_TOKEN_EXPIRE_TIME);
     }
 
     public JwtToken generateToken(User user) {
@@ -117,8 +123,6 @@ public class JwtTokenUtils {
         String refreshToken = createToken(user, now, REFRESH_TOKEN_EXPIRE_TIME);
         return JwtToken.of(accessToken, refreshToken, ACCESS_TOKEN_EXPIRE_TIME);
     }
-
-
 
     public String getUserIdFromToken(String token) {
         try {

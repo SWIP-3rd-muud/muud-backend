@@ -9,20 +9,29 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity{
+
     @Id @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false, unique = true)
     private String email;
+
     private String password;
+
     @Column(nullable = false, length = 10)
     private String nickname;
+
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
+
     private String socialId; //카카오 로그인시, 이메일 로그인 유저는 null
+
     @Enumerated(EnumType.STRING)
     private Authority role;
+
     private String refreshToken;
+
     @Builder
     public User(String email, String password, String nickname, LoginType loginType, String socialId) {
         this.email = email;
@@ -32,6 +41,7 @@ public class User extends BaseEntity{
         this.socialId = socialId;
         this.role = Authority.USER;
     }
+
     public UserInfo toDto(){
         return UserInfo.builder()
                 .id(id)
@@ -42,11 +52,9 @@ public class User extends BaseEntity{
     public boolean checkValidId(Long id){
         return id == this.id;
     }
+
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
-    }
-    public boolean checkPassword(String password){
-        return this.password.equals(password);
     }
   
     public void updateNickname(String nickname) {
@@ -62,4 +70,5 @@ public class User extends BaseEntity{
             return false;
         return true;
     }
+
 }
