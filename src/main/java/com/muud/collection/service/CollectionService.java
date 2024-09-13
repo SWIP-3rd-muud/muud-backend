@@ -37,7 +37,7 @@ public class CollectionService {
                         user(user)
                         .playList(playList)
                         .build());
-        collectionRepository.save(collection);
+        collection = collectionRepository.save(collection);
         return CollectionDto.of(collection.getId(), collection.isLiked(), playList.getVideoId());
     }
 
