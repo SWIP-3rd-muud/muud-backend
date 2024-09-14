@@ -64,7 +64,7 @@ public class CollectionController {
         return ResponseEntity.ok(collectionDto);
     }
 
-    @Operation(description = "좋아요 누른 Collection 리스트를 조회한다.", summary = "좋아요 누른 컬렉션 리스트 변경")
+    @Operation(description = "좋아요 누른 Collection 리스트를 조회한다.", summary = "좋아요 누른 컬렉션 리스트 조회")
     @ApiResponse(responseCode = "200")
     @GetMapping("/collections/like")
     public ResponseEntity<PageResponse<CollectionDto>> getLikedCollections(Pageable pageable){
