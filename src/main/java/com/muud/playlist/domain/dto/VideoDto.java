@@ -1,12 +1,8 @@
 package com.muud.playlist.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.Column;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
-
-import javax.annotation.Nullable;
 import java.util.List;
 
 @Getter @Builder
