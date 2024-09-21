@@ -34,8 +34,8 @@ public class DiaryController {
     private final ImageDirectoryConfig imageDirectoryConfig;
 
     @Auth
-    @Operation(description = "일기 내용과 사진을 입력받아 등록한다. ", summary = "일기 작성")
-    @ApiResponse(responseCode = "201", description = "일기 작성 성공")
+    @Operation(description = "일기 내용과 사진을 입력받아 등록합니다. ", summary = "일기 작성")
+    @ApiResponse(responseCode = "201")
     @PostMapping("/diaries")
     public ResponseEntity<CreateDiaryResponse> createDiary(@RequestAttribute("user") final User user,
                                                            @Valid @ModelAttribute final DiaryRequest diaryRequest,
@@ -48,7 +48,8 @@ public class DiaryController {
     }
 
     @Auth
-    @Operation(description = "일기를 조회한다.", summary = "일기 상세 조회")
+    @Operation(description = "diaryId를 파라미터로 받아 해당 일기를 조회합니다.", summary = "일기 상세 조회")
+    @ApiResponse(responseCode = "200")
     @GetMapping("/diaries/{diaryId}")
     public ResponseEntity<DiaryResponse> getDiary(@RequestAttribute("user") final User user,
                                                   @PathVariable("diaryId") final Long diaryId) {
@@ -56,6 +57,8 @@ public class DiaryController {
     }
 
     @Auth
+    @Operation(description = "파라미터로 날짜를 입력받아 조회합니다.", summary = "일기 월별 조회")
+    @ApiResponse(responseCode = "200")
     @GetMapping("/diaries/month")
     public ResponseEntity<List<DiaryResponse>> getMonthlyDiaryList(@RequestAttribute("user") final User user,
                                                                    @RequestParam(name = "date", required = true) final String date) {
@@ -64,6 +67,8 @@ public class DiaryController {
     }
 
     @Auth
+    @Operation(description = "일기의 내용을 수정합니다.", summary = "일기 수정")
+    @ApiResponse(responseCode = "200")
     @PutMapping("/diaries/{diaryId}")
     public ResponseEntity<DiaryResponse> updateContent(@RequestAttribute("user") final User user,
                                                        @PathVariable("diaryId") final Long diaryId,
@@ -72,6 +77,8 @@ public class DiaryController {
     }
 
     @Auth
+    @Operation(description = "감정별로 분류된 일기를 조회합니다. ", summary = "감정별 일기 조회")
+    @ApiResponse(responseCode = "200")
     @GetMapping("/diaries/emotion")
     public ResponseEntity<List<DiaryPreviewResponse>> getDiaryPreviewListByEmotion(@RequestAttribute("user") final User user,
                                                                                    @RequestParam(name = "emotion", required = true) final Emotion emotion) {
