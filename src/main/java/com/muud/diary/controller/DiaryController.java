@@ -1,11 +1,11 @@
 package com.muud.diary.controller;
 
-import com.muud.auth.jwt.Auth;
 import com.muud.diary.config.ImageDirectoryConfig;
 import com.muud.diary.domain.dto.*;
 import com.muud.diary.service.DiaryService;
 import com.muud.emotion.domain.Emotion;
 import com.muud.global.util.PhotoManager;
+import com.muud.global.util.SecurityUtils;
 import com.muud.playlist.domain.PlayList;
 import com.muud.playlist.service.PlayListService;
 import com.muud.user.entity.User;
@@ -33,56 +33,46 @@ public class DiaryController {
     private final PlayListService playListService;
     private final ImageDirectoryConfig imageDirectoryConfig;
 
-    @Auth
     @Operation(description = "일기 내용과 사진을 입력받아 등록합니다. ", summary = "일기 작성")
     @ApiResponse(responseCode = "201")
     @PostMapping("/diaries")
-    public ResponseEntity<CreateDiaryResponse> createDiary(@RequestAttribute("user") final User user,
-                                                           @Valid @ModelAttribute final DiaryRequest diaryRequest,
+    public ResponseEntity<CreateDiaryResponse> createDiary(@Valid @ModelAttribute final DiaryRequest diaryRequest,
                                                            @RequestPart(name = "multipartFile", required = false) final MultipartFile multipartFile) {
         PlayList playList = playListService.getPlayList(diaryRequest.playlistId());
         String image = saveImage(multipartFile);
-        CreateDiaryResponse createDiaryResponse = diaryService.create(user, diaryRequest, image, playList);
+        CreateDiaryResponse createDiaryResponse = diaryService.create(getCurrentUser(), diaryRequest, image, playList);
         return ResponseEntity.created(URI.create("/diaries/"+ createDiaryResponse.DiaryId()))
                 .body(createDiaryResponse);
     }
 
-    @Auth
     @Operation(description = "diaryId를 파라미터로 받아 해당 일기를 조회합니다.", summary = "일기 상세 조회")
     @ApiResponse(responseCode = "200")
     @GetMapping("/diaries/{diaryId}")
-    public ResponseEntity<DiaryResponse> getDiary(@RequestAttribute("user") final User user,
-                                                  @PathVariable("diaryId") final Long diaryId) {
-        return ResponseEntity.ok(diaryService.getDiary(user, diaryId));
+    public ResponseEntity<DiaryResponse> getDiary(@PathVariable("diaryId") final Long diaryId) {
+        return ResponseEntity.ok(diaryService.getDiary(getCurrentUser(), diaryId));
     }
 
-    @Auth
     @Operation(description = "파라미터로 날짜를 입력받아 조회합니다.", summary = "일기 월별 조회")
     @ApiResponse(responseCode = "200")
     @GetMapping("/diaries/month")
-    public ResponseEntity<List<DiaryResponse>> getMonthlyDiaryList(@RequestAttribute("user") final User user,
-                                                                   @RequestParam(name = "date", required = true) final String date) {
+    public ResponseEntity<List<DiaryResponse>> getMonthlyDiaryList(@RequestParam(name = "date", required = true) final String date) {
         YearMonth yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy-MM"));
-        return ResponseEntity.ok(diaryService.getMonthlyDiaryList(user, yearMonth));
+        return ResponseEntity.ok(diaryService.getMonthlyDiaryList(getCurrentUser(), yearMonth));
     }
 
-    @Auth
     @Operation(description = "일기의 내용을 수정합니다.", summary = "일기 수정")
     @ApiResponse(responseCode = "200")
     @PutMapping("/diaries/{diaryId}")
-    public ResponseEntity<DiaryResponse> updateContent(@RequestAttribute("user") final User user,
-                                                       @PathVariable("diaryId") final Long diaryId,
+    public ResponseEntity<DiaryResponse> updateContent(@PathVariable("diaryId") final Long diaryId,
                                                        @Valid @RequestBody final ContentUpdateRequest contentUpdateRequest) {
-        return ResponseEntity.ok(diaryService.updateContent(user, diaryId, contentUpdateRequest));
+        return ResponseEntity.ok(diaryService.updateContent(getCurrentUser(), diaryId, contentUpdateRequest));
     }
 
-    @Auth
     @Operation(description = "감정별로 분류된 일기를 조회합니다. ", summary = "감정별 일기 조회")
     @ApiResponse(responseCode = "200")
     @GetMapping("/diaries/emotion")
-    public ResponseEntity<List<DiaryPreviewResponse>> getDiaryPreviewListByEmotion(@RequestAttribute("user") final User user,
-                                                                                   @RequestParam(name = "emotion", required = true) final Emotion emotion) {
-        return ResponseEntity.ok(diaryService.getDiaryPreviewListByEmotion(user, emotion));
+    public ResponseEntity<List<DiaryPreviewResponse>> getDiaryPreviewListByEmotion(@RequestParam(name = "emotion", required = true) final Emotion emotion) {
+        return ResponseEntity.ok(diaryService.getDiaryPreviewListByEmotion(getCurrentUser(), emotion));
     }
 
     private String saveImage(final MultipartFile image) {
@@ -91,5 +81,9 @@ public class DiaryController {
         }
 
         return photoManager.upload(image, imageDirectoryConfig.getImageDirectory());
+    }
+
+    private User getCurrentUser() {
+        return SecurityUtils.getCurrentUser();
     }
 }
