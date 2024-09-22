@@ -1,6 +1,6 @@
 package com.muud.report.controller;
 
-import com.muud.auth.jwt.Auth;
+import com.muud.global.util.SecurityUtils;
 import com.muud.report.domain.dto.ReportResponse;
 import com.muud.report.service.ReportService;
 import com.muud.user.entity.User;
@@ -16,10 +16,9 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    @Auth
     @GetMapping("/reports")
-    public ResponseEntity<ReportResponse> getReport(@RequestAttribute("user") final User user,
-                                                    @RequestParam(name = "date", required = false) final YearMonth inputDate) {
+    public ResponseEntity<ReportResponse> getReport(@RequestParam(name = "date", required = false) final YearMonth inputDate) {
+        User user = SecurityUtils.getCurrentUser();
         YearMonth date = (inputDate != null) ? inputDate : YearMonth.now();
         return ResponseEntity.ok(reportService.generate(user, date));
     }

@@ -1,6 +1,5 @@
 package com.muud.emotion.controller.v1;
 
-import com.muud.auth.jwt.Auth;
 import com.muud.emotion.domain.EmotionCard;
 import com.muud.emotion.domain.dto.EmotionListResponse;
 import com.muud.emotion.domain.dto.TagListResponse;
@@ -19,14 +18,12 @@ public class EmotionControllerV1 {
 
     private final EmotionService emotionService;
 
-    @Auth
     @Operation(summary = "감정 카드 호출", description = "감정 카드의 값들을 불러온다")
     @GetMapping
     public ResponseEntity<EmotionListResponse> getEmotionList() {
         return ResponseEntity.ok(emotionService.getEmotionValueList());
     }
 
-    @Auth
     @Operation(summary = "감정 태그 호출", description = "감정 태그들을 불러오고, 파라미터에 따른 focus 감정을 반환한다")
     @GetMapping("/tags")
     public ResponseEntity<TagListResponse> getEmotionTagList(@RequestParam EmotionCard emotion) {
