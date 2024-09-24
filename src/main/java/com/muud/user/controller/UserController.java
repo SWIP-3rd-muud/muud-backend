@@ -3,6 +3,7 @@ package com.muud.user.controller;
 import com.muud.auth.jwt.Auth;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
+import com.muud.global.util.SecurityUtils;
 import com.muud.user.dto.UserInfo;
 import com.muud.user.entity.User;
 import com.muud.user.service.UserService;
@@ -22,9 +23,9 @@ public class UserController {
 
     private final UserService userService;
 
-    @Auth
     @PatchMapping("/users/{userId}/nickname")
-    public ResponseEntity updateUserNickname(@RequestAttribute User user, @PathVariable("userId") Long userId, @RequestBody Map<String, String> mapNickname){
+    public ResponseEntity updateUserNickname(@PathVariable("userId") Long userId, @RequestBody Map<String, String> mapNickname){
+        User user = SecurityUtils.getCurrentUser();
         if(!user.getId().equals(userId)){
             throw new ApiException(ExceptionType.FORBIDDEN_USER);
         }
