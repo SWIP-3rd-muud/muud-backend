@@ -5,9 +5,9 @@ import com.muud.diary.domain.dto.ContentUpdateRequest;
 import com.muud.diary.domain.dto.CreateDiaryResponse;
 import com.muud.diary.domain.dto.DiaryRequest;
 import com.muud.diary.domain.dto.DiaryResponse;
+import com.muud.diary.exception.DiaryErrorCode;
+import com.muud.diary.exception.DiaryException;
 import com.muud.diary.repository.DiaryRepository;
-import com.muud.global.error.ApiException;
-import com.muud.global.error.ExceptionType;
 import com.muud.playlist.domain.PlayList;
 import com.muud.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,18 +106,18 @@ class DiaryServiceTest {
     }
 
     @Test
-    @DisplayName("일기 작성 실패 - 하루에 한 개만 작성 가능")
+    @DisplayName("일기 작성 실패 - 해당 날짜에 이미 작성된 일기 존재")
     void create_failure_alreadyWrittenDiary() {
         // Given
         when(diaryRepository.countDiaryOnDate(anyLong(), any(LocalDate.class))).thenReturn(1);
 
         // When & Then
-        ApiException exception = assertThrows(ApiException.class, () -> {
+        DiaryException exception = assertThrows(DiaryException.class, () -> {
             diaryService.create(userA, diaryRequest, null, playList);
         });
 
-        assertEquals(ExceptionType.BAD_REQUEST, exception.getExceptionType());
-        assertEquals("일기는 하루에 한개만 작성 가능합니다.", exception.getMessage());
+        assertEquals(DiaryErrorCode.DIARY_ALREADY_EXISTS, exception.getErrorCode());
+        assertEquals(DiaryErrorCode.DIARY_ALREADY_EXISTS.defaultMessage(), exception.getMessage());
     }
 
     @Test
@@ -141,10 +141,13 @@ class DiaryServiceTest {
         // Given
         when(diaryRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // When & Then
-        assertThrows(IllegalArgumentException.class, () -> {
+        // When
+        DiaryException e = assertThrows(DiaryException.class, () -> {
             diaryService.getDiary(userA, 1L);
         });
+
+        // Then
+        assertEquals(DiaryErrorCode.DIARY_NOT_FOUND, e.getErrorCode());
     }
 
     @Test
@@ -154,11 +157,11 @@ class DiaryServiceTest {
         when(diaryRepository.findById(3L)).thenReturn(Optional.of(otherDiary));
 
         // When & Then
-        ApiException exception = assertThrows(ApiException.class, () -> {
+        DiaryException e = assertThrows(DiaryException.class, () -> {
             diaryService.getDiary(userA, 3L);
         });
 
-        assertEquals(ExceptionType.FORBIDDEN_USER, exception.getExceptionType());
+        assertEquals(DiaryErrorCode.DIARY_ACCESS_DENIED, e.getErrorCode());
     }
 
     @Test
@@ -182,10 +185,13 @@ class DiaryServiceTest {
         // Given
         when(diaryRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // When & Then
-        assertThrows(IllegalArgumentException.class, () -> {
+        // When
+        DiaryException e = assertThrows(DiaryException.class, () -> {
             diaryService.updateContent(userA, 1L, contentUpdateRequest);
         });
+
+        // then
+        assertEquals(DiaryErrorCode.DIARY_NOT_FOUND, e.getErrorCode());
     }
 
     @Test
@@ -195,11 +201,11 @@ class DiaryServiceTest {
         when(diaryRepository.findById(3L)).thenReturn(Optional.of(otherDiary));
 
         // When & Then
-        ApiException exception = assertThrows(ApiException.class, () -> {
+        DiaryException e = assertThrows(DiaryException.class, () -> {
             diaryService.updateContent(userA, 3L, contentUpdateRequest);
         });
 
-        assertEquals(ExceptionType.FORBIDDEN_USER, exception.getExceptionType());
+        assertEquals(DiaryErrorCode.DIARY_ACCESS_DENIED, e.getErrorCode());
     }
 
     @Test
