@@ -26,10 +26,10 @@ public class UserController {
     @PatchMapping("/users/{userId}/nickname")
     public ResponseEntity updateUserNickname(@PathVariable("userId") Long userId, @RequestBody Map<String, String> mapNickname){
         User user = SecurityUtils.getCurrentUser();
-        if(!user.getId().equals(userId)){
-            throw new ApiException(ExceptionType.FORBIDDEN_USER);
-        }
+        SecurityUtils.validateUser(userId);
+
         UserInfo userInfo = userService.changeUserNickname(userId, mapNickname.get("nickname"));
+
         return ResponseEntity.ok(userInfo);
     }
 }
