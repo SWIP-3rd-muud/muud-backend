@@ -4,8 +4,6 @@ import com.muud.diary.domain.Diary;
 import com.muud.diary.domain.dto.*;
 import com.muud.diary.repository.DiaryRepository;
 import com.muud.emotion.domain.Emotion;
-import com.muud.global.error.ApiException;
-import com.muud.global.error.ExceptionType;
 import com.muud.playlist.domain.PlayList;
 import com.muud.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.muud.diary.exception.DiaryErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +36,7 @@ public class DiaryService {
     public DiaryResponse getDiary(final User user,
                                   final Long diaryId) {
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(DIARY_NOT_FOUND::defaultException);
         validateDiaryOwnership(user, diary);
         return DiaryResponse.from(diary);
     }
@@ -55,7 +55,7 @@ public class DiaryService {
                                        final Long diaryId,
                                        final ContentUpdateRequest contentUpdateRequest) {
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(DIARY_NOT_FOUND::defaultException);
         validateDiaryOwnership(user, diary);
         diary.updateContent(contentUpdateRequest.content());
         Diary updatedDiary = diaryRepository.save(diary);
@@ -83,7 +83,7 @@ public class DiaryService {
     private void validateDiaryOwnership(final User user,
                                         final Diary diary) {
         if (!user.checkValidId(diary.getUser().getId())) {
-            throw new ApiException(ExceptionType.FORBIDDEN_USER);
+            throw DIARY_ACCESS_DENIED.defaultException();
         }
     }
 
@@ -91,7 +91,7 @@ public class DiaryService {
                                final DiaryRequest diaryRequest) {
         int count = diaryRepository.countDiaryOnDate(user.getId(), diaryRequest.referenceDate());
         if (count > 0) {
-            throw new ApiException(ExceptionType.BAD_REQUEST, "일기는 하루에 한개만 작성 가능합니다.");
+            throw DIARY_ALREADY_EXISTS.defaultException();
         }
     }
 }
