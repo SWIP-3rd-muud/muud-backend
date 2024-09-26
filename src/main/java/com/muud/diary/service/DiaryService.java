@@ -6,6 +6,7 @@ import com.muud.diary.repository.DiaryRepository;
 import com.muud.emotion.domain.Emotion;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
+import com.muud.global.util.SecurityUtils;
 import com.muud.playlist.domain.PlayList;
 import com.muud.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class DiaryService {
                                   final Long diaryId) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new);
-        validateDiaryOwnership(user, diary);
+        validateDiaryOwnership(diary);
         return DiaryResponse.from(diary);
     }
 
@@ -56,7 +57,7 @@ public class DiaryService {
                                        final ContentUpdateRequest contentUpdateRequest) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(IllegalArgumentException::new);
-        validateDiaryOwnership(user, diary);
+        validateDiaryOwnership(diary);
         diary.updateContent(contentUpdateRequest.content());
         Diary updatedDiary = diaryRepository.save(diary);
         return DiaryResponse.from(updatedDiary);
@@ -73,16 +74,15 @@ public class DiaryService {
         List<Diary> diaryList = diaryRepository.findByEmotion(user.getId(), emotion);
 
         if (!diaryList.isEmpty()) {
-            validateDiaryOwnership(user, diaryList.get(0));
+            validateDiaryOwnership(diaryList.get(0));
         }
         return diaryList.stream()
                 .map(DiaryPreviewResponse::from)
                 .collect(Collectors.toList());
     }
 
-    private void validateDiaryOwnership(final User user,
-                                        final Diary diary) {
-        if (!user.checkValidId(diary.getUser().getId())) {
+    private void validateDiaryOwnership(final Diary diary) {
+        if (!SecurityUtils.checkCurrentUserId(diary.getUser().getId())) {
             throw new ApiException(ExceptionType.FORBIDDEN_USER);
         }
     }

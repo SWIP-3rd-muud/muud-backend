@@ -28,8 +28,6 @@ public class UserController {
     @ApiResponse(responseCode = "403", description = "수정 접근 권한 없음")
     public ResponseEntity updateUserNickname(@PathVariable("userId") Long userId,
                                              @Valid @RequestBody UserInfoUpdateRequest userInfoUpdateRequest){
-        SecurityUtils.validateUser(userId);
-
         UserInfo userInfo = userService.changeUserNickname(userId, userInfoUpdateRequest);
 
         return ResponseEntity.ok(userInfo);
