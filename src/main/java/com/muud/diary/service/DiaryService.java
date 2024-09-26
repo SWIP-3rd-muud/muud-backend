@@ -83,8 +83,7 @@ public class DiaryService {
                 .collect(Collectors.toList());
     }
 
-    private void validateDiaryOwnership(final User user,
-                                        final Diary diary) {
+    private void validateDiaryOwnership(final Diary diary) {
         if (!SecurityUtils.checkCurrentUserId(diary.getUser().getId())) {
             throw DIARY_ACCESS_DENIED.defaultException();
         }
