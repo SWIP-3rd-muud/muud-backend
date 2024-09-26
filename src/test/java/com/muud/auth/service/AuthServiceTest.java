@@ -109,7 +109,7 @@ class AuthServiceTest {
         SigninResponse response = authService.signinWithEmail(request);
         assertEquals(response.accessToken(), token.accessToken());
         assertEquals(response.refreshToken(), token.refreshToken());
-        assertEquals(response.userInfo().getId(), user.getId());
+        assertEquals(response.userInfo().id(), user.getId());
     }
 
     @Test
@@ -166,7 +166,7 @@ class AuthServiceTest {
         //then
         assertEquals(response.accessToken(), token.accessToken());
         assertEquals(response.refreshToken(), token.refreshToken());
-        assertEquals(response.userInfo().getId(), user.getId());
+        assertEquals(response.userInfo().id(), user.getId());
         assertTrue(response.isNewUser());
     }
 

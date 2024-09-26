@@ -7,7 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 @Getter
-@Entity @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity{
 
     @Id @Column(name = "user_id")
@@ -43,14 +44,7 @@ public class User extends BaseEntity{
     }
 
     public UserInfo toDto(){
-        return UserInfo.builder()
-                .id(id)
-                .nickname(nickname)
-                .build();
-    }
-
-    public boolean checkValidId(Long id){
-        return id == this.id;
+        return new UserInfo(id, nickname);
     }
 
     public void updateRefreshToken(String refreshToken){
@@ -64,11 +58,9 @@ public class User extends BaseEntity{
     public void grantAdminAuth(){
         this.role = Authority.ADMIN;
     }
-  
+
     public boolean validRefreshToken(String refreshToken){
-        if(refreshToken == null || !refreshToken.equals(this.refreshToken))
-            return false;
-        return true;
+        return refreshToken != null && refreshToken.equals(this.refreshToken);
     }
 
 }

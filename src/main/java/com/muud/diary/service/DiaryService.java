@@ -4,6 +4,7 @@ import com.muud.diary.domain.Diary;
 import com.muud.diary.domain.dto.*;
 import com.muud.diary.repository.DiaryRepository;
 import com.muud.emotion.domain.Emotion;
+import com.muud.global.util.SecurityUtils;
 import com.muud.playlist.domain.PlayList;
 import com.muud.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,8 @@ public class DiaryService {
                                   final Long diaryId) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(DIARY_NOT_FOUND::defaultException);
-        validateDiaryOwnership(user, diary);
+        validateDiaryOwnership(diary);
+      
         return DiaryResponse.from(diary);
     }
 
@@ -56,7 +58,8 @@ public class DiaryService {
                                        final ContentUpdateRequest contentUpdateRequest) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(DIARY_NOT_FOUND::defaultException);
-        validateDiaryOwnership(user, diary);
+        validateDiaryOwnership(diary);
+
         diary.updateContent(contentUpdateRequest.content());
         Diary updatedDiary = diaryRepository.save(diary);
         return DiaryResponse.from(updatedDiary);
@@ -73,7 +76,7 @@ public class DiaryService {
         List<Diary> diaryList = diaryRepository.findByEmotion(user.getId(), emotion);
 
         if (!diaryList.isEmpty()) {
-            validateDiaryOwnership(user, diaryList.get(0));
+            validateDiaryOwnership(diaryList.get(0));
         }
         return diaryList.stream()
                 .map(DiaryPreviewResponse::from)
@@ -82,7 +85,7 @@ public class DiaryService {
 
     private void validateDiaryOwnership(final User user,
                                         final Diary diary) {
-        if (!user.checkValidId(diary.getUser().getId())) {
+        if (!SecurityUtils.checkCurrentUserId(diary.getUser().getId())) {
             throw DIARY_ACCESS_DENIED.defaultException();
         }
     }

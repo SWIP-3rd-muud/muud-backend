@@ -25,4 +25,14 @@ public class SecurityUtils {
         throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
     }
 
+    /**
+     * 현재 사용자와 주어진 사용자 ID 비교 및 검증
+     *
+     * @param userId 검증할 사용자 ID
+     * @return boolean 현재 로그인한 userId면 true, 아니면 false
+     */
+    public static boolean checkCurrentUserId(Long userId) {
+        User user = getCurrentUser();
+        return user.getId().equals(userId);
+    }
 }
