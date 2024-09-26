@@ -47,10 +47,6 @@ public class User extends BaseEntity{
         return new UserInfo(id, nickname);
     }
 
-    public boolean checkValidId(Long id){
-        return id == this.id;
-    }
-
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
     }
