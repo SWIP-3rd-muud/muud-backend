@@ -5,8 +5,6 @@ import com.muud.bookmark.domain.dto.BookmarkResponse;
 import com.muud.bookmark.repository.BookmarkRepository;
 import com.muud.diary.domain.Diary;
 import com.muud.diary.repository.DiaryRepository;
-import com.muud.global.error.ApiException;
-import com.muud.global.error.ExceptionType;
 import com.muud.user.entity.User;
 import com.muud.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.muud.bookmark.exception.BookmarkErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,13 +28,13 @@ public class BookmarkService {
     @Transactional
     public Bookmark addBookmark(final Long userId, final Long diaryId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()->new ApiException(ExceptionType.NOT_FOUND));
+                .orElseThrow(USER_NOT_FOUND::defaultException);
 
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(()->new ApiException(ExceptionType.NOT_FOUND));
+                .orElseThrow(DIARY_NOT_FOUND::defaultException);
 
         if (isBookmarked(userId, diaryId)) {
-            throw new ApiException(ExceptionType.BAD_REQUEST);
+            throw BOOKMARK_ALREADY_EXISTS.defaultException();
         }
         return bookmarkRepository.save(new Bookmark(user, diary));
     }
@@ -42,7 +42,7 @@ public class BookmarkService {
     @Transactional
     public void removeBookmark(final Long userId, final Long diaryId) {
         Bookmark bookmark = bookmarkRepository.findByUserIdAndDiaryId(userId, diaryId)
-                .orElseThrow(() -> new ApiException(ExceptionType.NOT_FOUND));
+                .orElseThrow(BOOKMARK_NOT_FOUND::defaultException);
         bookmarkRepository.delete(bookmark);
     }
 
@@ -57,5 +57,3 @@ public class BookmarkService {
         return bookmarkRepository.findByUserIdAndDiaryId(userId, diaryId).isPresent();
     }
 }
-
-
