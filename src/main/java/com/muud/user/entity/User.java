@@ -58,11 +58,9 @@ public class User extends BaseEntity{
     public void grantAdminAuth(){
         this.role = Authority.ADMIN;
     }
-  
+
     public boolean validRefreshToken(String refreshToken){
-        if(refreshToken == null || !refreshToken.equals(this.refreshToken))
-            return false;
-        return true;
+        return refreshToken != null && refreshToken.equals(this.refreshToken);
     }
 
 }
