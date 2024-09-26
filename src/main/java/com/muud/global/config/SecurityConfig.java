@@ -1,10 +1,8 @@
 package com.muud.global.config;
 
-import com.muud.auth.jwt.Auth;
+
 import com.muud.auth.jwt.JwtAuthenticationFilter;
-import com.muud.user.entity.Authority;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
