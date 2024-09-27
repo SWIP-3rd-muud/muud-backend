@@ -82,7 +82,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("User가 존재하지 않으면 AuthException 발생")
+    @DisplayName("User가 존재하지 않으면 USER_NOT_FOUND 발생")
     void changeUserNickname_userNotFound() {
         // Given
         Long userId = 1L;

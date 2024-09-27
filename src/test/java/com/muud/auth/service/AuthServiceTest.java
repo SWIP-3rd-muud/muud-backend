@@ -8,6 +8,7 @@ import com.muud.auth.jwt.JwtTokenUtils;
 import com.muud.user.entity.User;
 import com.muud.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -59,6 +60,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("성공적으로 이메일 회원가입 처리")
     void signupWithEmail_success() {
         //given
         SignupRequest request = signupRequest();
@@ -80,6 +82,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("이미 존재하는 이메일로 회원가입 시도 시 EMAIL_ALREADY_EXISTS 반환")
     void signupWithEmail_fail_duplicateEmail() {
         // given
         SignupRequest request = signupRequest();
@@ -92,6 +95,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("성공적으로 이메일 로그인 처리")
     void signinWithEmail_success() {
         //given
         SigninRequest request = signinRequest();
@@ -110,6 +114,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("비밀번호가 일치하지 않을 때 PASSWORD_INCORRECT 반환")
     void signinWithEmail_fail_incorrectPassword() {
         // given
         SigninRequest request = signinRequest();
@@ -129,6 +134,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("성공적으로 카카오 회원가입 처리")
     void kakao_signup_success(){
         //given
         KakaoInfoResponse kakaoInfoResponse = new KakaoInfoResponse("123456789", "test@test.com", "test");
@@ -150,6 +156,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("성공적으로 카카오 로그인 처리")
     void kakao_signin_success(){
         // given
         KakaoInfoResponse kakaoInfoResponse = new KakaoInfoResponse("123456789", "test@test.com", "test");
