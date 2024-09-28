@@ -1,4 +1,4 @@
-package com.muud.auth.domain.dto;
+package com.muud.auth.domain.dto.response;
 
 public record SignupResponse(String message) {
 
