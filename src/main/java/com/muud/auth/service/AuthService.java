@@ -7,6 +7,7 @@ import com.muud.auth.domain.dto.response.KakaoInfoResponse;
 import com.muud.auth.domain.dto.response.SigninResponse;
 import com.muud.auth.domain.dto.response.TokenResponse;
 import com.muud.auth.exception.AuthException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,9 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtTokenUtils jwtTokenUtils;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${admin-code}")
+    private String ADMIN_CODE;
 
     /**
      * 주어진 사용자 ID에 해당하는 사용자 정보를 반환합니다.
@@ -57,11 +61,15 @@ public class AuthService {
     /**
      * 어드민 권한을 가진 사용자를 등록합니다.
      *
+     * @param authCode 서비스에서 발급한 어드민 인증 코드
      * @param request 어드민 사용자 등록 요청 정보
      * @return Long 등록된 어드민 사용자 ID
      * @throws AuthException 이메일이 중복되면 예외 발생
      */
-    public Long signupAdmin(SignupRequest request){
+    public Long signupAdmin(String authCode, SignupRequest request){
+        if(authCode == null || !authCode.equals(ADMIN_CODE))
+            throw UNAUTHORIZED_ADMIN_CODE.defaultException();
+
         validateEmail(request.email());
         User user = buildUser(request);
         user.grantAdminAuth();

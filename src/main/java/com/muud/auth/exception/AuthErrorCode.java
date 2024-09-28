@@ -15,7 +15,8 @@ public enum AuthErrorCode implements ErrorCode {
     INVALID_TOKEN("유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED),
     TOKEN_EXPIRED("토큰이 만료되었습니다.", HttpStatus.UNAUTHORIZED),
     USER_NOT_FOUND("사용자를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    DEFAULT("인증 처리 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    DEFAULT("인증 처리 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    UNAUTHORIZED_ADMIN_CODE("인증되지 않은 어드민 코드입니다.", HttpStatus.BAD_REQUEST);
 
     private final String message;
     private final HttpStatus status;
