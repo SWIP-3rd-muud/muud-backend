@@ -1,5 +1,6 @@
 package com.muud.auth.controller;
 
+import com.muud.auth.domain.dto.request.RefreshTokenRequest;
 import com.muud.auth.domain.dto.request.SigninRequest;
 import com.muud.auth.domain.dto.request.SignupRequest;
 import com.muud.auth.domain.dto.response.KakaoInfoResponse;
@@ -85,11 +86,8 @@ public class AuthController {
     @ApiResponse(responseCode = "201", description = "토큰 재발급 성공")
     @ApiResponse(responseCode = "401", description = "리프레시 토큰이 유효하지 않거나 누락됨")
     @PostMapping("/auth/refresh")
-    public ResponseEntity<TokenResponse> reIssueToken(@RequestBody Map<String, String> mapToken){
-        String refreshToken = mapToken.get("refreshToken");
-        if(refreshToken==null)
-            throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
-        TokenResponse tokenResponse = authService.reIssueToken(refreshToken);
+    public ResponseEntity<TokenResponse> reIssueToken(@RequestBody RefreshTokenRequest refreshTokenRequest){
+        TokenResponse tokenResponse = authService.reIssueToken(refreshTokenRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(tokenResponse);
     }

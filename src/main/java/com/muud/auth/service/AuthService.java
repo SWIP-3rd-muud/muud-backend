@@ -1,5 +1,6 @@
 package com.muud.auth.service;
 
+import com.muud.auth.domain.dto.request.RefreshTokenRequest;
 import com.muud.auth.domain.dto.request.SigninRequest;
 import com.muud.auth.domain.dto.request.SignupRequest;
 import com.muud.auth.domain.dto.response.KakaoInfoResponse;
@@ -138,19 +139,26 @@ public class AuthService {
     /**
      *  refreshToken을 사용하여 새로운 JWT 토큰을 발급합니다.
      *
-     * @param refreshToken 리프레시 토큰
+     * @param refreshTokenRequest 리프레시 토큰을 담은 요청 객체
      * @return TokenResponse 새로운 JWT 토큰을 담은 응답 객체
-     * @throws AuthException 리프레시 토큰이 유효하지 않거나 만료된 경우 예외 발생
+     * @throws AuthException 리프레시 토큰이 유효하지 않거나 만료된 경우, 토큰의  예외 발생
      */
-    public TokenResponse reIssueToken(String refreshToken) {
+    public TokenResponse reIssueToken(RefreshTokenRequest refreshTokenRequest) {
+        if (refreshTokenRequest == null || refreshTokenRequest.refreshToken() == null) {
+            throw INVALID_TOKEN.defaultException();
+        }
+
+        String refreshToken = refreshTokenRequest.refreshToken();
         jwtTokenUtils.validateToken(refreshToken);
+
         Long userId = Long.valueOf(jwtTokenUtils.getUserIdFromToken(refreshToken));
         User user = getLoginUser(userId);
+
         if (user.validRefreshToken(refreshToken)) {
             String newToken = jwtTokenUtils.reIssueToken(user);
             return TokenResponse.of(newToken);
         } else {
-            throw TOKEN_EXPIRED.defaultException();
+            throw INVALID_TOKEN.defaultException();
         }
     }
 

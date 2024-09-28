@@ -1,4 +1,4 @@
 package com.muud.auth.domain.dto.request;
 
-public class RefreshTokenRequest {
+public record RefreshTokenRequest(String refreshToken) {
 }
