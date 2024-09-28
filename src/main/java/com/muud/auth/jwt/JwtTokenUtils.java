@@ -1,7 +1,6 @@
 package com.muud.auth.jwt;
 
-import com.muud.global.error.ApiException;
-import com.muud.global.error.ExceptionType;
+import com.muud.auth.exception.AuthException;
 import com.muud.user.entity.User;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
@@ -12,6 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import java.util.Base64;
 import java.util.Date;
+
+import static com.muud.auth.exception.AuthErrorCode.*;
 
 @RequiredArgsConstructor
 @Component
@@ -33,11 +34,12 @@ public class JwtTokenUtils {
      *
      * @param request 요청된 http request
      * @return JWT 토큰
+     * @throws AuthException
      */
     public String getTokenFromHeader(HttpServletRequest request){
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (token == null || !token.startsWith(TOKEN_TYPE)) {
-            throw new ApiException(ExceptionType.ACCESS_DENIED_EXCEPTION);
+            throw INVALID_TOKEN.defaultException();
         }else{
             return token.substring(7, token.length());
         }
@@ -48,7 +50,7 @@ public class JwtTokenUtils {
      *
      * @param token 검증 토큰
      * @return 유효 여부, 유효하면 true
-     * @throws ApiException 토큰이 유효하지 않거나, 만료된 경우
+     * @throws AuthException 토큰이 유효하지 않거나, 만료된 경우
      */
     public boolean validateToken(String token){
         try {
@@ -58,11 +60,9 @@ public class JwtTokenUtils {
                     .getBody();
             return true;
         } catch (MalformedJwtException | UnsupportedJwtException | SignatureException e) {
-            e.printStackTrace();
-            throw new ApiException(ExceptionType.INVALID_TOKEN);
+            throw INVALID_TOKEN.defaultException();
         } catch (ExpiredJwtException e) {
-            e.printStackTrace();
-            throw new ApiException(ExceptionType.TOKEN_EXPIRED);
+            throw TOKEN_EXPIRED.defaultException();
         }
     }
 
@@ -71,7 +71,7 @@ public class JwtTokenUtils {
      *
      * @param token JWT 토큰
      * @return 토큰에서 추출한 이메일
-     * @throws ApiException 토큰이 유효하지 않거나, 만료된 경우 또는 이메일 추출에 실패한 경우
+     * @throws AuthException 토큰이 유효하지 않거나, 만료된 경우 또는 이메일 추출에 실패한 경우
      */
     public String getEmailFromToken(String token) {
         try {
@@ -81,9 +81,9 @@ public class JwtTokenUtils {
                     .getBody();
             return (String) claims.get("email");
         } catch (MalformedJwtException | UnsupportedJwtException | SignatureException e) {
-            throw new ApiException(ExceptionType.INVALID_TOKEN);
+            throw INVALID_TOKEN.defaultException();
         } catch (ExpiredJwtException e) {
-            throw new ApiException(ExceptionType.TOKEN_EXPIRED);
+            throw TOKEN_EXPIRED.defaultException();
         }
     }
 
@@ -129,9 +129,9 @@ public class JwtTokenUtils {
             return Jwts.parser().setSigningKey(secretKey)
                     .parseClaimsJws(token).getBody().getSubject();
         }catch (MalformedJwtException | UnsupportedJwtException | SignatureException e) {
-            throw new ApiException(ExceptionType.INVALID_TOKEN);
+            throw INVALID_TOKEN.defaultException();
         } catch (ExpiredJwtException e) {
-            throw new ApiException(ExceptionType.TOKEN_EXPIRED);
+            throw TOKEN_EXPIRED.defaultException();
         }
     }
 
