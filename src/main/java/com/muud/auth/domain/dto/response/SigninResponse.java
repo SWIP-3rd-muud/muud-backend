@@ -1,4 +1,4 @@
-package com.muud.auth.domain.dto;
+package com.muud.auth.domain.dto.response;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.muud.user.dto.UserInfo;
 

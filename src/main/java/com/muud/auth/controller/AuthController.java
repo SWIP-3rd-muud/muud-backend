@@ -1,16 +1,19 @@
 package com.muud.auth.controller;
 
-import com.muud.auth.domain.dto.*;
+import com.muud.auth.domain.dto.request.RefreshTokenRequest;
+import com.muud.auth.domain.dto.request.SigninRequest;
+import com.muud.auth.domain.dto.request.SignupRequest;
+import com.muud.auth.domain.dto.response.KakaoInfoResponse;
+import com.muud.auth.domain.dto.response.SigninResponse;
+import com.muud.auth.domain.dto.response.SignupResponse;
+import com.muud.auth.domain.dto.response.TokenResponse;
 import com.muud.auth.service.AuthService;
 import com.muud.auth.service.KakaoService;
-import com.muud.global.error.ApiException;
-import com.muud.global.error.ExceptionType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +27,6 @@ public class AuthController {
 
     private final AuthService authService;
     private final KakaoService kakaoService;
-    @Value("${admin-code}")
-    private String ADMIN_CODE;
 
     @Operation(summary = "이메일로 회원가입", description = "이메일을 사용하여 새로운 사용자 계정을 생성합니다.")
     @ApiResponse(responseCode = "201", description = "회원가입 성공")
@@ -69,9 +70,7 @@ public class AuthController {
     @ApiResponse(responseCode = "409", description = "이미 가입된 회원")
     @PostMapping("/auth/signup/admin")
     public ResponseEntity<SignupResponse> signupAdmin(@RequestBody SignupRequest signupRequest, @RequestHeader(name = "Auth_Code") String authCode){
-        if(!authCode.equals(ADMIN_CODE))
-            throw new ApiException(ExceptionType.FORBIDDEN_USER);
-        Long userId = authService.signupAdmin(signupRequest);
+        Long userId = authService.signupAdmin(authCode, signupRequest);
         return ResponseEntity.created(URI.create("/users/"+userId))
                 .body(SignupResponse.of());
     }
@@ -80,11 +79,8 @@ public class AuthController {
     @ApiResponse(responseCode = "201", description = "토큰 재발급 성공")
     @ApiResponse(responseCode = "401", description = "리프레시 토큰이 유효하지 않거나 누락됨")
     @PostMapping("/auth/refresh")
-    public ResponseEntity<TokenResponse> reIssueToken(@RequestBody Map<String, String> mapToken){
-        String refreshToken = mapToken.get("refreshToken");
-        if(refreshToken==null)
-            throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
-        TokenResponse tokenResponse = authService.reIssueToken(refreshToken);
+    public ResponseEntity<TokenResponse> reIssueToken(@RequestBody RefreshTokenRequest refreshTokenRequest){
+        TokenResponse tokenResponse = authService.reIssueToken(refreshTokenRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(tokenResponse);
     }

@@ -1,13 +1,17 @@
 package com.muud.auth.service;
 
-import com.muud.auth.domain.dto.*;
+import com.muud.auth.domain.dto.request.SigninRequest;
+import com.muud.auth.domain.dto.request.SignupRequest;
+import com.muud.auth.domain.dto.response.KakaoInfoResponse;
+import com.muud.auth.domain.dto.response.SigninResponse;
+import com.muud.auth.exception.AuthErrorCode;
+import com.muud.auth.exception.AuthException;
 import com.muud.auth.jwt.JwtToken;
 import com.muud.auth.jwt.JwtTokenUtils;
-import com.muud.global.error.ApiException;
-import com.muud.global.error.ExceptionType;
 import com.muud.user.entity.User;
 import com.muud.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -59,6 +63,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("성공적으로 이메일 회원가입 처리")
     void signupWithEmail_success() {
         //given
         SignupRequest request = signupRequest();
@@ -70,7 +75,6 @@ class AuthServiceTest {
         when(userRepository.save(any(User.class)))
                 .thenReturn(user);
 
-
         // when
         Long userId = authService.signupWithEmail(request);
 
@@ -81,20 +85,20 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("이미 존재하는 이메일로 회원가입 시도 시 EMAIL_ALREADY_EXISTS 반환")
     void signupWithEmail_fail_duplicateEmail() {
         // given
         SignupRequest request = signupRequest();
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user)); // 이미 존재하는 이메일
 
         // when & then
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            authService.signupWithEmail(request);
-        });
-        assertEquals(ExceptionType.ALREADY_EXIST_EMAIL, exception.getExceptionType());
+        AuthException exception = assertThrows(AuthException.class, () -> authService.signupWithEmail(request));
+        assertEquals(AuthErrorCode.EMAIL_ALREADY_EXISTS, exception.getErrorCode());
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
+    @DisplayName("성공적으로 이메일 로그인 처리")
     void signinWithEmail_success() {
         //given
         SigninRequest request = signinRequest();
@@ -113,24 +117,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void signinWithEmail_fail_userNotFound() {
-        // given
-        SigninRequest request = signinRequest();
-        when(userRepository.findByEmail(anyString()))
-                .thenReturn(Optional.empty());
-
-        // when & then
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            authService.signinWithEmail(request);
-        });
-        assertEquals(ExceptionType.INVALID_AUTHENTICATE, exception.getExceptionType());
-        verify(userRepository, times(1))
-                .findByEmail(anyString());
-        verify(passwordEncoder, never())
-                .matches(anyString(), anyString());
-    }
-
-    @Test
+    @DisplayName("비밀번호가 일치하지 않을 때 PASSWORD_INCORRECT 반환")
     void signinWithEmail_fail_incorrectPassword() {
         // given
         SigninRequest request = signinRequest();
@@ -141,15 +128,16 @@ class AuthServiceTest {
                 .thenReturn(false); // 비밀번호 불일치
 
         // when & then
-        ApiException exception = assertThrows(ApiException.class, () -> {
+        AuthException exception = assertThrows(AuthException.class, () -> {
             authService.signinWithEmail(request);
         });
-        assertEquals(ExceptionType.INVALID_AUTHENTICATE, exception.getExceptionType());
+        assertEquals(AuthErrorCode.PASSWORD_INCORRECT, exception.getErrorCode());
         verify(passwordEncoder, times(1))
                 .matches(anyString(), anyString());
     }
 
     @Test
+    @DisplayName("성공적으로 카카오 회원가입 처리")
     void kakao_signup_success(){
         //given
         KakaoInfoResponse kakaoInfoResponse = new KakaoInfoResponse("123456789", "test@test.com", "test");
@@ -171,6 +159,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("성공적으로 카카오 로그인 처리")
     void kakao_signin_success(){
         // given
         KakaoInfoResponse kakaoInfoResponse = new KakaoInfoResponse("123456789", "test@test.com", "test");

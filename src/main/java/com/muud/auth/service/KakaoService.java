@@ -1,6 +1,6 @@
 package com.muud.auth.service;
 
-import com.muud.auth.domain.dto.KakaoInfoResponse;
+import com.muud.auth.domain.dto.response.KakaoInfoResponse;
 import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
 import org.json.simple.JSONObject;

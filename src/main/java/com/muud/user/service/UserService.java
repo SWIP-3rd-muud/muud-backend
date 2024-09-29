@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.muud.auth.exception.AuthErrorCode.ACCESS_DENIED;
+import static com.muud.auth.exception.AuthErrorCode.USER_NOT_FOUND;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -20,12 +23,12 @@ public class UserService {
 
     public UserInfo changeUserNickname(Long userId, UserInfoUpdateRequest infoUpdateRequest) {
         if(!SecurityUtils.checkCurrentUserId(userId)) {
-            throw new ApiException(ExceptionType.FORBIDDEN_USER);
+            throw ACCESS_DENIED.defaultException();
         }
 
         String nickname = infoUpdateRequest.nickname();
         User user = userRepository.findById(userId)
-                .orElseThrow(()->new ApiException(ExceptionType.BAD_REQUEST));
+                .orElseThrow(USER_NOT_FOUND::defaultException);
         user.updateNickname(nickname);
 
         return user.toDto();

@@ -1,8 +1,13 @@
 package com.muud.auth.service;
 
-import com.muud.auth.domain.dto.*;
-import com.muud.global.error.ApiException;
-import com.muud.global.error.ExceptionType;
+import com.muud.auth.domain.dto.request.RefreshTokenRequest;
+import com.muud.auth.domain.dto.request.SigninRequest;
+import com.muud.auth.domain.dto.request.SignupRequest;
+import com.muud.auth.domain.dto.response.KakaoInfoResponse;
+import com.muud.auth.domain.dto.response.SigninResponse;
+import com.muud.auth.domain.dto.response.TokenResponse;
+import com.muud.auth.exception.AuthException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +19,8 @@ import com.muud.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.muud.auth.exception.AuthErrorCode.*;
+
 @Transactional
 @Service @RequiredArgsConstructor
 public class AuthService {
@@ -22,17 +29,20 @@ public class AuthService {
     private final JwtTokenUtils jwtTokenUtils;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${admin-code}")
+    private String ADMIN_CODE;
+
     /**
      * 주어진 사용자 ID에 해당하는 사용자 정보를 반환합니다.
      *
      * @param userId 사용자 ID
      * @return User 사용자 객체
-     * @throws ApiException 사용자가 존재하지 않으면 예외를 발생시킵니다.
+     * @throws AuthException 사용자가 존재하지 않으면 예외를 발생시킵니다.
      */
     @Transactional(readOnly = true)
     public User getLoginUser(Long userId){
         return userRepository.findById(userId)
-                .orElseThrow(()->new ApiException(ExceptionType.INVALID_TOKEN));
+                .orElseThrow(INVALID_TOKEN::defaultException);
     }
 
     /**
@@ -40,7 +50,7 @@ public class AuthService {
      *
      * @param request 사용자 등록 요청 정보
      * @return Long 등록된 사용자 ID
-     * @throws ApiException 이메일이 중복되면 예외 발생
+     * @throws AuthException 이메일이 중복되면 예외 발생
      */
     public Long signupWithEmail(SignupRequest request) {
         validateEmail(request.email());
@@ -51,11 +61,15 @@ public class AuthService {
     /**
      * 어드민 권한을 가진 사용자를 등록합니다.
      *
+     * @param authCode 서비스에서 발급한 어드민 인증 코드
      * @param request 어드민 사용자 등록 요청 정보
      * @return Long 등록된 어드민 사용자 ID
-     * @throws ApiException 이메일이 중복되면 예외 발생
+     * @throws AuthException 이메일이 중복되면 예외 발생
      */
-    public Long signupAdmin(SignupRequest request){
+    public Long signupAdmin(String authCode, SignupRequest request){
+        if(authCode == null || !authCode.equals(ADMIN_CODE))
+            throw UNAUTHORIZED_ADMIN_CODE.defaultException();
+
         validateEmail(request.email());
         User user = buildUser(request);
         user.grantAdminAuth();
@@ -67,16 +81,16 @@ public class AuthService {
      *
      * @param signinRequest 로그인 요청 정보
      * @return SigninResponse 로그인 결과와 토큰 정보를 담은 응답 객체
-     * @throws ApiException 이메일이 없거나 비밀번호가 틀리면 예외 발생
+     * @throws AuthException 이메일이 없거나 비밀번호가 틀리면 예외 발생
      */
     public SigninResponse signinWithEmail(SigninRequest signinRequest){
         User user = userRepository.findByEmail(signinRequest.email())
-                .orElseThrow(() ->
-                        new ApiException(ExceptionType.INVALID_AUTHENTICATE));
+                .orElseThrow(EMAIL_NOT_FOUND::defaultException);
+
         if(passwordEncoder.matches(signinRequest.password(), user.getPassword())) {
             return generateSigninResponse(user, false);
         } else {
-            throw new ApiException(ExceptionType.INVALID_AUTHENTICATE);
+            throw PASSWORD_INCORRECT.defaultException();
         }
     }
 
@@ -116,11 +130,11 @@ public class AuthService {
      * 주어진 이메일이 이미 존재하는지 확인하고, 존재하면 예외를 발생시킵니다.
      *
      * @param email 사용자 이메일
-     * @throws ApiException 이메일이 이미 존재하는 경우 예외 발생
+     * @throws AuthException 이메일이 이미 존재하는 경우 예외 발생
      */
     private void validateEmail(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new ApiException(ExceptionType.ALREADY_EXIST_EMAIL);
+            throw EMAIL_ALREADY_EXISTS.defaultException();
         }
     }
 
@@ -133,19 +147,26 @@ public class AuthService {
     /**
      *  refreshToken을 사용하여 새로운 JWT 토큰을 발급합니다.
      *
-     * @param refreshToken 리프레시 토큰
+     * @param refreshTokenRequest 리프레시 토큰을 담은 요청 객체
      * @return TokenResponse 새로운 JWT 토큰을 담은 응답 객체
-     * @throws ApiException 리프레시 토큰이 유효하지 않거나 만료된 경우 예외 발생
+     * @throws AuthException 리프레시 토큰이 유효하지 않거나 만료된 경우, 토큰의  예외 발생
      */
-    public TokenResponse reIssueToken(String refreshToken) {
+    public TokenResponse reIssueToken(RefreshTokenRequest refreshTokenRequest) {
+        if (refreshTokenRequest == null || refreshTokenRequest.refreshToken() == null) {
+            throw INVALID_TOKEN.defaultException();
+        }
+
+        String refreshToken = refreshTokenRequest.refreshToken();
         jwtTokenUtils.validateToken(refreshToken);
+
         Long userId = Long.valueOf(jwtTokenUtils.getUserIdFromToken(refreshToken));
         User user = getLoginUser(userId);
+
         if (user.validRefreshToken(refreshToken)) {
             String newToken = jwtTokenUtils.reIssueToken(user);
             return TokenResponse.of(newToken);
         } else {
-            throw new ApiException(ExceptionType.TOKEN_EXPIRED, "Refresh token is invalid or expired");
+            throw INVALID_TOKEN.defaultException();
         }
     }
 

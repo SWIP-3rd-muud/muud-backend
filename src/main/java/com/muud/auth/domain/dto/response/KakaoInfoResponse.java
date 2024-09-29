@@ -1,4 +1,4 @@
-package com.muud.auth.domain.dto;
+package com.muud.auth.domain.dto.response;
 
 import com.muud.user.entity.LoginType;
 import com.muud.user.entity.User;
