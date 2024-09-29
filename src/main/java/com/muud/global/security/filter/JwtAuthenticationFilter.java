@@ -2,6 +2,7 @@ package com.muud.auth.jwt;
 
 import com.muud.auth.service.UserPrincipalService;
 import com.muud.auth.service.UserPrincipal;
+import com.muud.global.exception.support.CustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,19 +27,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = jwtTokenUtils.getTokenFromHeader(request);
-        if (token != null) {
-            String email = jwtTokenUtils.getEmailFromToken(token);
-            UserPrincipal userDetails = principalService.loadUserByUsername(email);
-            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            String token = jwtTokenUtils.getTokenFromHeader(request);
+            if (token != null) {
+                String email = jwtTokenUtils.getEmailFromToken(token);
+                UserPrincipal userDetails = principalService.loadUserByUsername(email);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+
+            filterChain.doFilter(request, response);
+        }catch (CustomException e) {
+            log.error(e.getMessage());
+            throw e;
         }
 
-        filterChain.doFilter(request, response);
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request){
         String path = request.getRequestURI();
         return path.startsWith("/auth/") ||
                 path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs");
