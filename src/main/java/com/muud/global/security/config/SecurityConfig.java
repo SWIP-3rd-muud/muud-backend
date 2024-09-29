@@ -1,7 +1,7 @@
-package com.muud.global.config;
+package com.muud.global.security.config;
 
-
-import com.muud.auth.jwt.JwtAuthenticationFilter;
+import com.muud.global.security.exception.AccessDeniedHandlerImpl;
+import com.muud.global.security.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,18 +22,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AccessDeniedHandlerImpl accessDeniedHandlerImpl;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/health-check").permitAll()
                         .requestMatchers(HttpMethod.POST, "/playlists/data", "/playlists").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/playlists/{playlistId}").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .accessDeniedHandler(accessDeniedHandlerImpl)
+                );
 
         return http.build();
     }

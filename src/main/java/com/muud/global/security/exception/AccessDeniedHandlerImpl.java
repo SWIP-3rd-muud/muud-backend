@@ -1,4 +1,4 @@
-package com.muud.global.security.filter;
+package com.muud.global.security.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.muud.global.exception.response.ApiResponseError;
