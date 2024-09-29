@@ -1,7 +1,11 @@
-package com.muud.auth.jwt;
+package com.muud.global.security.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.muud.auth.exception.AuthException;
+import com.muud.auth.jwt.JwtTokenUtils;
 import com.muud.auth.service.UserPrincipalService;
 import com.muud.auth.service.UserPrincipal;
+import com.muud.global.exception.response.ApiResponseError;
 import com.muud.global.exception.support.CustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,8 +18,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
+
 
 @RequiredArgsConstructor
 @Component
@@ -24,9 +28,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtils jwtTokenUtils;
     private final UserPrincipalService principalService;
+    private final ObjectMapper objectMapper;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
         try {
             String token = jwtTokenUtils.getTokenFromHeader(request);
             if (token != null) {
@@ -37,9 +42,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             filterChain.doFilter(request, response);
-        }catch (CustomException e) {
-            log.error(e.getMessage());
-            throw e;
+        }
+        catch (CustomException e) {
+            log.error("Exception occurred: {}", e.getMessage());
+            setResponse(response, e);
+        }
+        catch (ServletException | IOException e) {
+            log.error("Exception during filter processing: {}", e.getMessage(), e);
+            setResponse(response, new AuthException(e.getMessage(), e.getCause()));
         }
 
     }
@@ -49,6 +59,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         return path.startsWith("/auth/") ||
                 path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs");
+    }
+
+
+    private void setResponse(HttpServletResponse response, CustomException e) {
+        try {
+            ApiResponseError responseError = ApiResponseError.from(e);
+            response.setStatus(responseError.status());
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(objectMapper.writeValueAsString(responseError));
+        } catch (IOException ex) {
+            log.error("Exception during filter processing: {}", e.getMessage(), e);
+        }
     }
 
 }
