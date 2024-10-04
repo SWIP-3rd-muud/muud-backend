@@ -5,6 +5,8 @@ import com.muud.global.error.ApiException;
 import com.muud.global.error.ExceptionType;
 import com.muud.playlist.domain.PlayList;
 import com.muud.playlist.domain.dto.VideoDto;
+import com.muud.playlist.exception.PlayListErrorCode;
+import com.muud.playlist.exception.PlayListException;
 import com.muud.playlist.repository.PlayListRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -87,15 +89,15 @@ public class PlayListServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 playListId가 넘어오면 BAD_REQUEST 예외가 발생")
+    @DisplayName("존재하지 않는 playListId가 넘어오면 PLAY_LIST_NOT_FOUND 예외가 발생")
     public void testGetPlayList_NotFound() {
         // given
         Long playListId = 1L;
         when(playListRepository.findById(playListId)).thenReturn(Optional.empty());
 
         // when & then
-        ApiException exception = assertThrows(ApiException.class, () -> playListService.getPlayList(playListId));
-        assertEquals(ExceptionType.BAD_REQUEST, exception.getExceptionType());
+        PlayListException exception = assertThrows(PlayListException.class, () -> playListService.getPlayList(playListId));
+        assertEquals(PlayListErrorCode.PLAY_LIST_NOT_FOUND, exception.getErrorCode());
         verify(playListRepository, times(1)).findById(playListId);
     }
 
