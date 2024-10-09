@@ -1,5 +1,6 @@
 package com.muud.library.service;
 
+import com.muud.global.util.SecurityUtils;
 import com.muud.library.domain.dto.LibraryResponse;
 import com.muud.library.domain.entity.Library;
 import com.muud.library.domain.entity.LibraryPlayList;
@@ -12,11 +13,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.muud.playlist.exception.PlayListErrorCode.PLAY_LIST_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class LibraryService {
 
     private final LibraryRepository libraryRepository;
@@ -28,7 +31,8 @@ public class LibraryService {
         return libraries.map(libraryMapper::toResponse);
     }
 
-    public LibraryResponse createCollection(User user, String title, Long playListId) {
+    @Transactional
+    public LibraryResponse createLibrary(User user, String title, Long playListId) {
         Library library = libraryMapper.toLibrary(user, title);
         if(playListId!=null) {
             PlayList playList = getPlayList(playListId);
@@ -42,5 +46,20 @@ public class LibraryService {
     public PlayList getPlayList(Long playListId) {
         return playListRepository.findById(playListId)
                 .orElseThrow(PLAY_LIST_NOT_FOUND::defaultException);
+    }
+
+    @Transactional
+    public void deleteLibrary(Long libraryId) {
+        Library library = getLibrary(libraryId);
+        libraryRepository.delete(library);
+    }
+
+    public Library getLibrary(Long libraryId) {
+        Library library = libraryRepository.findById(libraryId)
+                .orElseThrow();
+        if(!SecurityUtils.checkCurrentUserId(library.getOwner().getId())){
+            throw new RuntimeException();
+        }
+        return library;
     }
 }

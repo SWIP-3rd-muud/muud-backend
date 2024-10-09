@@ -14,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
@@ -39,10 +36,19 @@ public class LibraryController {
     @Operation(description = "보관함을 생성한다.", summary = "보관함 추가")
     @ApiResponse(responseCode = "201", description = "보관함 추가 성공")
     @PostMapping("/libraries")
-    public ResponseEntity<LibraryResponse> createCollection(@RequestParam String title,
-                                                            @RequestParam(required = false) Long playListId){
-        LibraryResponse libraryResponse = libraryService.createCollection(SecurityUtils.getCurrentUser(), title, playListId);
+    public ResponseEntity<LibraryResponse> createLibrary(@RequestParam String title,
+                                                         @RequestParam(required = false) Long playListId){
+        LibraryResponse libraryResponse = libraryService.createLibrary(SecurityUtils.getCurrentUser(), title, playListId);
         return ResponseEntity.created(URI.create("/libraries/"+libraryResponse.id()))
                 .body(libraryResponse);
     }
+
+    @Operation(description = "보관함을 삭제한다.", summary = "보관함 삭제")
+    @ApiResponse(responseCode = "204", description = "보관함 삭제 성공")
+    @DeleteMapping("/libraries/{libraryId}")
+    public ResponseEntity<Void> deleteLibrary(@PathVariable Long libraryId){
+        libraryService.deleteLibrary(libraryId);
+        return ResponseEntity.noContent().build();
+    }
+
 }
