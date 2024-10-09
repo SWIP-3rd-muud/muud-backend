@@ -1,18 +1,14 @@
 package com.muud.playlist.service;
 
 import com.muud.emotion.domain.Emotion;
-import com.muud.global.error.ApiException;
-import com.muud.global.error.ExceptionType;
 import com.muud.playlist.domain.dto.VideoDto;
 import com.muud.playlist.domain.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
+import static com.muud.playlist.exception.PlayListErrorCode.PLAY_LIST_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +23,7 @@ public class PlayListService {
 
     public PlayList getPlayList(Long playListId) {
         return playListRepository.findById(playListId)
-                .orElseThrow(()-> new ApiException(ExceptionType.BAD_REQUEST));
+                .orElseThrow(PLAY_LIST_NOT_FOUND::defaultException);
     }
 
     public void removePlayList(Long playlistId) {

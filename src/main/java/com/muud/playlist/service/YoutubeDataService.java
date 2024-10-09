@@ -5,8 +5,6 @@ import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoSnippet;
 import com.muud.emotion.domain.Emotion;
-import com.muud.global.error.ApiException;
-import com.muud.global.error.ExceptionType;
 import com.muud.playlist.domain.dto.PlayListRequest;
 import com.muud.playlist.domain.PlayList;
 import com.muud.playlist.repository.PlayListRepository;
@@ -16,10 +14,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Collections;
 import java.util.stream.Collectors;
+import static com.muud.playlist.exception.PlayListErrorCode.YOUTUBE_REQUEST_ERROR;
 
 @Service
 @RequiredArgsConstructor
@@ -32,19 +34,24 @@ public class YoutubeDataService {
     private final YouTube youtube;
 
     @Transactional
-    public int upsertPlayList() throws IOException {
+    public int upsertPlayList() {
         log.info("===playlist data upsert job start===");
         List<PlayList> playLists = new ArrayList<>();
         Set<String> idSet = new HashSet<>();
 
-        for (Emotion emotion : Emotion.values()) {
-            List<String> ids = fetchVideoIdsByEmotion(emotion);
-            ids.removeIf(idSet::contains);  // 중복 제거
-            idSet.addAll(ids);
-            playLists.addAll(getVideoDetails(emotion, ids));
-        }
+        try {
+            for (Emotion emotion : Emotion.values()) {
+                List<String> ids = fetchVideoIdsByEmotion(emotion);
+                ids.removeIf(idSet::contains);  // 중복 제거
+                idSet.addAll(ids);
+                playLists.addAll(getVideoDetails(emotion, ids));
+            }
 
-        return savePlayList(playLists).size();
+            return savePlayList(playLists).size();
+        }catch (IOException e) {
+            log.error(e.getMessage());
+            throw YOUTUBE_REQUEST_ERROR.defaultException();
+        }
     }
 
     protected List<String> fetchVideoIdsByEmotion(Emotion emotion) throws IOException {
@@ -65,14 +72,9 @@ public class YoutubeDataService {
 
     @Transactional
     public void addPlayList(PlayListRequest playListRequestList) {
-        playListRequestList.getPlayLists().forEach((emotion, videoIds) -> {
-            try {
-                List<PlayList> playLists = getVideoDetails(emotion, videoIds);
-                savePlayList(playLists);
-            } catch (IOException e) {
-                log.error(e.getMessage());
-                throw new ApiException(ExceptionType.SYSTEM_ERROR);
-            }
+        playListRequestList.playLists().forEach((emotion, videoIds) -> {
+            List<PlayList> playLists = getVideoDetails(emotion, videoIds);
+            savePlayList(playLists);
         });
     }
 
@@ -90,53 +92,65 @@ public class YoutubeDataService {
         return playListRepository.saveAll(playLists);
     }
 
-    public List<PlayList> getVideoDetails(Emotion emotion, List<String> videoIds) throws IOException {
+    public List<PlayList> getVideoDetails(Emotion emotion, List<String> videoIds) {
         if (videoIds.isEmpty()) return Collections.emptyList();
 
-        YouTube.Videos.List request = youtube.videos().list(Collections.singletonList("snippet"));
-        request.setKey(apiKey).setId(videoIds);
-        List<Video> videoList = request.execute().getItems();
-        return videoList.stream().map(video -> {
-            VideoSnippet snippet = video.getSnippet();
-            return PlayList.builder()
-                    .videoId(video.getId())
-                    .title(snippet.getTitle())
-                    .channelName(snippet.getChannelTitle())
-                    .tags(snippet.getTags())
-                    .emotion(emotion)
-                    .build();
-        }).collect(Collectors.toList());
+        try {
+            YouTube.Videos.List request = youtube.videos().list(Collections.singletonList("snippet"));
+            request.setKey(apiKey).setId(videoIds);
+            List<Video> videoList = request.execute().getItems();
+
+            return videoList.stream().map(video -> {
+                VideoSnippet snippet = video.getSnippet();
+                return PlayList.builder()
+                        .videoId(video.getId())
+                        .title(snippet.getTitle())
+                        .channelName(snippet.getChannelTitle())
+                        .tags(snippet.getTags())
+                        .emotion(emotion)
+                        .build();
+            }).collect(Collectors.toList());
+        }catch (IOException e) {
+            log.error(e.getMessage());
+            throw YOUTUBE_REQUEST_ERROR.defaultException();
+        }
     }
 
     @Scheduled(cron = "0 30 4 * * *")
     @Transactional
-    public void checkAndRemoveDeletedVideos() throws IOException {
+    public void checkAndRemoveDeletedVideos() {
         //모든 플레이리스트에 대해 수행
         List<String> allVideoIds = getAllVideoIds();
         List<String> deletedVideoIds = new ArrayList<>();
 
-        YouTube.Videos.List request = youtube.videos().list(Collections.singletonList("id"));
-        request.setKey(apiKey);
+        try {
+            YouTube.Videos.List request = youtube.videos().list(Collections.singletonList("id"));
+            request.setKey(apiKey);
 
-        //50개씩 나눠서 수행
-        for (List<String> videoIdsBatch : partitionList(allVideoIds, 50)) {
-            request.setId(videoIdsBatch);
-            List<Video> videos = request.execute().getItems();
+            //50개씩 나눠서 수행
+            for (List<String> videoIdsBatch : partitionList(allVideoIds, 50)) {
+                request.setId(videoIdsBatch);
+                List<Video> videos = request.execute().getItems();
 
-            Set<String> existingVideoIds = videos.stream()
-                    .map(Video::getId)
-                    .collect(Collectors.toSet());
+                Set<String> existingVideoIds = videos.stream()
+                        .map(Video::getId)
+                        .collect(Collectors.toSet());
 
-            for (String videoId : videoIdsBatch) {
-                if (!existingVideoIds.contains(videoId)) {
-                    deletedVideoIds.add(videoId);
+                for (String videoId : videoIdsBatch) {
+                    if (!existingVideoIds.contains(videoId)) {
+                        deletedVideoIds.add(videoId);
+                    }
                 }
             }
+
+            if (!deletedVideoIds.isEmpty()) {
+                playListRepository.deleteByVideoIds(deletedVideoIds);
+            }
+        }catch (IOException e) {
+            log.error(e.getMessage());
+            throw YOUTUBE_REQUEST_ERROR.defaultException();
         }
 
-        if (!deletedVideoIds.isEmpty()) {
-            playListRepository.deleteByVideoIds(deletedVideoIds);
-        }
     }
 
     public List<String> getAllVideoIds() {

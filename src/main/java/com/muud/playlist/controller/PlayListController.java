@@ -2,9 +2,6 @@ package com.muud.playlist.controller;
 
 import com.muud.emotion.domain.Emotion;
 import com.muud.global.common.PageResponse;
-import com.muud.global.error.ApiException;
-import com.muud.global.error.ExceptionType;
-import com.muud.global.error.ResponseError;
 import com.muud.playlist.domain.dto.PlayListRequest;
 import com.muud.playlist.domain.dto.VideoDto;
 import com.muud.playlist.service.PlayListService;
@@ -20,8 +17,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 import java.util.Map;
 
 
@@ -49,13 +44,9 @@ public class PlayListController {
     @ApiResponse(responseCode = "500", description = "서버 에러")
     @PostMapping("/playlists/data")
     public ResponseEntity updatePlayLists(){
-        try {
-            youtubeDataService.upsertPlayList();
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(Map.of("message", "success"));
-        } catch (IOException e) {
-            throw new ApiException(ExceptionType.SYSTEM_ERROR);
-        }
+        youtubeDataService.upsertPlayList();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "success"));
     }
 
     @Operation(description = "관리자 권한으로 특정 PlayList들을 생성합니다.", summary = "플레이 리스트 추가")
@@ -78,13 +69,6 @@ public class PlayListController {
     public ResponseEntity deletePlayList(@PathVariable Long playlistId){
         playListService.removePlayList(playlistId);
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ResponseError> handleInvalidEnumValueException(IllegalArgumentException ex) {
-        return ResponseEntity.badRequest()
-                .body(new ResponseError(ExceptionType.INVALID_INPUT_VALUE.getMessage()));
     }
 
 }
