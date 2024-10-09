@@ -5,6 +5,7 @@ import com.muud.playlist.domain.PlayList;
 import com.muud.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,4 +31,16 @@ public class Library extends BaseEntity {
     @OneToMany(mappedBy = "library", cascade = CascadeType.ALL)
     private List<LibraryPlayList> libraryPlayLists = new ArrayList<>();
 
+    @Builder
+    public Library(String title, User owner, List<LibraryPlayList> libraryPlayLists) {
+        this.title = title;
+        this.owner = owner;
+        this.libraryPlayLists = libraryPlayLists;
+    }
+
+    public void addPlayList(LibraryPlayList playList) {
+        if(libraryPlayLists==null)
+            libraryPlayLists = new ArrayList<>();
+        libraryPlayLists.add(playList);
+    }
 }

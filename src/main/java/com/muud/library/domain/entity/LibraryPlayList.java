@@ -3,6 +3,7 @@ package com.muud.library.domain.entity;
 import com.muud.playlist.domain.PlayList;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,4 +26,9 @@ public class LibraryPlayList {
     @JoinColumn(name = "playlist_id")
     private PlayList playList;
 
+    @Builder
+    public LibraryPlayList(Library library, PlayList playList) {
+        this.library = library;
+        this.playList = playList;
+    }
 }

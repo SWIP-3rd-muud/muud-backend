@@ -3,7 +3,9 @@ package com.muud.library.domain.mapper;
 import com.muud.library.domain.dto.LibraryResponse;
 import com.muud.library.domain.entity.Library;
 import com.muud.library.domain.entity.LibraryPlayList;
+import com.muud.playlist.domain.PlayList;
 import com.muud.playlist.domain.dto.VideoDto;
+import com.muud.user.entity.User;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -17,11 +19,11 @@ public class LibraryMapper {
         return new LibraryResponse(
                 library.getId(),
                 library.getTitle(),
-                mapLibraryPlayListsToVideoDtos(library.getLibraryPlayLists())
+                toLibraryPlayListsToVideoDtos(library.getLibraryPlayLists())
         );
     }
 
-    public List<VideoDto> mapLibraryPlayListsToVideoDtos(List<LibraryPlayList> libraryPlayLists) {
+    public List<VideoDto> toLibraryPlayListsToVideoDtos(List<LibraryPlayList> libraryPlayLists) {
         if (libraryPlayLists == null) {
             return Collections.emptyList();
         }
@@ -31,4 +33,17 @@ public class LibraryMapper {
                 .collect(Collectors.toList());
     }
 
+    public Library toLibrary(User user, String title) {
+        return Library.builder()
+                .owner(user)
+                .title(title)
+                .build();
+    }
+
+    public LibraryPlayList toLibraryPlayList(Library library, PlayList playList) {
+        return LibraryPlayList.builder()
+                .library(library)
+                .playList(playList)
+                .build();
+    }
 }
