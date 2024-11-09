@@ -1,7 +1,6 @@
 package com.muud.library.domain.entity;
 
 import com.muud.global.common.BaseEntity;
-import com.muud.playlist.domain.PlayList;
 import com.muud.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
